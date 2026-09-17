@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>중3 수학 RPG - 아르카니스: 수학의 수호자</title>
   
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- FontAwesome Icons -->
+  <!-- FontAwesome Icons CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- KaTeX 수식 렌더러 -->
+  <!-- KaTeX 수식 렌더러 CDN -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
 
@@ -23,29 +23,37 @@
       -webkit-user-select: none;
     }
 
-    /* 전투 횡방향 상호 돌진 애니메이션 */
-    @keyframes playerAttackRush {
-      0% { transform: translateX(0) scale(1); }
-      40% { transform: translateX(110px) scale(1.15) rotate(4deg); }
-      70% { transform: translateX(125px) scale(1.18) rotate(-2deg); }
-      100% { transform: translateX(0) scale(1); }
-    }
-    @keyframes monsterAttackRush {
-      0% { transform: translateX(0) scale(1); }
-      40% { transform: translateX(-110px) scale(1.15) rotate(-4deg); }
-      70% { transform: translateX(-125px) scale(1.18) rotate(2deg); }
-      100% { transform: translateX(0) scale(1); }
-    }
-    @keyframes hitShake {
-      0%, 100% { transform: translateX(0); filter: brightness(1); }
-      20% { transform: translateX(-10px) rotate(-4deg); filter: brightness(2) drop-shadow(0 0 12px #ef4444); }
-      40% { transform: translateX(10px) rotate(4deg); }
-      60% { transform: translateX(-8px); }
-      80% { transform: translateX(8px); }
-    }
+    /* 횡방향 공방 돌진 및 타격 애니메이션 (반응형 clamp 거리 적용) */
     @keyframes floatingIdle {
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-7px); }
+    }
+    @keyframes playerRush {
+      0% { transform: translateX(0) scale(1); }
+      20% { transform: translateX(-25px) scale(0.95); } /* 뒤로 당기는 예비동작 */
+      55% { transform: translateX(clamp(130px, 34vw, 320px)) scale(1.25) rotate(8deg); filter: brightness(1.6) drop-shadow(0 0 18px #6366f1); } /* 전방 돌진 강타 */
+      75% { transform: translateX(clamp(140px, 36vw, 340px)) scale(1.28) rotate(-4deg); }
+      100% { transform: translateX(0) scale(1); filter: brightness(1); }
+    }
+    @keyframes monsterRush {
+      0% { transform: translateX(0) scale(1); }
+      20% { transform: translateX(25px) scale(0.95); } /* 뒤로 당기는 예비동작 */
+      55% { transform: translateX(clamp(-320px, -34vw, -130px)) scale(1.25) rotate(-8deg); filter: brightness(1.6) drop-shadow(0 0 18px #ef4444); } /* 전방 돌진 강타 */
+      75% { transform: translateX(clamp(-340px, -36vw, -140px)) scale(1.28) rotate(4deg); }
+      100% { transform: translateX(0) scale(1); filter: brightness(1); }
+    }
+    @keyframes hitShake {
+      0%, 100% { transform: translateX(0) scale(1); filter: brightness(1); }
+      15% { transform: translateX(-16px) scale(1.1) rotate(-6deg); filter: brightness(2.2) drop-shadow(0 0 20px #ef4444); }
+      35% { transform: translateX(16px) scale(1.1) rotate(6deg); }
+      55% { transform: translateX(-12px); }
+      75% { transform: translateX(10px); }
+      90% { transform: translateX(-4px); }
+    }
+    @keyframes slashFlash {
+      0% { opacity: 0; transform: scale(0.4) rotate(-35deg); }
+      50% { opacity: 1; transform: scale(1.4) rotate(0deg); }
+      100% { opacity: 0; transform: scale(1.8) rotate(35deg); }
     }
     @keyframes damageFloat {
       0% { opacity: 1; transform: translateY(0) scale(1); }
@@ -53,10 +61,11 @@
       100% { opacity: 0; transform: translateY(-55px) scale(0.85); }
     }
 
-    .anim-player-attack { animation: playerAttackRush 0.45s ease-in-out; }
-    .anim-monster-attack { animation: monsterAttackRush 0.45s ease-in-out; }
-    .anim-hit-shake { animation: hitShake 0.45s ease-in-out; }
     .anim-idle { animation: floatingIdle 3s ease-in-out infinite; }
+    .anim-player-attack { animation: playerRush 0.55s cubic-bezier(0.22, 1, 0.36, 1) !important; z-index: 30; }
+    .anim-monster-attack { animation: monsterRush 0.55s cubic-bezier(0.22, 1, 0.36, 1) !important; z-index: 30; }
+    .anim-hit-shake { animation: hitShake 0.5s ease-in-out !important; }
+    .anim-slash { animation: slashFlash 0.4s ease-out forwards; }
     .damage-popup { animation: damageFloat 0.9s forwards ease-out; }
 
     /* 커스텀 스크롤바 */
@@ -86,7 +95,6 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
-        
         <!-- 레벨 & 경험치 -->
         <div class="flex flex-col items-end">
           <div class="flex items-center gap-1.5 text-xs font-bold">
@@ -115,7 +123,7 @@
           <span id="header-gold" class="font-mono">100</span> G
         </div>
 
-        <!-- 구글 시트 클라우드 동기화 상태 및 PIN 버튼 (화면 훔쳐보기 방지 보안 인디케이터) -->
+        <!-- 구글 시트 클라우드 동기화 상태 및 PIN 버튼 -->
         <button onclick="App.openPinModal()" id="btn-cloud-sync" class="flex items-center gap-1.5 bg-indigo-950/80 hover:bg-indigo-900 border border-indigo-500/50 text-indigo-200 text-xs px-2.5 py-1 rounded-lg transition shadow" title="클라우드 동기화 설정">
           <i id="header-pin-icon" class="fa-solid fa-cloud-arrow-up text-indigo-400"></i>
           <span id="header-pin-label">클라우드: 미연동</span>
@@ -128,8 +136,7 @@
 
     <!-- [뷰 1] 마을 로비 (Lobby View) -->
     <section id="view-lobby" class="w-full flex flex-col gap-4">
-      
-      <!-- 상단 마을 현수막 & 대장간/연금술/물약 바로가기 -->
+      <!-- 상단 마을 현수막 & 시설 바로가기 -->
       <div class="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-xl">
         <div class="space-y-1 text-center md:text-left">
           <h2 class="text-lg sm:text-xl font-black text-amber-300 flex items-center justify-center md:justify-start gap-2">
@@ -140,7 +147,6 @@
           </p>
         </div>
 
-        <!-- 마을 시설 빠른 버튼 -->
         <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
           <button onclick="App.openBlacksmithModal()" class="flex items-center gap-1.5 bg-amber-600/90 hover:bg-amber-500 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
             <i class="fa-solid fa-hammer"></i> 마도 대장간
@@ -158,6 +164,7 @@
         </div>
       </div>
 
+      <!-- 티어 선택 탭 -->
       <div class="flex items-center justify-between border-b border-slate-800 pb-2 flex-wrap gap-2">
         <div class="flex gap-2">
           <button id="tab-tier-1" onclick="App.switchTier(1)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-slate-950 shadow-lg transition">
@@ -176,9 +183,7 @@
       </div>
 
       <!-- 5대 수학 던전 카드 그리드 -->
-      <div id="dungeon-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5">
-        <!-- JS로 5개 던전 카드 동적 생성 -->
-      </div>
+      <div id="dungeon-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5"></div>
     </section>
 
     <!-- [뷰 2] 전투 스테이지 (Battle Stage) -->
@@ -216,8 +221,8 @@
       <!-- 배틀 아레나 (좌우 횡 대치 구도) -->
       <div id="battle-arena" class="relative w-full h-64 sm:h-72 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-2xl flex items-center justify-between px-6 sm:px-14">
         
-        <!-- 동적 SVG 테마 배경 레이어 -->
-        <div id="battle-bg-layer" class="absolute inset-0 z-0 pointer-events-none opacity-45"></div>
+        <!-- 동적 SVG 테마 배경 레이어 (선명한 던전 비주얼과 조명) -->
+        <div id="battle-bg-layer" class="absolute inset-0 z-0 pointer-events-none opacity-85"></div>
 
         <!-- 좌측: 플레이어 캐릭터 영역 -->
         <div class="relative z-10 flex flex-col items-center">
@@ -225,8 +230,14 @@
             <span class="text-xs font-bold text-sky-300">플레이어</span>
             <div class="text-[10px] text-slate-400 font-mono">ATK <span id="arena-player-atk">20</span> / DEF <span id="arena-player-def">5</span></div>
           </div>
-          <div id="battle-player-sprite" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center anim-idle transition">
-            <!-- 동적 플레이어 아바타 SVG -->
+          <div class="relative flex items-center justify-center">
+            <div id="battle-player-sprite" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center anim-idle transition">
+              <!-- 동적 플레이어 아바타 SVG -->
+            </div>
+            <!-- 플레이어 피격 참격 광원 레이어 -->
+            <div id="player-slash-fx" class="absolute inset-0 pointer-events-none hidden items-center justify-center text-4xl text-rose-500 font-black">
+              <i class="fa-solid fa-bolt text-rose-400 filter drop-shadow(0 0 10px #ef4444)"></i>
+            </div>
           </div>
           <div id="player-damage-pos" class="absolute -top-4 font-black text-xl text-rose-500 font-mono pointer-events-none"></div>
         </div>
@@ -248,8 +259,14 @@
               <span id="battle-monster-hp-text" class="text-[10px] text-slate-400 font-mono">100/100</span>
             </div>
           </div>
-          <div id="monster-svg-target" class="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center anim-idle transition">
-            <!-- 동적 몬스터 SVG -->
+          <div class="relative flex items-center justify-center">
+            <div id="monster-svg-target" class="w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center anim-idle transition">
+              <!-- 동적 몬스터 SVG -->
+            </div>
+            <!-- 몬스터 피격 참격 광원 레이어 -->
+            <div id="monster-slash-fx" class="absolute inset-0 pointer-events-none hidden items-center justify-center text-4xl text-amber-400 font-black">
+              <i class="fa-solid fa-burst text-amber-300 filter drop-shadow(0 0 12px #f59e0b)"></i>
+            </div>
           </div>
           <div id="monster-damage-pos" class="absolute -top-4 font-black text-xl text-amber-400 font-mono pointer-events-none"></div>
         </div>
@@ -275,9 +292,7 @@
         </div>
 
         <!-- 4지선다 객관식 버튼 영역 (Tier 1, 2) -->
-        <div id="choice-buttons-area" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-          <!-- JS로 보기 4개 동적 주입 -->
-        </div>
+        <div id="choice-buttons-area" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
 
         <!-- 주관식 키패드 영역 (Tier 3 보스) -->
         <div id="keypad-input-area" class="hidden flex flex-col items-center gap-3">
@@ -496,7 +511,6 @@
         </button>
       </div>
 
-      <!-- 현재 PIN 로그아웃(연동 해제) 버튼 -->
       <button id="btn-pin-logout" onclick="App.logoutCloudPin()" class="w-full bg-rose-950/80 hover:bg-rose-900 border border-rose-600/60 text-rose-300 py-2.5 rounded-xl text-xs font-bold transition hidden flex items-center justify-center gap-1.5 shadow">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
         <span>이 컴퓨터에서 안전하게 로그아웃</span>
@@ -522,7 +536,6 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script>
-    // 5대 수학 던전 및 티어별 3단계 웨이브 마물 데이터베이스
     const DUNGEON_DATA = [
       {
         id: 1,
@@ -650,12 +663,10 @@
         }
       }
     ];
-
     // 다크 판타지 수학 몬스터 및 캐릭터 SVG 렌더러
     const MonsterSvgRenderer = {
       render(unitId, tier) {
         if (unitId === 1) {
-          // 루트의 숲
           if (tier === 1) {
             return `
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #10b981)">
@@ -692,7 +703,6 @@
             `;
           }
         } else if (unitId === 2) {
-          // 등식의 유적
           if (tier === 1) {
             return `
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #8b5cf6)">
@@ -726,7 +736,6 @@
             `;
           }
         } else if (unitId === 3) {
-          // 포물선 계곡
           if (tier === 1) {
             return `
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #38bdf8)">
@@ -760,7 +769,6 @@
             `;
           }
         } else if (unitId === 4) {
-          // 직각의 탑
           if (tier === 1) {
             return `
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f59e0b)">
@@ -792,7 +800,6 @@
             `;
           }
         } else {
-          // 원형 차원문
           if (tier === 1) {
             return `
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f43f5e)">
@@ -829,52 +836,238 @@
         }
       },
 
+      // 던전별 고유 이름과 수학 테마가 생생하게 살아있는 고품질 던전 배경 렌더러
       renderBackground(unitId) {
         if (unitId === 1) {
+          // 1. 루트의 숲: 뒤틀린 거대 근호목(√), 신비로운 덩굴안개, 발광 포자, 이끼 낀 고대 석판 바닥
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <rect width="600" height="300" fill="#022c22"/>
-              <circle cx="450" cy="70" r="40" fill="#10b981" opacity="0.15"/>
-              <path d="M0 300 L120 180 L240 300 L380 150 L520 300 L600 220 L600 300 Z" fill="#064e3b" opacity="0.35"/>
-              <path d="M80 120 Q120 40 150 180" stroke="#34d399" stroke-width="2" fill="none" opacity="0.3"/>
-              <path d="M400 100 Q460 30 500 200" stroke="#34d399" stroke-width="2" fill="none" opacity="0.3"/>
+              <defs>
+                <linearGradient id="forestSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#021a12"/>
+                  <stop offset="60%" stop-color="#042e20"/>
+                  <stop offset="100%" stop-color="#064e3b"/>
+                </linearGradient>
+                <linearGradient id="forestFloor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#064e3b"/>
+                  <stop offset="100%" stop-color="#021f17"/>
+                </linearGradient>
+                <radialGradient id="rootGlow" cx="50%" cy="40%" r="50%">
+                  <stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <!-- 숲 심층부 하늘 및 원경 -->
+              <rect width="600" height="300" fill="url(#forestSky)"/>
+              <circle cx="300" cy="110" r="140" fill="url(#rootGlow)"/>
+              
+              <!-- 원경 실루엣 거목들 -->
+              <path d="M40 220 L70 60 Q80 40 95 60 L120 220 Z" fill="#02261b" opacity="0.8"/>
+              <path d="M480 220 L510 50 Q525 30 540 50 L570 220 Z" fill="#02261b" opacity="0.8"/>
+              
+              <!-- 중앙 뒤틀린 거대한 루트(√) 신목 -->
+              <path d="M210 240 L235 240 L255 200 L275 255 L295 70 L380 70 L380 90 L310 90 L290 230 L270 170 L245 240 Z" fill="#043928" stroke="#10b981" stroke-width="2.5" opacity="0.85"/>
+              
+              <!-- 덩굴 및 형광 룬 버섯 광원 -->
+              <path d="M20 180 Q80 120 160 160 Q220 200 280 170" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+              <path d="M350 170 Q420 140 500 180 Q550 200 600 175" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+              
+              <!-- 부유하는 에메랄드 무리수 룬 입자 -->
+              <circle cx="140" cy="90" r="3" fill="#6ee7b7" opacity="0.7"/>
+              <circle cx="220" cy="60" r="2" fill="#a7f3d0" opacity="0.8"/>
+              <circle cx="440" cy="80" r="3.5" fill="#6ee7b7" opacity="0.6"/>
+              <circle cx="370" cy="130" r="2.5" fill="#34d399" opacity="0.75"/>
+              <text x="170" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√2</text>
+              <text x="430" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√3</text>
+              
+              <!-- 던전 바닥(플랫폼) 및 이끼 낀 지면 -->
+              <path d="M0 230 Q150 220 300 228 Q450 220 600 230 L600 300 L0 300 Z" fill="url(#forestFloor)"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#10b981" stroke-width="2" opacity="0.6"/>
+              <!-- 지면 넝쿨 질감 디테일 -->
+              <path d="M60 230 Q100 245 150 230" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
+              <path d="M320 232 Q380 248 440 232" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
+              <path d="M470 230 Q520 242 570 230" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
             </svg>
           `;
         } else if (unitId === 2) {
+          // 2. 등식의 유적: 무너진 신전의 거대 석조 기둥, 공중에 뜬 등식(=)과 미지수 톱니바퀴, 신비로운 보랏빛 유적
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <rect width="600" height="300" fill="#1e1b4b"/>
-              <line x1="80" y1="0" x2="80" y2="300" stroke="#8b5cf6" stroke-width="12" opacity="0.12"/>
-              <line x1="520" y1="0" x2="520" y2="300" stroke="#8b5cf6" stroke-width="12" opacity="0.12"/>
-              <circle cx="300" cy="120" r="90" fill="none" stroke="#a78bfa" stroke-width="4" stroke-dasharray="12,8" opacity="0.2"/>
-              <line x1="0" y1="220" x2="600" y2="220" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,6" opacity="0.3"/>
+              <defs>
+                <linearGradient id="ruinSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0f0728"/>
+                  <stop offset="60%" stop-color="#1e1045"/>
+                  <stop offset="100%" stop-color="#2e1065"/>
+                </linearGradient>
+                <linearGradient id="ruinStone" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3b1d75"/>
+                  <stop offset="100%" stop-color="#180b33"/>
+                </linearGradient>
+                <radialGradient id="portalPurple" cx="50%" cy="45%" r="50%">
+                  <stop offset="0%" stop-color="#a855f7" stop-opacity="0.4"/>
+                  <stop offset="100%" stop-color="#6b21a8" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#ruinSky)"/>
+              <circle cx="300" cy="115" r="130" fill="url(#portalPurple)"/>
+              
+              <!-- 배경 고대 신전 회랑 기둥들 -->
+              <rect x="50" y="40" width="34" height="190" fill="#1c0f3d" stroke="#6d28d9" stroke-width="1.5" opacity="0.7"/>
+              <rect x="42" y="32" width="50" height="14" fill="#281452"/>
+              <rect x="516" y="40" width="34" height="190" fill="#1c0f3d" stroke="#6d28d9" stroke-width="1.5" opacity="0.7"/>
+              <rect x="508" y="32" width="50" height="14" fill="#281452"/>
+
+              <rect x="130" y="70" width="26" height="160" fill="#180c35" opacity="0.6"/>
+              <rect x="444" y="70" width="26" height="160" fill="#180c35" opacity="0.6"/>
+              
+              <!-- 중앙 부유하는 마법 등식 기호 (=) 와 미지수 석판 -->
+              <g opacity="0.85">
+                <circle cx="300" cy="110" r="55" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="10,6"/>
+                <line x1="270" y1="102" x2="330" y2="102" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" filter="drop-shadow(0 0 6px #f59e0b)"/>
+                <line x1="270" y1="118" x2="330" y2="118" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" filter="drop-shadow(0 0 6px #f59e0b)"/>
+              </g>
+
+              <!-- 공중에 떠 있는 톱니 파편 실루엣 -->
+              <circle cx="210" cy="80" r="22" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="8,4" opacity="0.6"/>
+              <circle cx="390" cy="75" r="26" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="9,5" opacity="0.6"/>
+              
+              <text x="210" y="85" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900" opacity="0.6">x²</text>
+              <text x="390" y="81" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900" opacity="0.6">D&gt;0</text>
+
+              <!-- 무너진 고대 신전 판석 바닥 -->
+              <path d="M0 230 L600 230 L600 300 L0 300 Z" fill="url(#ruinStone)"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#a855f7" stroke-width="2" opacity="0.8"/>
+              <!-- 바닥 판석 줄눈 -->
+              <line x1="120" y1="230" x2="90" y2="300" stroke="#581c87" stroke-width="2"/>
+              <line x1="240" y1="230" x2="220" y2="300" stroke="#581c87" stroke-width="2"/>
+              <line x1="360" y1="230" x2="380" y2="300" stroke="#581c87" stroke-width="2"/>
+              <line x1="480" y1="230" x2="510" y2="300" stroke="#581c87" stroke-width="2"/>
+              <line x1="0" y1="260" x2="600" y2="260" stroke="#581c87" stroke-width="1.5" stroke-dasharray="14,10"/>
             </svg>
           `;
         } else if (unitId === 3) {
+          // 3. 포물선 계곡: 아찔한 2차 곡선 궤적(y=ax²) 협곡, 솟구치는 벼락, 꼭짓점 암벽, 사이버네틱 절벽
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <rect width="600" height="300" fill="#082f49"/>
-              <path d="M0 240 Q300 30 600 240" stroke="#38bdf8" stroke-width="3" fill="none" opacity="0.3"/>
-              <path d="M100 280 Q300 90 500 280" stroke="#0ea5e9" stroke-width="2" fill="none" opacity="0.25"/>
-              <line x1="300" y1="20" x2="300" y2="280" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.3"/>
+              <defs>
+                <linearGradient id="valleySky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#031526"/>
+                  <stop offset="60%" stop-color="#082f49"/>
+                  <stop offset="100%" stop-color="#0c4a6e"/>
+                </linearGradient>
+                <linearGradient id="valleyFloor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#082f49"/>
+                  <stop offset="100%" stop-color="#021422"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#valleySky)"/>
+              
+              <!-- 원경 벼락과 뇌운 -->
+              <path d="M0 120 Q150 40 300 70 Q450 40 600 110 L600 230 L0 230 Z" fill="#051f33" opacity="0.7"/>
+              <polyline points="295,0 305,45 292,85 308,125 300,160" stroke="#38bdf8" stroke-width="2.5" fill="none" opacity="0.7" filter="drop-shadow(0 0 8px #38bdf8)"/>
+              
+              <!-- 웅장한 포물선 대칭 곡선 레이어들 (y = ax²) -->
+              <path d="M0 240 Q300 -20 600 240" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.6"/>
+              <path d="M50 240 Q300 40 550 240" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="8,6" opacity="0.5"/>
+              <path d="M120 240 Q300 100 480 240" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
+
+              <!-- 꼭짓점(대칭축) 좌표 강조 레이어 -->
+              <line x1="300" y1="10" x2="300" y2="230" stroke="#facc15" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.5"/>
+              <circle cx="300" cy="100" r="5" fill="#ef4444" filter="drop-shadow(0 0 6px #ef4444)"/>
+              <text x="312" y="104" fill="#fde047" font-size="11" font-weight="bold" font-family="monospace">Apex(p,q)</text>
+
+              <!-- 좌우 주상절리 협곡 암벽 -->
+              <polygon points="0,50 90,140 70,240 0,240" fill="#041a29"/>
+              <polygon points="600,50 510,140 530,240 600,240" fill="#041a29"/>
+
+              <!-- 협곡 다리 지면 바닥 -->
+              <path d="M0 230 Q300 215 600 230 L600 300 L0 300 Z" fill="url(#valleyFloor)"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#38bdf8" stroke-width="2.5" opacity="0.8"/>
+              <line x1="0" y1="238" x2="600" y2="238" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="12,6"/>
             </svg>
           `;
         } else if (unitId === 4) {
+          // 4. 직각의 탑: 천공을 찌르는 고대 대리석 첨탑, 기하학적 삼각비 스테인드글라스, 황금빛 프리즘 광선
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <rect width="600" height="300" fill="#1c1917"/>
-              <polygon points="120,300 200,80 280,300" fill="#44403c" opacity="0.2"/>
-              <polygon points="340,300 440,50 540,300" fill="#44403c" opacity="0.2"/>
-              <line x1="0" y1="260" x2="600" y2="260" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
+              <defs>
+                <linearGradient id="towerSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1c1106"/>
+                  <stop offset="50%" stop-color="#2d1c0b"/>
+                  <stop offset="100%" stop-color="#45260a"/>
+                </linearGradient>
+                <linearGradient id="towerFloor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3d2208"/>
+                  <stop offset="100%" stop-color="#140a02"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#towerSky)"/>
+
+              <!-- 고대 천공 첨탑의 아치형 기하학적 창문과 야경 -->
+              <path d="M220 230 L220 70 Q300 20 380 70 L380 230 Z" fill="#120902" stroke="#d97706" stroke-width="2"/>
+              <circle cx="300" cy="90" r="30" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
+              
+              <!-- 삼각비 특수각(30-60-90) 프리즘 형상 투영 -->
+              <polygon points="250,210 350,210 350,80" fill="#78350f" stroke="#fbbf24" stroke-width="2.5" opacity="0.6"/>
+              <rect x="332" y="192" width="18" height="18" fill="none" stroke="#fbbf24" stroke-width="2"/>
+              <text x="300" y="200" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">θ = 30°</text>
+
+              <!-- 기둥과 황금빛 프리즘 광원 선들 -->
+              <line x1="0" y1="0" x2="220" y2="230" stroke="#f59e0b" stroke-width="1.5" opacity="0.3"/>
+              <line x1="600" y1="0" x2="380" y2="230" stroke="#f59e0b" stroke-width="1.5" opacity="0.3"/>
+              <polygon points="30,230 60,30 90,230" fill="#241406" stroke="#b45309" stroke-width="1.5"/>
+              <polygon points="510,230 540,30 570,230" fill="#241406" stroke="#b45309" stroke-width="1.5"/>
+
+              <!-- 탑 꼭대기 테라스 대리석 바닥 -->
+              <path d="M0 230 L600 230 L600 300 L0 300 Z" fill="url(#towerFloor)"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#fbbf24" stroke-width="2.5" opacity="0.9"/>
+              <!-- 기하학적 바닥 무늬 -->
+              <polygon points="150,230 180,265 120,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
+              <polygon points="300,230 330,265 270,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
+              <polygon points="450,230 480,265 420,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
             </svg>
           `;
         } else {
+          // 5. 원형 차원문: 시공을 삼키는 거대한 동심원 우로보로스 차원문, 핏빛/암자색 소용돌이 마법진
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <rect width="600" height="300" fill="#1a0006"/>
-              <circle cx="300" cy="150" r="130" fill="none" stroke="#f43f5e" stroke-width="2" opacity="0.2"/>
-              <circle cx="300" cy="150" r="80" fill="none" stroke="#fb7185" stroke-width="2" stroke-dasharray="8,6" opacity="0.25"/>
-              <circle cx="300" cy="150" r="30" fill="#be123c" opacity="0.15"/>
+              <defs>
+                <linearGradient id="portalSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1f020a"/>
+                  <stop offset="50%" stop-color="#3b0718"/>
+                  <stop offset="100%" stop-color="#4c0519"/>
+                </linearGradient>
+                <radialGradient id="vortexCore" cx="50%" cy="40%" r="50%">
+                  <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.6"/>
+                  <stop offset="50%" stop-color="#be123c" stop-opacity="0.3"/>
+                  <stop offset="100%" stop-color="#1f020a" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#portalSky)"/>
+              
+              <!-- 차원 왜곡 중심 소용돌이 -->
+              <circle cx="300" cy="115" r="140" fill="url(#vortexCore)"/>
+              
+              <!-- 겹겹이 회전하는 거대 동심원 궤도와 원주각 기하 라인 -->
+              <circle cx="300" cy="115" r="105" fill="none" stroke="#fb7185" stroke-width="3" stroke-dasharray="16,8" opacity="0.8"/>
+              <circle cx="300" cy="115" r="75" fill="none" stroke="#fda4af" stroke-width="2.5" stroke-dasharray="10,5" opacity="0.85"/>
+              <circle cx="300" cy="115" r="45" fill="none" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6,4" opacity="0.9"/>
+              <circle cx="300" cy="115" r="16" fill="#fb7185" opacity="0.8" filter="drop-shadow(0 0 10px #f43f5e)"/>
+              
+              <!-- 원에 내접하는 기하학적 삼각형 레이저선 (원주각 = 2분의1 중심각) -->
+              <polygon points="300,10 210,180 390,180" fill="none" stroke="#fecdd3" stroke-width="2" opacity="0.5"/>
+              <line x1="300" y1="115" x2="210" y2="180" stroke="#facc15" stroke-width="2" opacity="0.6"/>
+              <line x1="300" y1="115" x2="390" y2="180" stroke="#facc15" stroke-width="2" opacity="0.6"/>
+              <text x="300" y="145" text-anchor="middle" fill="#fde047" font-size="12" font-weight="900">2θ</text>
+              <text x="300" y="32" text-anchor="middle" fill="#fecdd3" font-size="12" font-weight="900">θ</text>
+
+              <!-- 차원 제단 바닥 플랫폼 -->
+              <path d="M0 230 Q300 220 600 230 L600 300 L0 300 Z" fill="#200109"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#f43f5e" stroke-width="3" opacity="0.9"/>
+              
+              <!-- 제단 원형 룬 링 바닥 패턴 -->
+              <ellipse cx="300" cy="245" rx="180" ry="18" fill="none" stroke="#e11d48" stroke-width="2" stroke-dasharray="12,6" opacity="0.7"/>
+              <ellipse cx="300" cy="245" rx="100" ry="10" fill="none" stroke="#fb7185" stroke-width="2" opacity="0.6"/>
             </svg>
           `;
         }
@@ -885,25 +1078,19 @@
         const armorColor = armorLv >= 10 ? "#6366f1" : (armorLv >= 5 ? "#3b82f6" : "#475569");
         return `
           <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 10px ${staffGlow})">
-            <!-- 로브 몸통 -->
             <path d="M35 85 L42 42 L58 42 L65 85 Z" fill="${armorColor}" stroke="#e2e8f0" stroke-width="2.5"/>
-            <!-- 머리 및 후드 -->
             <circle cx="50" cy="32" r="16" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/>
-            <!-- 얼굴 눈동자 -->
             <ellipse cx="45" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
             <ellipse cx="55" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
-            <!-- 컴퍼스 마도검/스태프 -->
             <line x1="72" y1="18" x2="72" y2="88" stroke="${staffGlow}" stroke-width="4" stroke-linecap="round"/>
             <circle cx="72" cy="18" r="7" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
             <polygon points="72,11 68,18 76,18" fill="#ef4444"/>
-            <!-- 수호 문양 -->
             <path d="M47 52 L53 52 L50 58 Z" fill="#fbbf24"/>
           </svg>
         `;
       }
     };
 
-    // Web Audio API 기반 오디오 합성 매니저
     const SoundManager = {
       ctx: null,
       init() {
@@ -951,9 +1138,8 @@
       }
     };
 
-    // 중3 5대 전단원 다유형 무한 난수 문제 은행 엔진
     const MathEngine = {
-      recentKeys: [], // 최근 출제된 문제 키 기록 (연속 중복 방지)
+      recentKeys: [],
 
       getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -967,7 +1153,6 @@
         let prob = null;
         let attempts = 0;
 
-        // 최근 5문제 이내에 출제된 유형 및 질문과 겹치지 않도록 필터링
         do {
           attempts++;
           if (unitId === 1) prob = this.genUnit1(tier);
@@ -982,7 +1167,6 @@
           this.recentKeys.shift();
         }
 
-        // 4지선다 객관식 선택지 4개 생성
         const ans = prob.answer;
         const set = new Set();
         set.add(ans);
@@ -1006,12 +1190,10 @@
         };
       },
 
-      // 1단원: 제곱근과 실수
       genUnit1(tier) {
         if (tier === 1) {
           const type = this.getRandomInt(1, 4);
           if (type === 1) {
-            // 꼴 변환: sqrt(a^2 * b) = a*sqrt(b)
             const a = this.getRandomInt(2, 6);
             const b = this.getRandomChoice([2, 3, 5, 7]);
             const inside = a * a * b;
@@ -1022,7 +1204,6 @@
               solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 입니다.<br>따라서 $a = ${a}$ 입니다.`
             };
           } else if (type === 2) {
-            // 제곱근의 성질: sqrt((-a)^2) + sqrt(b^2)
             const a = this.getRandomInt(3, 9);
             const b = this.getRandomInt(2, 8);
             return {
@@ -1032,7 +1213,6 @@
               solution: `$\\sqrt{(-${a})^2} = ${a}$, $\\sqrt{${b}^2} = ${b}$ 이므로<br>$${a} + ${b} = ${a + b}$ 입니다.`
             };
           } else if (type === 3) {
-            // 근호 안으로 넣기
             const a = this.getRandomInt(2, 5);
             const b = this.getRandomChoice([2, 3, 5]);
             const ans = a * a * b;
@@ -1043,7 +1223,6 @@
               solution: `$${a}\\sqrt{${b}} = \\sqrt{${a}^2 \\times ${b}} = \\sqrt{${a * a} \\times ${b}} = \\sqrt{${ans}}$ 이므로 $k = ${ans}$ 입니다.`
             };
           } else {
-            // 동류근호 덧셈/뺄셈 계수
             const p = this.getRandomInt(3, 7);
             const q = this.getRandomInt(2, 5);
             const r = this.getRandomChoice([2, 3, 5]);
@@ -1057,7 +1236,6 @@
         } else if (tier === 2) {
           const type = this.getRandomInt(1, 3);
           if (type === 1) {
-            // 분모의 유리화
             const a = this.getRandomChoice([2, 3, 5]);
             const mul = this.getRandomInt(2, 6);
             const top = a * mul;
@@ -1068,7 +1246,6 @@
               solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다.`
             };
           } else if (type === 2) {
-            // 자연수가 되도록 하는 미지수
             const n = this.getRandomChoice([12, 18, 20, 24, 27, 45]);
             let ans = 3;
             if (n === 12 || n === 27) ans = 3;
@@ -1092,7 +1269,6 @@
             };
           }
         } else {
-          // 보스 성소: 주관식
           const type = this.getRandomInt(1, 2);
           if (type === 1) {
             const n = this.getRandomInt(4, 9);
@@ -1117,7 +1293,6 @@
         }
       },
 
-      // 2단원: 이차방정식
       genUnit2(tier) {
         const r1 = this.getRandomInt(1, 5);
         const r2 = this.getRandomInt(2, 6);
@@ -1136,7 +1311,6 @@
               solution: `좌변을 인수분해하면 $(x - ${r1})(x - ${r2}) = 0$ 이므로<br>두 근은 $x = ${r1}$ 또는 $x = ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
             };
           } else if (type === 2) {
-            // 한 근이 주어졌을 때 상수 구하기
             return {
               topic: "[이차방정식] 한 근 대입과 미지수",
               question: `이차방정식 $x^2 ${bSign} + k = 0$ 의 한 근이 $x = ${r1}$ 일 때, 상수 $k$의 값은?`,
@@ -1144,7 +1318,6 @@
               solution: `$x = ${r1}$ 을 대입하면 $(${r1})^2 ${b < 0 ? `${b} \\times ${r1}` : `+ ${b} \\times ${r1}`} + k = 0 \\implies k = ${c}$ 입니다.`
             };
           } else {
-            // 중근을 가질 조건
             const k = this.getRandomInt(2, 7);
             return {
               topic: "[이차방정식] 중근을 가질 조건",
@@ -1163,7 +1336,6 @@
               solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${r1 + r2}$ 입니다.`
             };
           } else {
-            // 제곱근을 이용한 풀이
             const p = this.getRandomInt(1, 4);
             const k = this.getRandomChoice([4, 9, 16, 25]);
             const rootK = Math.round(Math.sqrt(k));
@@ -1175,7 +1347,6 @@
             };
           }
         } else {
-          // 보스 성소: 주관식
           return {
             topic: "[이차방정식 보스] 두 근의 곱",
             question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 곱을 구하시오. (단답형 정수 입력)`,
@@ -1185,7 +1356,6 @@
         }
       },
 
-      // 3단원: 이차함수
       genUnit3(tier) {
         const p = this.getRandomInt(1, 5);
         const q = this.getRandomInt(2, 8);
@@ -1207,7 +1377,6 @@
               solution: `꼭짓점의 좌표는 $(${p}, ${q})$ 이므로 꼭짓점의 $x$좌표는 $${p}$ 입니다.`
             };
           } else {
-            // y절편 구하기
             const ans = p * p + q;
             return {
               topic: "[이차함수] y축과의 교점(y절편)",
@@ -1226,7 +1395,6 @@
               solution: `대칭축은 $x + ${p} = 0 \\implies x = -${p}$ 입니다.`
             };
           } else {
-            // 최솟값 구하기
             const a = this.getRandomInt(2, 4);
             return {
               topic: "[이차함수] 함수의 최솟값",
@@ -1236,7 +1404,6 @@
             };
           }
         } else {
-          // 보스 성소: 주관식
           return {
             topic: "[이차함수 보스] 함수의 최댓값",
             question: `이차함수 $y = -(x - ${p})^2 + ${q}$ 의 최댓값을 구하시오. (단답형 정수 입력)`,
@@ -1246,12 +1413,10 @@
         }
       },
 
-      // 4단원: 삼각비 (다양한 특수각 및 직각삼각형 변 계산 템플릿)
       genUnit4(tier) {
         if (tier === 1) {
           const type = this.getRandomInt(1, 5);
           if (type === 1) {
-            // sin30 + cos60
             return {
               topic: "[삼각비] 특수각의 삼각비 연산",
               question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
@@ -1259,7 +1424,6 @@
               solution: `$\\sin 30^\\circ = \\frac{1}{2}$, $\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
             };
           } else if (type === 2) {
-            // tan45 * 2 + sin30 * 2
             const mul = this.getRandomInt(2, 5);
             return {
               topic: "[삼각비] 탄젠트와 사인 특수각",
@@ -1268,7 +1432,6 @@
               solution: `$\\tan 45^\\circ = 1$ 이므로 $1 \\times ${mul} + 1 = ${mul + 1}$ 입니다.`
             };
           } else if (type === 3) {
-            // cos0 + sin90
             return {
               topic: "[삼각비] 0도와 90도의 삼각비",
               question: `$\\cos 0^\\circ + \\sin 90^\\circ$ 의 값은?`,
@@ -1276,7 +1439,6 @@
               solution: `$\\cos 0^\\circ = 1$, $\\sin 90^\\circ = 1$ 이므로 $1 + 1 = 2$ 입니다.`
             };
           } else if (type === 4) {
-            // 2 * cos60
             const n = this.getRandomChoice([4, 6, 8, 10]);
             return {
               topic: "[삼각비] 코사인 60도 연산",
@@ -1285,9 +1447,7 @@
               solution: `$\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $${n} \\times \\frac{1}{2} = ${n / 2}$ 입니다.`
             };
           } else {
-            // sin45 * cos45 * 4 = 2
             const mul = this.getRandomChoice([2, 4, 6]);
-            const ans = (mul * 2) / 2; // (sqrt(2)/2 * sqrt(2)/2 * mul*2) = 1/2 * mul*2 = mul
             return {
               topic: "[삼각비] 45도 삼각비의 곱",
               question: `$\\sin 45^\\circ \\times \\cos 45^\\circ \\times ${mul * 2}$ 의 값은?`,
@@ -1306,7 +1466,6 @@
               solution: `$\\tan 45^\\circ = 1$, $\\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k} \\times 1 - 2 \\times \\frac{1}{2} = ${k} - 1 = ${k - 1}$ 입니다.`
             };
           } else if (type === 2) {
-            // 직각삼각형 3:4:5 변의 길이
             const mul = this.getRandomInt(1, 3);
             const a = 3 * mul;
             const b = 4 * mul;
@@ -1327,7 +1486,6 @@
             };
           }
         } else {
-          // 보스 성소: 주관식
           const type = this.getRandomInt(1, 2);
           if (type === 1) {
             const base = this.getRandomChoice([4, 6, 8, 10]);
@@ -1349,7 +1507,6 @@
         }
       },
 
-      // 5단원: 원의 성질
       genUnit5(tier) {
         if (tier === 1) {
           const type = this.getRandomInt(1, 3);
@@ -1389,7 +1546,6 @@
               solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 항상 $180^\\circ$ 이므로 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
             };
           } else {
-            // 접선과 반지름의 수직
             return {
               topic: "[원의 성질] 원의 접선과 반지름",
               question: `원의 접선과 그 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
@@ -1398,7 +1554,6 @@
             };
           }
         } else {
-          // 보스 성소: 주관식
           const angleA = this.getRandomChoice([60, 70, 75, 80, 85, 110, 115]);
           return {
             topic: "[원의 성질 보스] 원에 내접하는 사각형의 대각",
@@ -1410,12 +1565,10 @@
       }
     };
 
-    // 핵심 게임 애플리케이션 객체
     const App = {
       backendUrl: "https://script.google.com/macros/s/AKfycbxwhVUO2iLNCuJ9uRuKwUgZWz0q08D63psh8M6wiUWG6GmsD3SC7UVMXa0_EcU71V59/exec",
-      MAX_POTIONS: 5, // 물약 최대 소지 한도
+      MAX_POTIONS: 5,
 
-      // 게임 기본 상태
       state: {
         pin: "",
         level: 1,
@@ -1437,7 +1590,7 @@
       currentBattle: null,
       isTurnBusy: false,
       keypadInput: "",
-      wavePotionCount: 0, // 구역당 최대 2회 제한
+      wavePotionCount: 0,
 
       init() {
         this.loadFromLocalStorage();
@@ -1447,7 +1600,6 @@
         this.setupAlchemySelects();
       },
 
-      // 스탯 공식 계산 (레벨업 및 장비 15강 스케일링)
       calculateStats() {
         const lv = Math.min(30, this.state.level);
         this.state.maxHp = 100 + (lv - 1) * 12 + this.state.armor * 35;
@@ -1460,7 +1612,6 @@
         this.state.hp = Math.min(this.state.maxHp, this.state.hp);
       },
 
-      // KaTeX 수식 일괄 변환
       renderMath() {
         if (window.katex) {
           document.querySelectorAll(".math-render").forEach(el => {
@@ -1638,7 +1789,6 @@
 
         document.getElementById("problem-topic-tag").textContent = b.currentProblem.topic;
         
-        // 문제 KaTeX 렌더링
         const probTextEl = document.getElementById("problem-question-text");
         this.renderFormulaInto(probTextEl, b.currentProblem.question);
 
@@ -1646,13 +1796,11 @@
         const keypadArea = document.getElementById("keypad-input-area");
 
         if (b.tier === 3) {
-          // 보스전: 주관식 키패드
           choiceArea.classList.add("hidden");
           keypadArea.classList.remove("hidden");
           this.keypadInput = "";
           document.getElementById("keypad-display").value = "";
         } else {
-          // 1, 2티어: 객관식 4지선다
           choiceArea.classList.remove("hidden");
           keypadArea.classList.add("hidden");
           choiceArea.innerHTML = "";
@@ -1679,7 +1827,7 @@
           el.textContent = text;
           return;
         }
-        const parts = text.split("$");
+        const parts = String(text).split("$");
         el.innerHTML = "";
         parts.forEach((part, idx) => {
           if (idx % 2 === 1) {
@@ -1696,6 +1844,7 @@
         });
       },
 
+      // 확실한 횡방향 공방 돌진 & 타격 피격 시퀀스
       handlePlayerAnswer(selectedVal) {
         if (this.isTurnBusy || !this.currentBattle) return;
         this.isTurnBusy = true;
@@ -1707,33 +1856,52 @@
         if (isCorrect) this.state.stats.correct++;
 
         if (isCorrect) {
-          // 1. 정답 시: 플레이어 타격 돌진
           SoundManager.playSlash();
           const pSprite = document.getElementById("battle-player-sprite");
           const mSprite = document.getElementById("monster-svg-target");
+          const mSlash = document.getElementById("monster-slash-fx");
 
+          // 1단계: 플레이어 대기 모션 해제 후 적 진영으로 전력 돌진
+          pSprite.classList.remove("anim-idle");
           pSprite.classList.add("anim-player-attack");
+
+          // 2단계: 정점 타격 순간(약 300ms) 피격 이펙트 및 몬스터 넉백
           setTimeout(() => {
-            pSprite.classList.remove("anim-player-attack");
-            mSprite.classList.add("anim-hit-shake");
             SoundManager.playHit();
+            if (mSlash) {
+              mSlash.classList.remove("hidden");
+              mSlash.classList.add("anim-slash");
+            }
+            mSprite.classList.remove("anim-idle");
+            mSprite.classList.add("anim-hit-shake");
 
             const dmg = Math.max(5, Math.round(this.state.atk));
             b.monster.hp = Math.max(0, b.monster.hp - dmg);
             this.showDamagePopup("monster-damage-pos", `-${dmg}`);
             this.updateBattleStageHpUI();
 
+            // 3단계: 플레이어 원위치 복귀
             setTimeout(() => {
+              pSprite.classList.remove("anim-player-attack");
+              pSprite.classList.add("anim-idle");
+              if (mSlash) {
+                mSlash.classList.add("hidden");
+                mSlash.classList.remove("anim-slash");
+              }
               mSprite.classList.remove("anim-hit-shake");
+              mSprite.classList.add("anim-idle");
+
               if (b.monster.hp <= 0) {
                 this.handleMonsterDefeat();
               } else {
-                this.executeMonsterCounterAttack();
+                // 살아있으면 몬스터가 즉시 반격 돌진!
+                setTimeout(() => {
+                  this.executeMonsterCounterAttack();
+                }, 350);
               }
-            }, 300);
-          }, 450);
+            }, 260);
+          }, 300);
         } else {
-          // 2. 오답 시: 상세 풀이 모달 팝업
           SoundManager.playDefeat();
           this.showSolutionModal();
         }
@@ -1755,7 +1923,6 @@
 
       closeSolutionModalAndDefense() {
         document.getElementById("modal-solution").classList.add("hidden");
-        // 풀이 확인 후 몬스터 반격 실행
         this.executeMonsterCounterAttack();
       },
 
@@ -1765,28 +1932,45 @@
 
         const mSprite = document.getElementById("monster-svg-target");
         const pSprite = document.getElementById("battle-player-sprite");
+        const pSlash = document.getElementById("player-slash-fx");
 
+        // 1단계: 몬스터 대기 모션 해제 후 플레이어 진영으로 역돌진
+        mSprite.classList.remove("anim-idle");
         mSprite.classList.add("anim-monster-attack");
-        setTimeout(() => {
-          mSprite.classList.remove("anim-monster-attack");
-          pSprite.classList.add("anim-hit-shake");
-          SoundManager.playHit();
 
-          // 데미지 공식: 적 공격력 - 플레이어 방어력 (최소 5 보장)
+        // 2단계: 플레이어 충돌 순간(약 300ms) 피격 플래시 & 넉백 흔들림
+        setTimeout(() => {
+          SoundManager.playHit();
+          if (pSlash) {
+            pSlash.classList.remove("hidden");
+            pSlash.classList.add("anim-slash");
+          }
+          pSprite.classList.remove("anim-idle");
+          pSprite.classList.add("anim-hit-shake");
+
           const rawDmg = Math.max(5, Math.round(b.monster.atk - this.state.def));
           this.state.hp = Math.max(0, this.state.hp - rawDmg);
           this.showDamagePopup("player-damage-pos", `-${rawDmg}`);
           this.updateHeaderUI();
 
+          // 3단계: 몬스터 원위치 복귀 및 다음 턴 준비
           setTimeout(() => {
+            mSprite.classList.remove("anim-monster-attack");
+            mSprite.classList.add("anim-idle");
+            if (pSlash) {
+              pSlash.classList.add("hidden");
+              pSlash.classList.remove("anim-slash");
+            }
             pSprite.classList.remove("anim-hit-shake");
+            pSprite.classList.add("anim-idle");
+
             if (this.state.hp <= 0) {
               this.handlePlayerDefeat();
             } else {
               this.nextBattleTurn();
             }
-          }, 300);
-        }, 450);
+          }, 260);
+        }, 300);
       },
 
       pressKey(k) {
@@ -1831,7 +2015,6 @@
         this.checkLevelUp();
         this.triggerCloudSave(false);
 
-        // 다음 구역이 남아있는 경우
         if (b.wave < b.maxWaves) {
           const titleEl = document.getElementById("wave-clear-title");
           const descEl = document.getElementById("wave-clear-desc");
@@ -1853,12 +2036,11 @@
           return;
         }
 
-        // 3구역 모두 돌파: 정복 보상
         const tierKey = `tier${b.tier}`;
         this.state.progress[tierKey][`u${dungeon.id}`] = (this.state.progress[tierKey][`u${dungeon.id}`] || 0) + 1;
 
         const bonusGold = b.tier * 25;
-        const bonusMat = b.tier * 1; // 정복 보너스 재료를 1~3개로 절제
+        const bonusMat = b.tier * 1;
         this.state.gold += bonusGold;
         this.state.materials[dungeon.matKey] += bonusMat;
 
@@ -2024,9 +2206,7 @@
         }
       },
 
-      // 장비 레벨별 필요 재료 및 골드 공식 (단계적 파밍 확대)
       getUpgradeCost(currentLv) {
-        // +1강: 4개, +5강: 18개, +10강: 35개, +15강: 53개
         const reqMat = Math.floor(4 + currentLv * 3.5);
         const reqGold = (currentLv + 1) * 70 + currentLv * currentLv * 8;
         return { reqMat, reqGold };
@@ -2182,13 +2362,11 @@
       async logoutCloudPin() {
         if (!this.state.pin) return;
 
-        // 1. 현재까지 진행된 데이터를 구글 시트에 최종 백업
         await this.triggerCloudSave(false);
 
         const oldPin = this.state.pin;
         this.state.pin = "";
 
-        // 2. 다음 이용 학생을 위해 현재 PC의 로컬 데이터를 기본 상태로 리셋
         this.state = {
           pin: "",
           level: 1,
@@ -2412,7 +2590,6 @@
       }
     };
 
-    // 앱 기동
     window.addEventListener("DOMContentLoaded", () => {
       App.init();
     });
