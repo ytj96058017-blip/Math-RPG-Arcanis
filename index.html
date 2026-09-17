@@ -522,6 +522,387 @@
   <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
   <script>
+    // 5대 수학 던전 및 티어별 3단계 웨이브 마물 데이터베이스
+    const DUNGEON_DATA = [
+      {
+        id: 1,
+        name: "루트의 숲",
+        color: "emerald",
+        icon: "fa-tree",
+        matKey: "mat1",
+        matName: "근호의 이끼",
+        monsters: {
+          t1: [
+            { name: "루트 스프라이트", hp: 70, atk: 12, exp: 15, gold: 18, dropMin: 1, dropMax: 2 },
+            { name: "가시덤불 첨병", hp: 110, atk: 15, exp: 22, gold: 26, dropMin: 1, dropMax: 2 },
+            { name: "수호 근호수", hp: 160, atk: 18, exp: 35, gold: 40, dropMin: 1, dropMax: 2 }
+          ],
+          t2: [
+            { name: "맹독 덩굴귀", hp: 320, atk: 36, exp: 50, gold: 60, dropMin: 2, dropMax: 3 },
+            { name: "무리수 흑표범", hp: 450, atk: 46, exp: 70, gold: 85, dropMin: 2, dropMax: 3 },
+            { name: "맹독의 근호수 비히모스", hp: 620, atk: 56, exp: 100, gold: 120, dropMin: 2, dropMax: 4 }
+          ],
+          t3: [
+            { name: "심연의 룬 골렘", hp: 950, atk: 82, exp: 150, gold: 180, dropMin: 3, dropMax: 4 },
+            { name: "대지의 심판목", hp: 1400, atk: 108, exp: 220, gold: 260, dropMin: 3, dropMax: 5 },
+            { name: "대지근원 고대목 네메시스", hp: 2000, atk: 135, exp: 350, gold: 400, dropMin: 4, dropMax: 6 }
+          ]
+        }
+      },
+      {
+        id: 2,
+        name: "등식의 유적",
+        color: "violet",
+        icon: "fa-monument",
+        matKey: "mat2",
+        matName: "등식의 톱니",
+        monsters: {
+          t1: [
+            { name: "플로팅 큐브", hp: 75, atk: 13, exp: 16, gold: 19, dropMin: 1, dropMax: 2 },
+            { name: "녹슨 톱니보행자", hp: 115, atk: 16, exp: 24, gold: 28, dropMin: 1, dropMax: 2 },
+            { name: "등식의 석조골렘", hp: 165, atk: 19, exp: 36, gold: 42, dropMin: 1, dropMax: 2 }
+          ],
+          t2: [
+            { name: "판별식 파쇄기", hp: 330, atk: 38, exp: 52, gold: 62, dropMin: 2, dropMax: 3 },
+            { name: "중근의 사형집행관", hp: 460, atk: 48, exp: 72, gold: 88, dropMin: 2, dropMax: 3 },
+            { name: "톱니바퀴 처형인", hp: 630, atk: 58, exp: 105, gold: 125, dropMin: 2, dropMax: 4 }
+          ],
+          t3: [
+            { name: "미지수 거대골렘", hp: 980, atk: 84, exp: 155, gold: 185, dropMin: 3, dropMax: 4 },
+            { name: "이차식의 지배자", hp: 1450, atk: 110, exp: 230, gold: 270, dropMin: 3, dropMax: 5 },
+            { name: "혼돈의 이중 판별자", hp: 2050, atk: 138, exp: 360, gold: 420, dropMin: 4, dropMax: 6 }
+          ]
+        }
+      },
+      {
+        id: 3,
+        name: "포물선 계곡",
+        color: "sky",
+        icon: "fa-mountain-sun",
+        matKey: "mat3",
+        matName: "포물선의 깃털",
+        monsters: {
+          t1: [
+            { name: "돌풍의 날갯짓", hp: 70, atk: 13, exp: 15, gold: 18, dropMin: 1, dropMax: 2 },
+            { name: "낙하궤적 하피", hp: 110, atk: 16, exp: 23, gold: 27, dropMin: 1, dropMax: 2 },
+            { name: "포물선 협곡조", hp: 160, atk: 19, exp: 35, gold: 41, dropMin: 1, dropMax: 2 }
+          ],
+          t2: [
+            { name: "대칭축 벼락매", hp: 320, atk: 37, exp: 51, gold: 61, dropMin: 2, dropMax: 3 },
+            { name: "절편의 전갈괴수", hp: 450, atk: 47, exp: 71, gold: 86, dropMin: 2, dropMax: 3 },
+            { name: "꼭짓점의 키메라", hp: 620, atk: 57, exp: 102, gold: 122, dropMin: 2, dropMax: 4 }
+          ],
+          t3: [
+            { name: "상승기류 거대수", hp: 960, atk: 83, exp: 152, gold: 182, dropMin: 3, dropMax: 4 },
+            { name: "정점의 뇌전용", hp: 1420, atk: 109, exp: 225, gold: 265, dropMin: 3, dropMax: 5 },
+            { name: "파괴의 포물선 비룡", hp: 2020, atk: 136, exp: 355, gold: 410, dropMin: 4, dropMax: 6 }
+          ]
+        }
+      },
+      {
+        id: 4,
+        name: "직각의 탑",
+        color: "amber",
+        icon: "fa-shapes",
+        matKey: "mat4",
+        matName: "직각의 프리즘",
+        monsters: {
+          t1: [
+            { name: "삼각 파편 위스프", hp: 65, atk: 14, exp: 15, gold: 18, dropMin: 1, dropMax: 2 },
+            { name: "예각의 첨탑수호자", hp: 105, atk: 17, exp: 22, gold: 26, dropMin: 1, dropMax: 2 },
+            { name: "피타고라스 파수병", hp: 155, atk: 20, exp: 34, gold: 40, dropMin: 1, dropMax: 2 }
+          ],
+          t2: [
+            { name: "사인 칼날자객", hp: 310, atk: 39, exp: 50, gold: 60, dropMin: 2, dropMax: 3 },
+            { name: "코사인 첨단사신", hp: 440, atk: 49, exp: 70, gold: 85, dropMin: 2, dropMax: 3 },
+            { name: "빗변의 첨탑 골렘", hp: 610, atk: 59, exp: 100, gold: 120, dropMin: 2, dropMax: 4 }
+          ],
+          t3: [
+            { name: "기하학의 거대석상", hp: 940, atk: 85, exp: 150, gold: 180, dropMin: 3, dropMax: 4 },
+            { name: "경사각의 심문관", hp: 1390, atk: 112, exp: 220, gold: 260, dropMin: 3, dropMax: 5 },
+            { name: "탄젠트의 마신 아스펙트", hp: 2000, atk: 140, exp: 350, gold: 400, dropMin: 4, dropMax: 6 }
+          ]
+        }
+      },
+      {
+        id: 5,
+        name: "원형 차원문",
+        color: "rose",
+        icon: "fa-circle-notch",
+        matKey: "mat5",
+        matName: "원환의 정수",
+        monsters: {
+          t1: [
+            { name: "차원 구체 젤리", hp: 75, atk: 12, exp: 16, gold: 19, dropMin: 1, dropMax: 2 },
+            { name: "원주각 궤도구", hp: 115, atk: 15, exp: 24, gold: 28, dropMin: 1, dropMax: 2 },
+            { name: "접선의 방랑자", hp: 165, atk: 18, exp: 36, gold: 42, dropMin: 1, dropMax: 2 }
+          ],
+          t2: [
+            { name: "동심원의 눈동자", hp: 330, atk: 36, exp: 52, gold: 62, dropMin: 2, dropMax: 3 },
+            { name: "호의 균열체", hp: 460, atk: 46, exp: 72, gold: 88, dropMin: 2, dropMax: 3 },
+            { name: "원주각 심연 촉수괴", hp: 630, atk: 56, exp: 105, gold: 125, dropMin: 2, dropMax: 4 }
+          ],
+          t3: [
+            { name: "내접 다각형 거수", hp: 970, atk: 82, exp: 155, gold: 185, dropMin: 3, dropMax: 4 },
+            { name: "원주율의 시공악마", hp: 1430, atk: 107, exp: 228, gold: 268, dropMin: 3, dropMax: 5 },
+            { name: "차원 원환의 파멸신", hp: 2040, atk: 135, exp: 360, gold: 415, dropMin: 4, dropMax: 6 }
+          ]
+        }
+      }
+    ];
+
+    // 다크 판타지 수학 몬스터 및 캐릭터 SVG 렌더러
+    const MonsterSvgRenderer = {
+      render(unitId, tier) {
+        if (unitId === 1) {
+          // 루트의 숲
+          if (tier === 1) {
+            return `
+              <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #10b981)">
+                <circle cx="50" cy="55" r="26" fill="#064e3b" stroke="#34d399" stroke-width="3"/>
+                <path d="M42 32 C48 18 52 18 58 32 Z" fill="#10b981"/>
+                <circle cx="42" cy="52" r="3.5" fill="#a7f3d0"/>
+                <circle cx="58" cy="52" r="3.5" fill="#a7f3d0"/>
+                <path d="M46 63 Q50 67 54 63" stroke="#a7f3d0" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <text x="50" y="80" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="bold">√</text>
+              </svg>
+            `;
+          } else if (tier === 2) {
+            return `
+              <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #059669)">
+                <path d="M25 85 Q40 30 60 25 Q80 30 95 85 Q60 105 25 85 Z" fill="#022c22" stroke="#10b981" stroke-width="3"/>
+                <path d="M30 40 L15 25 L35 30" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
+                <path d="M90 40 L105 25 L85 30" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
+                <ellipse cx="45" cy="55" rx="5" ry="8" fill="#ef4444"/>
+                <ellipse cx="75" cy="55" rx="5" ry="8" fill="#ef4444"/>
+                <path d="M40 78 L50 86 L60 78 L70 86 L80 78" fill="none" stroke="#ecfdf5" stroke-width="3"/>
+                <text x="60" y="48" text-anchor="middle" fill="#34d399" font-size="16" font-weight="900" font-family="monospace">√x</text>
+              </svg>
+            `;
+          } else {
+            return `
+              <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 18px #047857)">
+                <circle cx="70" cy="70" r="55" fill="#022c22" stroke="#059669" stroke-width="4"/>
+                <path d="M30 110 L50 35 L70 95 L95 20 L115 110 Z" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="55" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/>
+                <circle cx="85" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/>
+                <path d="M48 92 Q70 108 92 92" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>
+                <text x="70" y="125" text-anchor="middle" fill="#6ee7b7" font-size="18" font-weight="900">RADIX TITAN</text>
+              </svg>
+            `;
+          }
+        } else if (unitId === 2) {
+          // 등식의 유적
+          if (tier === 1) {
+            return `
+              <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #8b5cf6)">
+                <rect x="25" y="25" width="50" height="50" rx="10" fill="#2e1065" stroke="#a78bfa" stroke-width="3"/>
+                <line x1="38" y1="46" x2="62" y2="46" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+                <line x1="38" y1="56" x2="62" y2="56" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
+                <circle cx="50" cy="51" r="3" fill="#fff"/>
+              </svg>
+            `;
+          } else if (tier === 2) {
+            return `
+              <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #7c3aed)">
+                <rect x="30" y="25" width="60" height="70" rx="8" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="3"/>
+                <circle cx="60" cy="60" r="22" fill="#0f172a" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,4"/>
+                <ellipse cx="60" cy="46" rx="8" ry="4" fill="#ef4444" filter="drop-shadow(0 0 5px #ef4444)"/>
+                <line x1="42" y1="72" x2="78" y2="72" stroke="#fbbf24" stroke-width="4"/>
+                <line x1="42" y1="82" x2="78" y2="82" stroke="#fbbf24" stroke-width="4"/>
+                <text x="60" y="66" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900">x²</text>
+              </svg>
+            `;
+          } else {
+            return `
+              <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 18px #6d28d9)">
+                <polygon points="70,10 120,40 120,100 70,130 20,100 20,40" fill="#1e1b4b" stroke="#a855f7" stroke-width="4"/>
+                <circle cx="52" cy="55" r="8" fill="#38bdf8"/>
+                <circle cx="88" cy="55" r="8" fill="#f43f5e"/>
+                <line x1="45" y1="85" x2="95" y2="85" stroke="#eab308" stroke-width="5"/>
+                <line x1="45" y1="97" x2="95" y2="97" stroke="#eab308" stroke-width="5"/>
+                <text x="70" y="42" text-anchor="middle" fill="#e9d5ff" font-size="16" font-weight="bold">α · β</text>
+              </svg>
+            `;
+          }
+        } else if (unitId === 3) {
+          // 포물선 계곡
+          if (tier === 1) {
+            return `
+              <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #38bdf8)">
+                <ellipse cx="50" cy="50" rx="30" ry="18" fill="#082f49" stroke="#38bdf8" stroke-width="3"/>
+                <path d="M25 45 Q50 75 75 45" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="40" cy="46" r="3.5" fill="#bae6fd"/>
+                <circle cx="60" cy="46" r="3.5" fill="#bae6fd"/>
+              </svg>
+            `;
+          } else if (tier === 2) {
+            return `
+              <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #0284c7)">
+                <path d="M20 75 Q60 15 100 75 Q60 115 20 75 Z" fill="#0c4a6e" stroke="#38bdf8" stroke-width="3"/>
+                <path d="M25 80 Q60 30 95 80" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
+                <polygon points="60,20 54,32 66,32" fill="#ef4444"/>
+                <circle cx="48" cy="58" r="5" fill="#facc15"/>
+                <circle cx="72" cy="58" r="5" fill="#facc15"/>
+                <text x="60" y="98" text-anchor="middle" fill="#7dd3fc" font-size="14" font-weight="900">f(x)=ax²</text>
+              </svg>
+            `;
+          } else {
+            return `
+              <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #0369a1)">
+                <path d="M15 90 Q70 10 125 90 L110 125 L30 125 Z" fill="#082f49" stroke="#0ea5e9" stroke-width="4"/>
+                <path d="M25 95 Q70 30 115 95" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
+                <circle cx="70" cy="30" r="10" fill="#f43f5e" filter="drop-shadow(0 0 10px #f43f5e)"/>
+                <circle cx="50" cy="72" r="7" fill="#fbbf24"/>
+                <circle cx="90" cy="72" r="7" fill="#fbbf24"/>
+                <path d="M52 105 Q70 120 88 105" stroke="#f8fafc" stroke-width="4" fill="none"/>
+              </svg>
+            `;
+          }
+        } else if (unitId === 4) {
+          // 직각의 탑
+          if (tier === 1) {
+            return `
+              <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f59e0b)">
+                <polygon points="25,75 75,75 75,25" fill="#451a03" stroke="#fbbf24" stroke-width="3"/>
+                <rect x="63" y="63" width="12" height="12" fill="none" stroke="#fbbf24" stroke-width="2"/>
+                <circle cx="56" cy="60" r="3.5" fill="#fef3c7"/>
+              </svg>
+            `;
+          } else if (tier === 2) {
+            return `
+              <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #d97706)">
+                <polygon points="20,95 100,95 100,20" fill="#292524" stroke="#f59e0b" stroke-width="4"/>
+                <rect x="82" y="77" width="18" height="18" fill="none" stroke="#facc15" stroke-width="2.5"/>
+                <ellipse cx="78" cy="55" rx="6" ry="10" fill="#ef4444"/>
+                <line x1="20" y1="95" x2="100" y2="20" stroke="#f43f5e" stroke-width="3" stroke-dasharray="4,3"/>
+                <text x="50" y="85" fill="#fef08a" font-size="14" font-weight="900">tan θ</text>
+              </svg>
+            `;
+          } else {
+            return `
+              <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #b45309)">
+                <polygon points="15,115 125,115 125,15" fill="#1c1917" stroke="#f59e0b" stroke-width="5"/>
+                <rect x="100" y="90" width="25" height="25" fill="none" stroke="#fde047" stroke-width="4"/>
+                <circle cx="95" cy="55" r="9" fill="#ef4444" filter="drop-shadow(0 0 8px #ef4444)"/>
+                <path d="M40 115 A35 35 0 0 0 65 92" fill="none" stroke="#38bdf8" stroke-width="4"/>
+                <text x="48" y="108" fill="#38bdf8" font-size="12" font-weight="bold">θ</text>
+                <text x="70" y="55" fill="#fbbf24" font-size="16" font-weight="900">ARCHDEMON</text>
+              </svg>
+            `;
+          }
+        } else {
+          // 원형 차원문
+          if (tier === 1) {
+            return `
+              <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f43f5e)">
+                <circle cx="50" cy="50" r="32" fill="#4c0519" stroke="#fb7185" stroke-width="3"/>
+                <circle cx="50" cy="50" r="16" fill="none" stroke="#fda4af" stroke-width="2" stroke-dasharray="5,3"/>
+                <circle cx="42" cy="46" r="3.5" fill="#fff"/>
+                <circle cx="58" cy="46" r="3.5" fill="#fff"/>
+              </svg>
+            `;
+          } else if (tier === 2) {
+            return `
+              <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #e11d48)">
+                <circle cx="60" cy="60" r="44" fill="#200109" stroke="#f43f5e" stroke-width="4"/>
+                <path d="M25 80 L60 20 L95 80 Z" fill="none" stroke="#fb7185" stroke-width="3"/>
+                <circle cx="60" cy="60" r="10" fill="#f59e0b" filter="drop-shadow(0 0 8px #f59e0b)"/>
+                <circle cx="44" cy="50" r="5" fill="#f43f5e"/>
+                <circle cx="76" cy="50" r="5" fill="#f43f5e"/>
+                <text x="60" y="102" text-anchor="middle" fill="#fda4af" font-size="14" font-weight="900">2θ</text>
+              </svg>
+            `;
+          } else {
+            return `
+              <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #be123c)">
+                <circle cx="70" cy="70" r="58" fill="#1a0006" stroke="#f43f5e" stroke-width="4" stroke-dasharray="10,5"/>
+                <circle cx="70" cy="70" r="42" fill="none" stroke="#fb7185" stroke-width="3"/>
+                <circle cx="70" cy="70" r="20" fill="#e11d48" filter="drop-shadow(0 0 15px #e11d48)"/>
+                <circle cx="50" cy="55" r="7" fill="#facc15"/>
+                <circle cx="90" cy="55" r="7" fill="#facc15"/>
+                <path d="M50 90 Q70 110 90 90" stroke="#fff" stroke-width="4" fill="none"/>
+                <text x="70" y="32" text-anchor="middle" fill="#fecdd3" font-size="15" font-weight="900">OUROBOROS</text>
+              </svg>
+            `;
+          }
+        }
+      },
+
+      renderBackground(unitId) {
+        if (unitId === 1) {
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <rect width="600" height="300" fill="#022c22"/>
+              <circle cx="450" cy="70" r="40" fill="#10b981" opacity="0.15"/>
+              <path d="M0 300 L120 180 L240 300 L380 150 L520 300 L600 220 L600 300 Z" fill="#064e3b" opacity="0.35"/>
+              <path d="M80 120 Q120 40 150 180" stroke="#34d399" stroke-width="2" fill="none" opacity="0.3"/>
+              <path d="M400 100 Q460 30 500 200" stroke="#34d399" stroke-width="2" fill="none" opacity="0.3"/>
+            </svg>
+          `;
+        } else if (unitId === 2) {
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <rect width="600" height="300" fill="#1e1b4b"/>
+              <line x1="80" y1="0" x2="80" y2="300" stroke="#8b5cf6" stroke-width="12" opacity="0.12"/>
+              <line x1="520" y1="0" x2="520" y2="300" stroke="#8b5cf6" stroke-width="12" opacity="0.12"/>
+              <circle cx="300" cy="120" r="90" fill="none" stroke="#a78bfa" stroke-width="4" stroke-dasharray="12,8" opacity="0.2"/>
+              <line x1="0" y1="220" x2="600" y2="220" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,6" opacity="0.3"/>
+            </svg>
+          `;
+        } else if (unitId === 3) {
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <rect width="600" height="300" fill="#082f49"/>
+              <path d="M0 240 Q300 30 600 240" stroke="#38bdf8" stroke-width="3" fill="none" opacity="0.3"/>
+              <path d="M100 280 Q300 90 500 280" stroke="#0ea5e9" stroke-width="2" fill="none" opacity="0.25"/>
+              <line x1="300" y1="20" x2="300" y2="280" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.3"/>
+            </svg>
+          `;
+        } else if (unitId === 4) {
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <rect width="600" height="300" fill="#1c1917"/>
+              <polygon points="120,300 200,80 280,300" fill="#44403c" opacity="0.2"/>
+              <polygon points="340,300 440,50 540,300" fill="#44403c" opacity="0.2"/>
+              <line x1="0" y1="260" x2="600" y2="260" stroke="#f59e0b" stroke-width="2" opacity="0.3"/>
+            </svg>
+          `;
+        } else {
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <rect width="600" height="300" fill="#1a0006"/>
+              <circle cx="300" cy="150" r="130" fill="none" stroke="#f43f5e" stroke-width="2" opacity="0.2"/>
+              <circle cx="300" cy="150" r="80" fill="none" stroke="#fb7185" stroke-width="2" stroke-dasharray="8,6" opacity="0.25"/>
+              <circle cx="300" cy="150" r="30" fill="#be123c" opacity="0.15"/>
+            </svg>
+          `;
+        }
+      },
+
+      renderPlayer(weaponLv, armorLv) {
+        const staffGlow = weaponLv >= 10 ? "#f59e0b" : (weaponLv >= 5 ? "#38bdf8" : "#94a3b8");
+        const armorColor = armorLv >= 10 ? "#6366f1" : (armorLv >= 5 ? "#3b82f6" : "#475569");
+        return `
+          <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 10px ${staffGlow})">
+            <!-- 로브 몸통 -->
+            <path d="M35 85 L42 42 L58 42 L65 85 Z" fill="${armorColor}" stroke="#e2e8f0" stroke-width="2.5"/>
+            <!-- 머리 및 후드 -->
+            <circle cx="50" cy="32" r="16" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/>
+            <!-- 얼굴 눈동자 -->
+            <ellipse cx="45" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
+            <ellipse cx="55" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
+            <!-- 컴퍼스 마도검/스태프 -->
+            <line x1="72" y1="18" x2="72" y2="88" stroke="${staffGlow}" stroke-width="4" stroke-linecap="round"/>
+            <circle cx="72" cy="18" r="7" fill="#fbbf24" stroke="#f59e0b" stroke-width="2"/>
+            <polygon points="72,11 68,18 76,18" fill="#ef4444"/>
+            <!-- 수호 문양 -->
+            <path d="M47 52 L53 52 L50 58 Z" fill="#fbbf24"/>
+          </svg>
+        `;
+      }
+    };
+
     // Web Audio API 기반 오디오 합성 매니저
     const SoundManager = {
       ctx: null,
@@ -570,371 +951,42 @@
       }
     };
 
-    // 5대 수학 던전 및 웨이브별 몬스터 데이터 (절제된 드랍 & 정밀 밸런스)
-    const DUNGEON_DATA = [
-      {
-        id: 1,
-        name: "루트의 숲",
-        sub: "제곱근과 실수",
-        icon: "fa-tree",
-        color: "emerald",
-        matKey: "mat1",
-        matName: "근호의 이끼",
-        monsters: {
-          t1: [
-            { name: "루트 스프라이트", hp: 60, atk: 12, exp: 15, gold: 12, dropMin: 1, dropMax: 1 },
-            { name: "가시덩굴 방랑자", hp: 95, atk: 15, exp: 22, gold: 18, dropMin: 1, dropMax: 1 },
-            { name: "원시목 수호병", hp: 140, atk: 20, exp: 35, gold: 28, dropMin: 1, dropMax: 2 }
-          ],
-          t2: [
-            { name: "맹독 근호수 첨병", hp: 280, atk: 38, exp: 50, gold: 40, dropMin: 1, dropMax: 2 },
-            { name: "가시덤불 학살자", hp: 400, atk: 48, exp: 75, gold: 55, dropMin: 1, dropMax: 2 },
-            { name: "맹독의 근호 거수", hp: 550, atk: 62, exp: 110, gold: 80, dropMin: 2, dropMax: 2 }
-          ],
-          t3: [
-            { name: "고대목 전위신", hp: 750, atk: 85, exp: 150, gold: 110, dropMin: 2, dropMax: 2 },
-            { name: "무리수 수호결계", hp: 1100, atk: 108, exp: 220, gold: 150, dropMin: 2, dropMax: 3 },
-            { name: "대지근원 고대목 네메시스", hp: 1800, atk: 145, exp: 400, gold: 260, dropMin: 2, dropMax: 3 }
-          ]
-        }
-      },
-      {
-        id: 2,
-        name: "등식의 유적",
-        sub: "이차방정식",
-        icon: "fa-monument",
-        color: "purple",
-        matKey: "mat2",
-        matName: "등식의 톱니",
-        monsters: {
-          t1: [
-            { name: "플로팅 큐브", hp: 60, atk: 12, exp: 15, gold: 12, dropMin: 1, dropMax: 1 },
-            { name: "녹슨 톱니 골렘", hp: 95, atk: 15, exp: 22, gold: 18, dropMin: 1, dropMax: 1 },
-            { name: "등식의 집행관", hp: 140, atk: 20, exp: 35, gold: 28, dropMin: 1, dropMax: 2 }
-          ],
-          t2: [
-            { name: "톱니바퀴 파수병", hp: 280, atk: 38, exp: 50, gold: 40, dropMin: 1, dropMax: 2 },
-            { name: "단두대 기계수", hp: 400, atk: 48, exp: 75, gold: 55, dropMin: 1, dropMax: 2 },
-            { name: "톱니바퀴 처형인", hp: 550, atk: 62, exp: 110, gold: 80, dropMin: 2, dropMax: 2 }
-          ],
-          t3: [
-            { name: "이차방정식 궤도체", hp: 750, atk: 85, exp: 150, gold: 110, dropMin: 2, dropMax: 2 },
-            { name: "판별식의 저주추", hp: 1100, atk: 108, exp: 220, gold: 150, dropMin: 2, dropMax: 3 },
-            { name: "혼돈의 이중 판별자", hp: 1800, atk: 145, exp: 400, gold: 260, dropMin: 2, dropMax: 3 }
-          ]
-        }
-      },
-      {
-        id: 3,
-        name: "포물선 계곡",
-        sub: "이차함수",
-        icon: "fa-volcano",
-        color: "amber",
-        matKey: "mat3",
-        matName: "포물선의 깃털",
-        monsters: {
-          t1: [
-            { name: "돌풍의 날갯짓", hp: 60, atk: 12, exp: 15, gold: 12, dropMin: 1, dropMax: 1 },
-            { name: "협곡의 벼락익룡", hp: 95, atk: 15, exp: 22, gold: 18, dropMin: 1, dropMax: 1 },
-            { name: "포물선 비행수", hp: 140, atk: 20, exp: 35, gold: 28, dropMin: 1, dropMax: 2 }
-          ],
-          t2: [
-            { name: "절벽의 전갈괴수", hp: 280, atk: 38, exp: 50, gold: 40, dropMin: 1, dropMax: 2 },
-            { name: "대칭축의 독수리", hp: 400, atk: 48, exp: 75, gold: 55, dropMin: 1, dropMax: 2 },
-            { name: "꼭짓점의 키메라", hp: 550, atk: 62, exp: 110, gold: 80, dropMin: 2, dropMax: 2 }
-          ],
-          t3: [
-            { name: "뇌운의 인도자", hp: 750, atk: 85, exp: 150, gold: 110, dropMin: 2, dropMax: 2 },
-            { name: "곡선 충격룡", hp: 1100, atk: 108, exp: 220, gold: 150, dropMin: 2, dropMax: 3 },
-            { name: "파괴의 포물선 뇌룡", hp: 1800, atk: 145, exp: 400, gold: 260, dropMin: 2, dropMax: 3 }
-          ]
-        }
-      },
-      {
-        id: 4,
-        name: "직각의 탑",
-        sub: "삼각비",
-        icon: "fa-chess-rook",
-        color: "sky",
-        matKey: "mat4",
-        matName: "직각의 프리즘",
-        monsters: {
-          t1: [
-            { name: "삼각 파편 위스프", hp: 60, atk: 12, exp: 15, gold: 12, dropMin: 1, dropMax: 1 },
-            { name: "예각의 첨탑수호자", hp: 95, atk: 15, exp: 22, gold: 18, dropMin: 1, dropMax: 1 },
-            { name: "피타고라스 석상", hp: 140, atk: 20, exp: 35, gold: 28, dropMin: 1, dropMax: 2 }
-          ],
-          t2: [
-            { name: "빗변의 칼날괴", hp: 280, atk: 38, exp: 50, gold: 40, dropMin: 1, dropMax: 2 },
-            { name: "기하학 판금수", hp: 400, atk: 48, exp: 75, gold: 55, dropMin: 1, dropMax: 2 },
-            { name: "빗변의 첨탑 골렘", hp: 550, atk: 62, exp: 110, gold: 80, dropMin: 2, dropMax: 2 }
-          ],
-          t3: [
-            { name: "사인 코사인 쌍두신", hp: 750, atk: 85, exp: 150, gold: 110, dropMin: 2, dropMax: 2 },
-            { name: "직각의 대마도핵", hp: 1100, atk: 108, exp: 220, gold: 150, dropMin: 2, dropMax: 3 },
-            { name: "탄젠트의 마신 아스펙트", hp: 1800, atk: 145, exp: 400, gold: 260, dropMin: 2, dropMax: 3 }
-          ]
-        }
-      },
-      {
-        id: 5,
-        name: "원형 차원문",
-        sub: "원의 성질",
-        icon: "fa-circle-nodes",
-        color: "rose",
-        matKey: "mat5",
-        matName: "원환의 정수",
-        monsters: {
-          t1: [
-            { name: "차원 구체 젤리", hp: 60, atk: 12, exp: 15, gold: 12, dropMin: 1, dropMax: 1 },
-            { name: "회전 호의 방랑괴", hp: 95, atk: 15, exp: 22, gold: 18, dropMin: 1, dropMax: 1 },
-            { name: "동심원의 눈동자", hp: 140, atk: 20, exp: 35, gold: 28, dropMin: 1, dropMax: 2 }
-          ],
-          t2: [
-            { name: "원주각의 그림자", hp: 280, atk: 38, exp: 50, gold: 40, dropMin: 1, dropMax: 2 },
-            { name: "접선의 촉수마", hp: 400, atk: 48, exp: 75, gold: 55, dropMin: 1, dropMax: 2 },
-            { name: "원주각의 심연괴", hp: 550, atk: 62, exp: 110, gold: 80, dropMin: 2, dropMax: 2 }
-          ],
-          t3: [
-            { name: "파이 붕괴핵", hp: 750, atk: 85, exp: 150, gold: 110, dropMin: 2, dropMax: 2 },
-            { name: "차원 원환의 파수룡", hp: 1100, atk: 108, exp: 220, gold: 150, dropMin: 2, dropMax: 3 },
-            { name: "우로보로스 차원 파멸신", hp: 1800, atk: 145, exp: 400, gold: 260, dropMin: 2, dropMax: 3 }
-          ]
-        }
-      }
-    ];
-
-    // 다크 판타지 SVG 비주얼 렌더러
-    const MonsterSvgRenderer = {
-      renderPlayer(weaponLv = 0, armorLv = 0) {
-        const staffColor = weaponLv >= 10 ? "#f59e0b" : (weaponLv >= 5 ? "#38bdf8" : "#94a3b8");
-        const robeColor = armorLv >= 10 ? "#4338ca" : (armorLv >= 5 ? "#1e293b" : "#0f172a");
-        const aura = weaponLv >= 10 ? `<circle cx="50" cy="50" r="44" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="4,4" opacity="0.8"/>` : '';
-
-        return `
-          <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(99,102,241,0.5)]">
-            ${aura}
-            <!-- 망토 및 로브 -->
-            <path d="M30 45 L50 20 L70 45 L78 88 L22 88 Z" fill="${robeColor}" stroke="#6366f1" stroke-width="2.5"/>
-            <!-- 얼굴 & 후드 -->
-            <circle cx="50" cy="36" r="14" fill="#020617" stroke="#818cf8" stroke-width="2"/>
-            <!-- 신비로운 발광 안광 -->
-            <ellipse cx="45" cy="36" rx="2.5" ry="3" fill="#38bdf8"/>
-            <ellipse cx="55" cy="36" rx="2.5" ry="3" fill="#38bdf8"/>
-            <!-- 컴퍼스 & 마도 스태프 -->
-            <line x1="72" y1="15" x2="72" y2="85" stroke="${staffColor}" stroke-width="3.5" stroke-linecap="round"/>
-            <path d="M66 22 L72 12 L78 22 Z" fill="${staffColor}"/>
-            <circle cx="72" cy="28" r="4" fill="#f43f5e"/>
-            <!-- 삼각자 펜던트 -->
-            <polygon points="50,48 44,58 56,58" fill="none" stroke="#fbbf24" stroke-width="2"/>
-          </svg>
-        `;
-      },
-
-      render(unitId, tier) {
-        if (unitId === 1) { // 루트의 숲
-          if (tier === 1) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]">
-                <circle cx="50" cy="55" r="26" fill="#10b981" stroke="#047857" stroke-width="3"/>
-                <path d="M38 34 Q50 14 62 34" fill="none" stroke="#059669" stroke-width="4"/>
-                <circle cx="42" cy="52" r="4" fill="#064e3b"/><circle cx="58" cy="52" r="4" fill="#064e3b"/>
-                <path d="M46 64 Q50 68 54 64" stroke="#064e3b" stroke-width="2" fill="none"/>
-              </svg>
-            `;
-          } else if (tier === 2) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(5,150,105,0.7)]">
-                <path d="M22 68 L36 32 L64 32 L78 68 L50 86 Z" fill="#064e3b" stroke="#34d399" stroke-width="3"/>
-                <path d="M36 32 L50 12 L64 32 Z" fill="#047857"/>
-                <circle cx="40" cy="46" r="4" fill="#ef4444"/><circle cx="60" cy="46" r="4" fill="#ef4444"/>
-                <path d="M30 60 L70 60 L50 78 Z" fill="#022c22"/>
-                <text x="44" y="66" font-family="monospace" font-size="12" font-weight="bold" fill="#34d399">√</text>
-              </svg>
-            `;
-          } else {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_16px_rgba(16,185,129,0.9)]">
-                <circle cx="50" cy="50" r="44" fill="#022c22" stroke="#10b981" stroke-width="4"/>
-                <path d="M20 50 Q50 10 80 50 Q50 90 20 50" fill="#064e3b" stroke="#34d399" stroke-width="2"/>
-                <circle cx="36" cy="48" r="5" fill="#f59e0b"/><circle cx="64" cy="48" r="5" fill="#f59e0b"/>
-                <text x="35" y="74" font-family="monospace" font-size="22" font-weight="900" fill="#a7f3d0">√N</text>
-              </svg>
-            `;
-          }
-        } else if (unitId === 2) { // 등식의 유적
-          if (tier === 1) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]">
-                <rect x="25" y="25" width="50" height="50" rx="12" fill="#7c3aed" stroke="#c084fc" stroke-width="3"/>
-                <line x1="36" y1="44" x2="64" y2="44" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
-                <line x1="36" y1="56" x2="64" y2="56" stroke="#ffffff" stroke-width="5" stroke-linecap="round"/>
-              </svg>
-            `;
-          } else if (tier === 2) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(147,51,234,0.7)]">
-                <circle cx="50" cy="50" r="38" fill="#4c1d95" stroke="#a855f7" stroke-width="3"/>
-                <path d="M50 12 L50 88 M12 50 L88 50" stroke="#7e22ce" stroke-width="6"/>
-                <circle cx="50" cy="50" r="18" fill="#2e1065" stroke="#f43f5e" stroke-width="3"/>
-                <circle cx="50" cy="50" r="6" fill="#ef4444"/>
-              </svg>
-            `;
-          } else {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_16px_rgba(168,85,247,0.9)]">
-                <polygon points="50,10 88,40 74,88 26,88 12,40" fill="#2e1065" stroke="#c084fc" stroke-width="4"/>
-                <circle cx="36" cy="44" r="5" fill="#38bdf8"/><circle cx="64" cy="44" r="5" fill="#f43f5e"/>
-                <text x="24" y="74" font-family="monospace" font-size="16" font-weight="900" fill="#e9d5ff">x²+bx</text>
-              </svg>
-            `;
-          }
-        } else if (unitId === 3) { // 포물선 계곡
-          if (tier === 1) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(245,158,11,0.5)]">
-                <path d="M20 70 Q50 18 80 70" fill="none" stroke="#f59e0b" stroke-width="6" stroke-linecap="round"/>
-                <circle cx="50" cy="24" r="9" fill="#d97706" stroke="#fef3c7" stroke-width="2"/>
-                <circle cx="47" cy="23" r="2" fill="#000"/><circle cx="53" cy="23" r="2" fill="#000"/>
-              </svg>
-            `;
-          } else if (tier === 2) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(217,119,6,0.7)]">
-                <path d="M15 78 Q50 12 85 78 Z" fill="#78350f" stroke="#fbbf24" stroke-width="3"/>
-                <circle cx="40" cy="48" r="5" fill="#ef4444"/><circle cx="60" cy="48" r="5" fill="#ef4444"/>
-                <line x1="50" y1="12" x2="50" y2="78" stroke="#f59e0b" stroke-dasharray="3,3" stroke-width="2"/>
-              </svg>
-            `;
-          } else {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_16px_rgba(245,158,11,0.9)]">
-                <path d="M10 82 Q50 4 90 82" fill="none" stroke="#f59e0b" stroke-width="8" stroke-linecap="round"/>
-                <polygon points="50,15 35,45 65,45" fill="#b45309" stroke="#fde68a" stroke-width="3"/>
-                <circle cx="44" cy="35" r="4" fill="#ef4444"/><circle cx="56" cy="35" r="4" fill="#ef4444"/>
-                <text x="28" y="70" font-family="monospace" font-size="14" font-weight="bold" fill="#fef08a">y=ax²</text>
-              </svg>
-            `;
-          }
-        } else if (unitId === 4) { // 직각의 탑
-          if (tier === 1) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(14,165,233,0.5)]">
-                <polygon points="25,75 75,75 75,25" fill="#0284c7" stroke="#38bdf8" stroke-width="3"/>
-                <rect x="63" y="63" width="12" height="12" fill="none" stroke="#ffffff" stroke-width="2"/>
-                <circle cx="56" cy="55" r="3" fill="#ffffff"/>
-              </svg>
-            `;
-          } else if (tier === 2) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(2,132,199,0.7)]">
-                <polygon points="20,80 80,80 80,20" fill="#0369a1" stroke="#7dd3fc" stroke-width="4"/>
-                <polygon points="25,75 75,75 75,25" fill="#0c4a6e"/>
-                <circle cx="55" cy="55" r="6" fill="#f59e0b"/>
-                <text x="36" y="72" font-family="monospace" font-size="12" font-weight="bold" fill="#bae6fd">sin θ</text>
-              </svg>
-            `;
-          } else {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_16px_rgba(14,165,233,0.9)]">
-                <polygon points="15,85 85,85 85,15" fill="#082f49" stroke="#38bdf8" stroke-width="4"/>
-                <circle cx="85" cy="85" r="45" fill="none" stroke="#f43f5e" stroke-dasharray="4,4" stroke-width="2"/>
-                <circle cx="55" cy="55" r="8" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
-                <text x="28" y="65" font-family="monospace" font-size="14" font-weight="bold" fill="#e0f2fe">tan 60°</text>
-              </svg>
-            `;
-          }
-        } else { // 원형 차원문
-          if (tier === 1) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]">
-                <circle cx="50" cy="50" r="32" fill="#e11d48" stroke="#fda4af" stroke-width="3"/>
-                <circle cx="40" cy="44" r="4" fill="#ffffff"/><circle cx="60" cy="44" r="4" fill="#ffffff"/>
-                <path d="M42 58 Q50 64 58 58" stroke="#ffffff" stroke-width="2" fill="none"/>
-              </svg>
-            `;
-          } else if (tier === 2) {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_12px_rgba(225,29,72,0.7)]">
-                <circle cx="50" cy="50" r="40" fill="#881337" stroke="#fb7185" stroke-width="3"/>
-                <circle cx="50" cy="50" r="24" fill="#4c0519" stroke="#f43f5e" stroke-width="2"/>
-                <circle cx="50" cy="50" r="9" fill="#ef4444"/>
-                <line x1="14" y1="50" x2="86" y2="50" stroke="#fda4af" stroke-width="2"/>
-              </svg>
-            `;
-          } else {
-            return `
-              <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_0_16px_rgba(244,63,94,0.9)]">
-                <circle cx="50" cy="50" r="42" fill="none" stroke="#e11d48" stroke-width="6"/>
-                <circle cx="50" cy="50" r="30" fill="none" stroke="#fb7185" stroke-dasharray="6,4" stroke-width="3"/>
-                <circle cx="50" cy="50" r="14" fill="#4c0519" stroke="#f43f5e" stroke-width="3"/>
-                <circle cx="50" cy="50" r="5" fill="#fde047"/>
-                <text x="44" y="56" font-family="monospace" font-size="16" font-weight="900" fill="#fff">π</text>
-              </svg>
-            `;
-          }
-        }
-      },
-
-      renderBackground(unitId) {
-        if (unitId === 1) {
-          return `
-            <svg viewBox="0 0 800 300" preserveAspectRatio="none" class="w-full h-full">
-              <path d="M0 300 L120 180 L240 300 L380 140 L520 300 L680 170 L800 300 Z" fill="#022c22"/>
-              <path d="M60 300 Q180 80 300 300 M450 300 Q580 90 700 300" stroke="#047857" stroke-width="8" fill="none"/>
-            </svg>
-          `;
-        } else if (unitId === 2) {
-          return `
-            <svg viewBox="0 0 800 300" preserveAspectRatio="none" class="w-full h-full">
-              <rect x="140" y="60" width="40" height="240" fill="#2e1065"/>
-              <rect x="620" y="60" width="40" height="240" fill="#2e1065"/>
-              <line x1="0" y1="120" x2="800" y2="120" stroke="#581c87" stroke-dasharray="10,10" stroke-width="4"/>
-            </svg>
-          `;
-        } else if (unitId === 3) {
-          return `
-            <svg viewBox="0 0 800 300" preserveAspectRatio="none" class="w-full h-full">
-              <path d="M0 240 Q400 40 800 240 L800 300 L0 300 Z" fill="#451a03"/>
-              <path d="M100 280 Q400 110 700 280" stroke="#d97706" stroke-width="4" fill="none"/>
-            </svg>
-          `;
-        } else if (unitId === 4) {
-          return `
-            <svg viewBox="0 0 800 300" preserveAspectRatio="none" class="w-full h-full">
-              <polygon points="100,300 180,60 260,300" fill="#082f49"/>
-              <polygon points="540,300 620,40 700,300" fill="#082f49"/>
-            </svg>
-          `;
-        } else {
-          return `
-            <svg viewBox="0 0 800 300" preserveAspectRatio="none" class="w-full h-full">
-              <circle cx="400" cy="150" r="120" fill="none" stroke="#4c0519" stroke-width="4"/>
-              <circle cx="400" cy="150" r="70" fill="none" stroke="#881337" stroke-dasharray="8,6" stroke-width="3"/>
-            </svg>
-          `;
-        }
-      }
-    };
-
-    // 무한 난수 수학 문제 생성기 (중3 전과정 KaTeX 연동)
+    // 중3 5대 전단원 다유형 무한 난수 문제 은행 엔진
     const MathEngine = {
+      recentKeys: [], // 최근 출제된 문제 키 기록 (연속 중복 방지)
+
       getRandomInt(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
       },
 
+      getRandomChoice(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      },
+
       generateProblem(unitId, tier) {
         let prob = null;
-        if (unitId === 1) prob = this.genUnit1(tier);
-        else if (unitId === 2) prob = this.genUnit2(tier);
-        else if (unitId === 3) prob = this.genUnit3(tier);
-        else if (unitId === 4) prob = this.genUnit4(tier);
-        else prob = this.genUnit5(tier);
+        let attempts = 0;
 
-        // 오답 선택지 3개 자동 생성 (객관식 4지선다용)
+        // 최근 5문제 이내에 출제된 유형 및 질문과 겹치지 않도록 필터링
+        do {
+          attempts++;
+          if (unitId === 1) prob = this.genUnit1(tier);
+          else if (unitId === 2) prob = this.genUnit2(tier);
+          else if (unitId === 3) prob = this.genUnit3(tier);
+          else if (unitId === 4) prob = this.genUnit4(tier);
+          else prob = this.genUnit5(tier);
+        } while (this.recentKeys.includes(prob.question) && attempts < 10);
+
+        this.recentKeys.push(prob.question);
+        if (this.recentKeys.length > 8) {
+          this.recentKeys.shift();
+        }
+
+        // 4지선다 객관식 선택지 4개 생성
         const ans = prob.answer;
         const set = new Set();
         set.add(ans);
+
         let tries = 0;
         while (set.size < 4 && tries < 60) {
           tries++;
@@ -943,6 +995,7 @@
           const wrong = typeof ans === "number" ? ans + delta : (String(ans).includes("-") ? String(ans).replace("-", "") : "-" + ans);
           set.add(wrong);
         }
+
         const choices = Array.from(set).sort(() => Math.random() - 0.5);
         return {
           topic: prob.topic,
@@ -956,33 +1009,111 @@
       // 1단원: 제곱근과 실수
       genUnit1(tier) {
         if (tier === 1) {
-          const a = this.getRandomInt(2, 6);
-          const b = [2, 3, 5][this.getRandomInt(0, 2)];
-          const inside = a * a * b;
-          return {
-            topic: "[제곱근] 근호 밖으로 꺼내기",
-            question: `$\\sqrt{${inside}}$ 를 $a\\sqrt{${b}}$ 꼴로 나타낼 때, $a$의 값은?`,
-            answer: a,
-            solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 입니다.<br>따라서 $a = ${a}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 4);
+          if (type === 1) {
+            // 꼴 변환: sqrt(a^2 * b) = a*sqrt(b)
+            const a = this.getRandomInt(2, 6);
+            const b = this.getRandomChoice([2, 3, 5, 7]);
+            const inside = a * a * b;
+            return {
+              topic: "[제곱근] 근호 밖으로 꺼내기",
+              question: `$\\sqrt{${inside}}$ 를 $a\\sqrt{${b}}$ 꼴로 나타낼 때, $a$의 값은?`,
+              answer: a,
+              solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 입니다.<br>따라서 $a = ${a}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 제곱근의 성질: sqrt((-a)^2) + sqrt(b^2)
+            const a = this.getRandomInt(3, 9);
+            const b = this.getRandomInt(2, 8);
+            return {
+              topic: "[제곱근] 제곱근의 성질 계산",
+              question: `$\\sqrt{(-${a})^2} + \\sqrt{${b}^2}$ 의 값을 계산하면?`,
+              answer: a + b,
+              solution: `$\\sqrt{(-${a})^2} = ${a}$, $\\sqrt{${b}^2} = ${b}$ 이므로<br>$${a} + ${b} = ${a + b}$ 입니다.`
+            };
+          } else if (type === 3) {
+            // 근호 안으로 넣기
+            const a = this.getRandomInt(2, 5);
+            const b = this.getRandomChoice([2, 3, 5]);
+            const ans = a * a * b;
+            return {
+              topic: "[제곱근] 근호 안으로 넣기",
+              question: `$${a}\\sqrt{${b}} = \\sqrt{k}$ 일 때, $k$의 값은?`,
+              answer: ans,
+              solution: `$${a}\\sqrt{${b}} = \\sqrt{${a}^2 \\times ${b}} = \\sqrt{${a * a} \\times ${b}} = \\sqrt{${ans}}$ 이므로 $k = ${ans}$ 입니다.`
+            };
+          } else {
+            // 동류근호 덧셈/뺄셈 계수
+            const p = this.getRandomInt(3, 7);
+            const q = this.getRandomInt(2, 5);
+            const r = this.getRandomChoice([2, 3, 5]);
+            return {
+              topic: "[제곱근] 제곱근의 덧셈과 뺄셈",
+              question: `$${p}\\sqrt{${r}} + ${q}\\sqrt{${r}} - \\sqrt{${r}}$ 를 계산한 결과 $k\\sqrt{${r}}$ 에서 $k$는?`,
+              answer: p + q - 1,
+              solution: `동류근호 앞의 계수들을 계산하면 $(${p} + ${q} - 1)\\sqrt{${r}} = ${p + q - 1}\\sqrt{${r}}$ 입니다.`
+            };
+          }
         } else if (tier === 2) {
-          const a = this.getRandomInt(2, 4);
-          const b = this.getRandomInt(2, 3);
-          const ans = a * 2;
-          return {
-            topic: "[제곱근] 제곱근의 곱셈 연산",
-            question: `$\\sqrt{${a*2}} \\times \\sqrt{${a*b*2}}$ 를 간단히 했을 때의 유리수 계수는?`,
-            answer: ans,
-            solution: `$\\sqrt{${a*2} \\times ${a*b*2}} = \\sqrt{(${a*2})^2 \\times ${b}} = ${a*2}\\sqrt{${b}}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 3);
+          if (type === 1) {
+            // 분모의 유리화
+            const a = this.getRandomChoice([2, 3, 5]);
+            const mul = this.getRandomInt(2, 6);
+            const top = a * mul;
+            return {
+              topic: "[제곱근] 분모의 유리화",
+              question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, $k$의 값은?`,
+              answer: mul,
+              solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 자연수가 되도록 하는 미지수
+            const n = this.getRandomChoice([12, 18, 20, 24, 27, 45]);
+            let ans = 3;
+            if (n === 12 || n === 27) ans = 3;
+            else if (n === 18) ans = 2;
+            else if (n === 20 || n === 45) ans = 5;
+            else if (n === 24) ans = 6;
+            return {
+              topic: "[제곱근] 근호 안이 제곱수가 되는 조건",
+              question: `$\\sqrt{${n}x}$ 가 가장 작은 자연수가 되도록 하는 자연수 $x$의 값은?`,
+              answer: ans,
+              solution: `$${n}$ 을 소인수분해하여 지수가 홀수인 소인수를 짝수로 만들어야 하므로 가장 작은 자연수 $x = ${ans}$ 입니다.`
+            };
+          } else {
+            const a = this.getRandomInt(2, 4);
+            const b = this.getRandomChoice([2, 3]);
+            return {
+              topic: "[제곱근] 제곱근의 곱셈 연산",
+              question: `$\\sqrt{${a * 2}} \\times \\sqrt{${a * b * 2}}$ 를 간단히 했을 때의 정수 계수는?`,
+              answer: a * 2,
+              solution: `$\\sqrt{${a * 2} \\times ${a * b * 2}} = \\sqrt{(${a * 2})^2 \\times ${b}} = ${a * 2}\\sqrt{${b}}$ 입니다.`
+            };
+          }
         } else {
-          const n = this.getRandomInt(3, 7);
-          return {
-            topic: "[제곱근 보스] 무리수의 정수 부분",
-            question: `$\\sqrt{${n * n + 2}}$ 의 정수 부분을 구하시오. (단답형 정수 입력)`,
-            answer: n,
-            solution: `$${n}^2 = ${n*n} < ${n*n+2} < ${(n+1)*(n+1)} = ${(n+1)**2}$ 이므로,<br>$\\sqrt{${n*n+2}}$ 의 정수 부분은 $${n}$ 입니다.`
-          };
+          // 보스 성소: 주관식
+          const type = this.getRandomInt(1, 2);
+          if (type === 1) {
+            const n = this.getRandomInt(4, 9);
+            const add = this.getRandomInt(1, 3);
+            return {
+              topic: "[제곱근 보스] 무리수의 정수 부분",
+              question: `$\\sqrt{${n * n + add}}$ 의 정수 부분을 구하시오. (단답형 정수 입력)`,
+              answer: n,
+              solution: `$${n}^2 = ${n * n} < ${n * n + add} < ${(n + 1) * (n + 1)} = ${(n + 1) ** 2}$ 이므로,<br>$\\sqrt{${n * n + add}}$ 의 정수 부분은 $${n}$ 입니다.`
+            };
+          } else {
+            const a = this.getRandomInt(2, 5);
+            const b = this.getRandomChoice([2, 3]);
+            const inside = a * a * b;
+            return {
+              topic: "[제곱근 보스] 근호 밖의 정수 계수",
+              question: `$\\sqrt{${inside}}$ 를 $k\\sqrt{${b}}$ 로 나타낼 때의 자연수 $k$의 값을 구하시오. (단답형 정수 입력)`,
+              answer: a,
+              solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 이므로 $k = ${a}$ 입니다.`
+            };
+          }
         }
       },
 
@@ -996,25 +1127,60 @@
         const cSign = c < 0 ? `${c}` : `+${c}`;
 
         if (tier === 1) {
-          return {
-            topic: "[이차방정식] 인수분해와 해 구하기",
-            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 양수인 두 근 중 더 큰 근은?`,
-            answer: Math.max(r1, r2),
-            solution: `좌변을 인수분해하면 $(x - ${r1})(x - ${r2}) = 0$ 이므로<br>두 근은 $x = ${r1}$ 또는 $x = ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 3);
+          if (type === 1) {
+            return {
+              topic: "[이차방정식] 인수분해와 해 구하기",
+              question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 양수인 두 근 중 더 큰 근은?`,
+              answer: Math.max(r1, r2),
+              solution: `좌변을 인수분해하면 $(x - ${r1})(x - ${r2}) = 0$ 이므로<br>두 근은 $x = ${r1}$ 또는 $x = ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 한 근이 주어졌을 때 상수 구하기
+            return {
+              topic: "[이차방정식] 한 근 대입과 미지수",
+              question: `이차방정식 $x^2 ${bSign} + k = 0$ 의 한 근이 $x = ${r1}$ 일 때, 상수 $k$의 값은?`,
+              answer: c,
+              solution: `$x = ${r1}$ 을 대입하면 $(${r1})^2 ${b < 0 ? `${b} \\times ${r1}` : `+ ${b} \\times ${r1}`} + k = 0 \\implies k = ${c}$ 입니다.`
+            };
+          } else {
+            // 중근을 가질 조건
+            const k = this.getRandomInt(2, 7);
+            return {
+              topic: "[이차방정식] 중근을 가질 조건",
+              question: `이차방정식 $x^2 - ${2 * k}x + m = 0$ 이 중근을 가질 때, 상수 $m$의 값은?`,
+              answer: k * k,
+              solution: `일차항 계수의 반의 제곱이 상수항이어야 하므로<br>$m = \\left(-\\frac{${2 * k}}{2}\\right)^2 = (-${k})^2 = ${k * k}$ 입니다.`
+            };
+          }
         } else if (tier === 2) {
-          return {
-            topic: "[이차방정식] 두 근의 합",
-            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 합은?`,
-            answer: r1 + r2,
-            solution: `근과 계수의 관계에 의해 두 근의 합은 $-\\frac{b}{a} = -(${b}) = ${r1 + r2}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 2);
+          if (type === 1) {
+            return {
+              topic: "[이차방정식] 두 근의 합",
+              question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 합은?`,
+              answer: r1 + r2,
+              solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${r1 + r2}$ 입니다.`
+            };
+          } else {
+            // 제곱근을 이용한 풀이
+            const p = this.getRandomInt(1, 4);
+            const k = this.getRandomChoice([4, 9, 16, 25]);
+            const rootK = Math.round(Math.sqrt(k));
+            return {
+              topic: "[이차방정식] 제곱근을 이용한 해",
+              question: `이차방정식 $(x - ${p})^2 = ${k}$ 의 양수인 해는?`,
+              answer: p + rootK,
+              solution: `$x - ${p} = \\pm ${rootK}$ 이므로 $x = ${p} + ${rootK} = ${p + rootK}$ 또는 $x = ${p} - ${rootK} = ${p - rootK}$ 입니다.`
+            };
+          }
         } else {
+          // 보스 성소: 주관식
           return {
             topic: "[이차방정식 보스] 두 근의 곱",
             question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 곱을 구하시오. (단답형 정수 입력)`,
             answer: c,
-            solution: `근과 계수의 관계에 의해 두 근의 곱은 $\\frac{c}{a} = ${c}$ 입니다.`
+            solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 곱은 $${r1} \\times ${r2} = ${c}$ 입니다.`
           };
         }
       },
@@ -1023,21 +1189,54 @@
       genUnit3(tier) {
         const p = this.getRandomInt(1, 5);
         const q = this.getRandomInt(2, 8);
+
         if (tier === 1) {
-          return {
-            topic: "[이차함수] 꼭짓점의 좌표",
-            question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
-            answer: q,
-            solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(p, q)$이므로 꼭짓점은 $(${p}, ${q})$ 이며, $y$좌표는 $${q}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 3);
+          if (type === 1) {
+            return {
+              topic: "[이차함수] 꼭짓점의 y좌표",
+              question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
+              answer: q,
+              solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
+            };
+          } else if (type === 2) {
+            return {
+              topic: "[이차함수] 꼭짓점의 x좌표",
+              question: `이차함수 $y = 2(x - ${p})^2 + ${q}$ 의 꼭짓점의 $x$좌표는?`,
+              answer: p,
+              solution: `꼭짓점의 좌표는 $(${p}, ${q})$ 이므로 꼭짓점의 $x$좌표는 $${p}$ 입니다.`
+            };
+          } else {
+            // y절편 구하기
+            const ans = p * p + q;
+            return {
+              topic: "[이차함수] y축과의 교점(y절편)",
+              question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 그래프가 $y$축과 만나는 점의 $y$좌표는?`,
+              answer: ans,
+              solution: `$x = 0$ 을 대입하면 $y = (0 - ${p})^2 + ${q} = ${p * p} + ${q} = ${ans}$ 입니다.`
+            };
+          }
         } else if (tier === 2) {
-          return {
-            topic: "[이차함수] 대칭축의 방정식",
-            question: `이차함수 $y = -(x + ${p})^2 + ${q}$ 의 대칭축의 방정식 $x = k$ 에서 $k$의 값은?`,
-            answer: -p,
-            solution: `$x + ${p} = 0$ 이 되는 지점이 축이므로 대칭축은 $x = -${p}$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 2);
+          if (type === 1) {
+            return {
+              topic: "[이차함수] 대칭축의 방정식",
+              question: `이차함수 $y = -(x + ${p})^2 + ${q}$ 의 대칭축의 방정식 $x = k$ 에서 $k$의 값은?`,
+              answer: -p,
+              solution: `대칭축은 $x + ${p} = 0 \\implies x = -${p}$ 입니다.`
+            };
+          } else {
+            // 최솟값 구하기
+            const a = this.getRandomInt(2, 4);
+            return {
+              topic: "[이차함수] 함수의 최솟값",
+              question: `이차함수 $y = ${a}(x - ${p})^2 + ${q}$ 의 최솟값은?`,
+              answer: q,
+              solution: `아래로 볼록한 포물선이므로 꼭짓점의 $y$좌표인 $${q}$ 가 최솟값입니다.`
+            };
+          }
         } else {
+          // 보스 성소: 주관식
           return {
             topic: "[이차함수 보스] 함수의 최댓값",
             question: `이차함수 $y = -(x - ${p})^2 + ${q}$ 의 최댓값을 구하시오. (단답형 정수 입력)`,
@@ -1047,57 +1246,165 @@
         }
       },
 
-      // 4단원: 삼각비
+      // 4단원: 삼각비 (다양한 특수각 및 직각삼각형 변 계산 템플릿)
       genUnit4(tier) {
         if (tier === 1) {
-          return {
-            topic: "[삼각비] 특수각의 삼각비",
-            question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
-            answer: 1,
-            solution: `$\\sin 30^\\circ = \\frac{1}{2}$, $\\cos 60^\\circ = \\frac{1}{2}$ 이므로<br>$\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 5);
+          if (type === 1) {
+            // sin30 + cos60
+            return {
+              topic: "[삼각비] 특수각의 삼각비 연산",
+              question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
+              answer: 1,
+              solution: `$\\sin 30^\\circ = \\frac{1}{2}$, $\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
+            };
+          } else if (type === 2) {
+            // tan45 * 2 + sin30 * 2
+            const mul = this.getRandomInt(2, 5);
+            return {
+              topic: "[삼각비] 탄젠트와 사인 특수각",
+              question: `$\\tan 45^\\circ \\times ${mul} + 1$ 의 값은?`,
+              answer: mul + 1,
+              solution: `$\\tan 45^\\circ = 1$ 이므로 $1 \\times ${mul} + 1 = ${mul + 1}$ 입니다.`
+            };
+          } else if (type === 3) {
+            // cos0 + sin90
+            return {
+              topic: "[삼각비] 0도와 90도의 삼각비",
+              question: `$\\cos 0^\\circ + \\sin 90^\\circ$ 의 값은?`,
+              answer: 2,
+              solution: `$\\cos 0^\\circ = 1$, $\\sin 90^\\circ = 1$ 이므로 $1 + 1 = 2$ 입니다.`
+            };
+          } else if (type === 4) {
+            // 2 * cos60
+            const n = this.getRandomChoice([4, 6, 8, 10]);
+            return {
+              topic: "[삼각비] 코사인 60도 연산",
+              question: `$${n} \\times \\cos 60^\\circ$ 의 값을 계산하면?`,
+              answer: n / 2,
+              solution: `$\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $${n} \\times \\frac{1}{2} = ${n / 2}$ 입니다.`
+            };
+          } else {
+            // sin45 * cos45 * 4 = 2
+            const mul = this.getRandomChoice([2, 4, 6]);
+            const ans = (mul * 2) / 2; // (sqrt(2)/2 * sqrt(2)/2 * mul*2) = 1/2 * mul*2 = mul
+            return {
+              topic: "[삼각비] 45도 삼각비의 곱",
+              question: `$\\sin 45^\\circ \\times \\cos 45^\\circ \\times ${mul * 2}$ 의 값은?`,
+              answer: mul,
+              solution: `$\\sin 45^\\circ = \\frac{\\sqrt{2}}{2}$, $\\cos 45^\\circ = \\frac{\\sqrt{2}}{2}$ 이므로 $\\frac{2}{4} \\times ${mul * 2} = ${mul}$ 입니다.`
+            };
+          }
         } else if (tier === 2) {
-          return {
-            topic: "[삼각비] 탄젠트와 특수각",
-            question: `$\\tan 45^\\circ \\times 4$ 의 값은?`,
-            answer: 4,
-            solution: `$\\tan 45^\\circ = 1$ 이므로 $1 \\times 4 = 4$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 3);
+          if (type === 1) {
+            const k = this.getRandomInt(2, 6);
+            return {
+              topic: "[삼각비] 특수각 혼합 사칙연산",
+              question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
+              answer: k - 1,
+              solution: `$\\tan 45^\\circ = 1$, $\\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k} \\times 1 - 2 \\times \\frac{1}{2} = ${k} - 1 = ${k - 1}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 직각삼각형 3:4:5 변의 길이
+            const mul = this.getRandomInt(1, 3);
+            const a = 3 * mul;
+            const b = 4 * mul;
+            const c = 5 * mul;
+            return {
+              topic: "[삼각비] 직각삼각형 빗변과 삼각비",
+              question: `밑변이 $${a}$, 높이가 $${b}$ 인 직각삼각형의 빗변의 길이는?`,
+              answer: c,
+              solution: `피타고라스 정리에 의해 $\\sqrt{${a}^2 + ${b}^2} = \\sqrt{${a * a} + ${b * b}} = \\sqrt{${c * c}} = ${c}$ 입니다.`
+            };
+          } else {
+            const hypo = this.getRandomChoice([8, 10, 12, 16]);
+            return {
+              topic: "[삼각비] 특수각 직각삼각형 높이",
+              question: `빗변이 $${hypo}$ 이고 밑각이 $30^\\circ$ 인 직각삼각형의 높이는?`,
+              answer: hypo / 2,
+              solution: `$\\text{높이} = \\text{빗변} \\times \\sin 30^\\circ = ${hypo} \\times \\frac{1}{2} = ${hypo / 2}$ 입니다.`
+            };
+          }
         } else {
-          return {
-            topic: "[삼각비 보스] 직각삼각형 빗변 계산",
-            question: `밑변이 6이고 각도가 $60^\\circ$ 인 직각삼각형에서 빗변의 길이를 구하시오. (단답형 정수 입력)`,
-            answer: 12,
-            solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2}$ 이므로,<br>빗변 $= 6 \\times 2 = 12$ 입니다.`
-          };
+          // 보스 성소: 주관식
+          const type = this.getRandomInt(1, 2);
+          if (type === 1) {
+            const base = this.getRandomChoice([4, 6, 8, 10]);
+            return {
+              topic: "[삼각비 보스] 직각삼각형 빗변 계산",
+              question: `밑변이 $${base}$ 이고 각도가 $60^\\circ$ 인 직각삼각형에서 빗변의 길이를 구하시오. (단답형 정수 입력)`,
+              answer: base * 2,
+              solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2}$ 이므로, 빗변 $= ${base} \\times 2 = ${base * 2}$ 입니다.`
+            };
+          } else {
+            const base = this.getRandomChoice([5, 7, 9, 12]);
+            return {
+              topic: "[삼각비 보스] 45도 직각삼각형 높이",
+              question: `밑각이 $45^\\circ$ 이고 밑변이 $${base}$ 인 직각삼각형의 높이를 구하시오. (단답형 정수 입력)`,
+              answer: base,
+              solution: `$\\tan 45^\\circ = \\frac{\\text{높이}}{\\text{밑변}} = 1$ 이므로 높이는 밑변과 같은 $${base}$ 입니다.`
+            };
+          }
         }
       },
 
       // 5단원: 원의 성질
       genUnit5(tier) {
-        const centerAngle = [60, 80, 100, 120][this.getRandomInt(0, 3)];
-        const inscribedAngle = centerAngle / 2;
-
         if (tier === 1) {
-          return {
-            topic: "[원의 성질] 중심각과 원주각",
-            question: `한 호에 대한 중심각의 크기가 $${centerAngle}^\\circ$ 일 때, 원주각의 크기는?`,
-            answer: inscribedAngle,
-            solution: `원주각의 크기는 중심각의 절반이므로 $\\frac{${centerAngle}^\\circ}{2} = ${inscribedAngle}^\\circ$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 3);
+          if (type === 1) {
+            const centerAngle = this.getRandomChoice([50, 60, 70, 80, 100, 120, 140]);
+            const inscribedAngle = centerAngle / 2;
+            return {
+              topic: "[원의 성질] 중심각과 원주각",
+              question: `한 호에 대한 중심각의 크기가 $${centerAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: inscribedAngle,
+              solution: `원주각의 크기는 중심각의 절반이므로 $\\frac{${centerAngle}^\\circ}{2} = ${inscribedAngle}^\\circ$ 입니다.`
+            };
+          } else if (type === 2) {
+            const inscribedAngle = this.getRandomChoice([25, 30, 35, 45, 55, 60]);
+            return {
+              topic: "[원의 성질] 원주각으로 중심각 구하기",
+              question: `한 호에 대한 원주각의 크기가 $${inscribedAngle}^\\circ$ 일 때, 중심각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: inscribedAngle * 2,
+              solution: `중심각의 크기는 원주각의 2배이므로 $${inscribedAngle}^\\circ \\times 2 = ${inscribedAngle * 2}^\\circ$ 입니다.`
+            };
+          } else {
+            return {
+              topic: "[원의 성질] 지름에 대한 원주각",
+              question: `원의 지름을 한 변으로 하는 내접 삼각형의 원주각 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90,
+              solution: `지름에 대한 호의 중심각이 $180^\\circ$ 이므로, 그 원주각은 절반인 $90^\\circ$ 입니다.`
+            };
+          }
         } else if (tier === 2) {
-          return {
-            topic: "[원의 성질] 지름에 대한 원주각",
-            question: `원의 지름을 한 변으로 하는 내접 삼각형의 원주각 크기는 몇 도($^\\circ$)인가?`,
-            answer: 90,
-            solution: `지름에 대한 호의 중심각은 $180^\\circ$ 이므로, 그 원주각은 절반인 $90^\\circ$ 입니다.`
-          };
+          const type = this.getRandomInt(1, 2);
+          if (type === 1) {
+            const angleA = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
+            return {
+              topic: "[원의 성질] 원에 내접하는 사각형",
+              question: `원에 내접하는 사각형의 한 각의 크기가 $${angleA}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 180 - angleA,
+              solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 항상 $180^\\circ$ 이므로 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
+            };
+          } else {
+            // 접선과 반지름의 수직
+            return {
+              topic: "[원의 성질] 원의 접선과 반지름",
+              question: `원의 접선과 그 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90,
+              solution: `원의 중심에서 접점에 그은 반지름은 접선과 항상 수직($90^\\circ$)을 이룹니다.`
+            };
+          }
         } else {
+          // 보스 성소: 주관식
+          const angleA = this.getRandomChoice([60, 70, 75, 80, 85, 110, 115]);
           return {
-            topic: "[원의 성질 보스] 원에 내접하는 사각형",
-            question: `원에 내접하는 사각형의 한 대각의 크기가 $70^\\circ$ 일 때, 마주 보는 대각의 크기를 구하시오. (단답형 정수 입력)`,
-            answer: 110,
-            solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 $180^\\circ$ 이므로,<br>$180^\\circ - 70^\\circ = 110^\\circ$ 입니다.`
+            topic: "[원의 성질 보스] 원에 내접하는 사각형의 대각",
+            question: `원에 내접하는 사각형의 한 각의 크기가 $${angleA}^\\circ$ 일 때, 마주 보는 대각의 크기를 구하시오. (단답형 정수 입력)`,
+            answer: 180 - angleA,
+            solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 $180^\\circ$ 이므로<br>$180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
           };
         }
       }
