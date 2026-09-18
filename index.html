@@ -30,15 +30,15 @@
     }
     @keyframes playerRush {
       0% { transform: translateX(0) scale(1); }
-      20% { transform: translateX(-25px) scale(0.95); } /* 뒤로 당기는 예비동작 */
-      55% { transform: translateX(clamp(130px, 34vw, 320px)) scale(1.25) rotate(8deg); filter: brightness(1.6) drop-shadow(0 0 18px #6366f1); } /* 전방 돌진 강타 */
+      20% { transform: translateX(-25px) scale(0.95); }
+      55% { transform: translateX(clamp(130px, 34vw, 320px)) scale(1.25) rotate(8deg); filter: brightness(1.6) drop-shadow(0 0 18px #6366f1); }
       75% { transform: translateX(clamp(140px, 36vw, 340px)) scale(1.28) rotate(-4deg); }
       100% { transform: translateX(0) scale(1); filter: brightness(1); }
     }
     @keyframes monsterRush {
       0% { transform: translateX(0) scale(1); }
-      20% { transform: translateX(25px) scale(0.95); } /* 뒤로 당기는 예비동작 */
-      55% { transform: translateX(clamp(-320px, -34vw, -130px)) scale(1.25) rotate(-8deg); filter: brightness(1.6) drop-shadow(0 0 18px #ef4444); } /* 전방 돌진 강타 */
+      20% { transform: translateX(25px) scale(0.95); }
+      55% { transform: translateX(clamp(-320px, -34vw, -130px)) scale(1.25) rotate(-8deg); filter: brightness(1.6) drop-shadow(0 0 18px #ef4444); }
       75% { transform: translateX(clamp(-340px, -36vw, -140px)) scale(1.28) rotate(4deg); }
       100% { transform: translateX(0) scale(1); filter: brightness(1); }
     }
@@ -143,23 +143,23 @@
             <i class="fa-solid fa-city"></i> 아르카니스 마도 수도
           </h2>
           <p class="text-xs text-slate-300 max-w-md">
-            5대 수학 차원의 균열을 정복하여 수학의 지배자(Lv.30)로 거듭나세요! 3단계 연속 웨이브를 돌파해 희귀 재료를 획득할 수 있습니다.
+            5대 수학 차원의 균열을 정복하여 수학의 지배자(Lv.30)로 거듭나세요! 획득한 골드로 상급 영약을 구매하고 가방을 확장하세요.
           </p>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
+        <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
           <button onclick="App.openBlacksmithModal()" class="flex items-center gap-1.5 bg-amber-600/90 hover:bg-amber-500 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
             <i class="fa-solid fa-hammer"></i> 마도 대장간
+          </button>
+          <button onclick="App.openShopModal()" class="flex items-center gap-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
+            <i class="fa-solid fa-shop"></i> 만물 상점
           </button>
           <button onclick="App.openAlchemyModal()" class="flex items-center gap-1.5 bg-indigo-600/90 hover:bg-indigo-500 text-white font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
             <i class="fa-solid fa-flask"></i> 연금술 공방
           </button>
-          <button onclick="App.usePotionInLobby()" class="flex items-center gap-1.5 bg-rose-950/90 hover:bg-rose-900 border border-rose-600/80 text-rose-200 text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
-            <i class="fa-solid fa-bottle-droplet text-rose-400"></i> 물약 복용
-            <span id="lobby-potion-count" class="bg-rose-500 text-white text-[10px] px-1.5 rounded-full ml-1 font-mono">3/5</span>
-          </button>
-          <button onclick="App.buyPotionWithGold()" class="flex items-center gap-1.5 bg-amber-950/90 hover:bg-amber-900 border border-amber-500/80 text-amber-200 text-xs sm:text-sm px-3 py-2 rounded-xl transition shadow-lg">
-            <i class="fa-solid fa-coins text-amber-400"></i> 물약 구매 (50G)
+          <button onclick="App.openLobbyPotionModal()" class="flex items-center gap-1.5 bg-rose-950/90 hover:bg-rose-900 border border-rose-600/80 text-rose-200 text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
+            <i class="fa-solid fa-bottle-droplet text-rose-400"></i> 물약 가방
+            <span id="lobby-potion-count" class="bg-rose-500 text-white text-[10px] px-1.5 rounded-full ml-1 font-mono">3 / 5</span>
           </button>
         </div>
       </div>
@@ -202,14 +202,14 @@
           </span>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="App.usePotionInBattle()" id="btn-battle-potion" class="flex items-center gap-1.5 bg-rose-950/90 hover:bg-rose-900 border border-rose-600/80 text-rose-200 text-xs px-2.5 py-1 rounded-lg transition shadow">
+          <button onclick="App.openBattlePotionSelectModal()" id="btn-battle-potion" class="flex items-center gap-1.5 bg-rose-950/90 hover:bg-rose-900 border border-rose-600/80 text-rose-200 text-xs px-2.5 py-1 rounded-lg transition shadow">
             <i class="fa-solid fa-bottle-droplet text-rose-400"></i>
-            <span>물약</span>
-            <span id="battle-potion-count" class="font-bold text-amber-300 font-mono">3/5</span>
+            <span>물약 복용</span>
+            <span id="battle-potion-count" class="font-bold text-amber-300 font-mono">3 / 5</span>
           </button>
-          <button onclick="App.buyPotionWithGold()" class="flex items-center gap-1 bg-amber-950/80 hover:bg-amber-900 border border-amber-600/60 text-amber-200 text-xs px-2 py-1 rounded-lg transition" title="50골드로 긴급 구매">
-            <i class="fa-solid fa-coins text-amber-400"></i>
-            <span class="text-[10px] text-amber-300 font-mono">50G</span>
+          <button onclick="App.openShopModal()" class="flex items-center gap-1 bg-amber-950/80 hover:bg-amber-900 border border-amber-600/60 text-amber-200 text-xs px-2.5 py-1 rounded-lg transition" title="긴급 상점">
+            <i class="fa-solid fa-shop text-amber-400"></i>
+            <span class="text-[10px] text-amber-300 font-mono">상점</span>
           </button>
           <button onclick="App.retreatToLobby()" class="flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-2.5 py-1 rounded-lg transition border border-slate-700">
             <i class="fa-solid fa-person-running"></i>
@@ -323,6 +323,174 @@
 
   </main>
 
+  <!-- [모달: 만물 상점 (물약 3단계 / 가방 확장 / 특산 재료 구매)] -->
+  <div id="modal-shop" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border border-emerald-500/60 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <i class="fa-solid fa-shop"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-emerald-300">아르카니스 만물 상점</h3>
+            <p class="text-[11px] text-slate-400">물약 보충, 가방 슬롯 확장, 부족한 던전 재료를 골드로 조달하세요.</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="bg-slate-950 px-3 py-1 rounded-lg border border-amber-500/40 text-xs font-bold text-amber-300">
+            <i class="fa-solid fa-coins mr-1 text-amber-400"></i><span id="shop-gold-display">0</span> G
+          </div>
+          <button onclick="App.closeModal('modal-shop')" class="text-slate-400 hover:text-white">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-y-auto space-y-4 pr-1 text-xs">
+        
+        <!-- 1. 물약 3단계 구매 코너 -->
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-rose-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-bottle-droplet"></i> 물약 3등급 직매소
+            </span>
+            <span class="text-[11px] text-slate-400">가방 소지 현황: <span id="shop-bag-status" class="font-mono text-cyan-300 font-bold">0 / 5</span></span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <!-- 하급 생명수 -->
+            <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between font-bold text-slate-200 mb-1">
+                  <span>하급 생명수</span>
+                  <span class="text-rose-400">+20% HP</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mb-2">가볍게 목을 축이는 기초 회복수</p>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-amber-300 font-bold font-mono">40 G</span>
+                <button onclick="App.buyPotion('minor')" class="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 px-2.5 py-1 rounded-lg font-bold transition">구매</button>
+              </div>
+            </div>
+
+            <!-- 상급 마나 영약 -->
+            <div class="bg-slate-900 border border-indigo-900/60 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between font-bold text-indigo-300 mb-1">
+                  <span>상급 마나 영약</span>
+                  <span class="text-indigo-400">+45% HP</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mb-2">마도사들이 애용하는 표준 영약</p>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-amber-300 font-bold font-mono">120 G</span>
+                <button onclick="App.buyPotion('normal')" class="bg-indigo-950 hover:bg-indigo-900 border border-indigo-500/50 text-indigo-200 px-2.5 py-1 rounded-lg font-bold transition">구매</button>
+              </div>
+            </div>
+
+            <!-- 기원의 엘릭서 -->
+            <div class="bg-slate-900 border border-amber-900/60 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between font-bold text-amber-300 mb-1">
+                  <span>기원의 엘릭서</span>
+                  <span class="text-emerald-400">+75% HP</span>
+                </div>
+                <p class="text-[10px] text-slate-400 mb-2">죽음의 문턱에서 부활하는 비약</p>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-amber-300 font-bold font-mono">280 G</span>
+                <button onclick="App.buyPotion('major')" class="bg-amber-950 hover:bg-amber-900 border border-amber-500/50 text-amber-200 px-2.5 py-1 rounded-lg font-bold transition">구매</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. 가방 슬롯 영구 확장 코너 -->
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div class="font-bold text-cyan-300 flex items-center gap-1.5 mb-0.5">
+              <i class="fa-solid fa-briefcase"></i> 마도 보관 가방 확장
+            </div>
+            <p id="bag-upgrade-desc" class="text-slate-400 text-[11px]">최대 소지 한도 확장 가능: 5칸 → 8칸</p>
+          </div>
+          <button id="btn-upgrade-bag" onclick="App.upgradeBagCapacity()" class="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-sky-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl transition shadow">
+            가방 확장 (400 G)
+          </button>
+        </div>
+
+        <!-- 3. 부족한 특산 재료 골드 구매 코너 (개당 180G) -->
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="font-bold text-amber-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-boxes-stacked"></i> 던전 특산물 암시장 조달
+            </span>
+            <span class="text-[11px] text-slate-400 font-mono">개당 일괄 180 G</span>
+          </div>
+          <p class="text-[11px] text-slate-400">던전을 다시 돌기 번거로울 때 모자란 재료를 즉시 골드로 보충하세요.</p>
+          <div id="shop-materials-grid" class="grid grid-cols-1 sm:grid-cols-5 gap-2 pt-1">
+            <!-- JS로 5대 재료 구매 버튼 동적 주입 -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달: 로비/전투 물약 선택 복용창] -->
+  <div id="modal-potion-select" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-rose-500/60 max-w-sm w-full rounded-2xl p-5 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <h3 class="text-base font-bold text-rose-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-bottle-droplet"></i> 복용할 물약 선택
+        </h3>
+        <button onclick="App.closeModal('modal-potion-select')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-400 mb-3" id="potion-modal-info">현재 체력 상태에 알맞은 물약을 선택하세요.</p>
+
+      <div class="space-y-2.5 mb-4">
+        <!-- 하급 -->
+        <div class="bg-slate-950 border border-slate-800 p-3 rounded-xl flex items-center justify-between">
+          <div>
+            <div class="font-bold text-slate-200 text-xs">하급 생명수 (+20%)</div>
+            <div class="text-[11px] text-slate-400 font-mono">보유: <span id="pos-count-minor" class="text-amber-300 font-bold">0</span>개</div>
+          </div>
+          <button onclick="App.consumePotion('minor')" class="bg-rose-950 hover:bg-rose-900 border border-rose-600 text-rose-200 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+            복용
+          </button>
+        </div>
+
+        <!-- 상급 -->
+        <div class="bg-slate-950 border border-indigo-900/50 p-3 rounded-xl flex items-center justify-between">
+          <div>
+            <div class="font-bold text-indigo-300 text-xs">상급 마나 영약 (+45%)</div>
+            <div class="text-[11px] text-slate-400 font-mono">보유: <span id="pos-count-normal" class="text-amber-300 font-bold">0</span>개</div>
+          </div>
+          <button onclick="App.consumePotion('normal')" class="bg-indigo-950 hover:bg-indigo-900 border border-indigo-600 text-indigo-200 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+            복용
+          </button>
+        </div>
+
+        <!-- 엘릭서 -->
+        <div class="bg-slate-950 border border-amber-900/50 p-3 rounded-xl flex items-center justify-between">
+          <div>
+            <div class="font-bold text-amber-300 text-xs">기원의 엘릭서 (+75%)</div>
+            <div class="text-[11px] text-slate-400 font-mono">보유: <span id="pos-count-major" class="text-amber-300 font-bold">0</span>개</div>
+          </div>
+          <button onclick="App.consumePotion('major')" class="bg-amber-950 hover:bg-amber-900 border border-amber-600 text-amber-200 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+            복용
+          </button>
+        </div>
+      </div>
+
+      <button onclick="App.openShopModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs py-2 rounded-xl border border-slate-700 font-bold transition flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-cart-shopping"></i> 만물 상점에서 물약 더 사기
+      </button>
+    </div>
+  </div>
+
   <!-- [모달 1] 구역(Wave) 돌파 성공 모달 -->
   <div id="modal-wave-clear" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border-2 border-indigo-500/80 max-w-md w-full rounded-2xl p-6 shadow-2xl text-center">
@@ -432,17 +600,17 @@
 
       <!-- 대장장이 가이드 메시지 박스 -->
       <div id="bs-guide-box" class="bg-amber-950/40 border border-amber-500/30 rounded-xl p-3 text-xs text-amber-200">
-        "5대 수학 던전의 특산물을 모아오면 무기와 방어구를 단련해 주겠네!"
+        "5대 수학 던전의 특산물을 모아오면 무기와 방어구를 단련해 주겠네! 재료가 부족하면 만물 상점에서 골드로 조달해 오게나!"
       </div>
     </div>
   </div>
 
-  <!-- [모달 4] 연금술 공방 모달 -->
+  <!-- [모달 4] 연금술 공방 모달 (3:1 재료 교환 전용) -->
   <div id="modal-alchemy" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-lg w-full rounded-2xl p-5 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
         <h3 class="text-base font-bold text-indigo-300 flex items-center gap-2">
-          <i class="fa-solid fa-flask"></i> 연금술 공방 (재료 교환 & 물약 제작)
+          <i class="fa-solid fa-flask"></i> 연금술 공방 (특산 재료 3:1 교환)
         </h3>
         <button onclick="App.closeModal('modal-alchemy')" class="text-slate-400 hover:text-white">
           <i class="fa-solid fa-xmark text-lg"></i>
@@ -450,22 +618,9 @@
       </div>
 
       <div class="space-y-4 text-xs">
-        <!-- 물약 제작 -->
-        <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
-          <div>
-            <div class="font-bold text-rose-400 flex items-center gap-1.5 mb-1">
-              <i class="fa-solid fa-bottle-droplet"></i> 생명의 마나 물약 연성
-            </div>
-            <p class="text-slate-400 text-[11px]">아무 특산 재료 3개 + 20 Gold → 체력 물약 1개 (최대 5개 소지)</p>
-          </div>
-          <button onclick="App.craftPotion()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-3 py-1.5 rounded-lg transition">
-            물약 연성
-          </button>
-        </div>
-
-        <!-- 3:1 재료 교환 -->
         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-          <div class="font-bold text-indigo-300 mb-2">단원 특산물 3:1 교환</div>
+          <div class="font-bold text-indigo-300 mb-2">단원 특산물 3:1 원소 변환</div>
+          <p class="text-[11px] text-slate-400 mb-3">남는 단원의 재료 3개를 다른 단원의 재료 1개로 교환합니다.</p>
           <div class="flex gap-2 items-center mb-3">
             <select id="alchemy-give-mat" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200"></select>
             <span class="text-slate-400 font-bold">3개 →</span>
@@ -663,7 +818,7 @@
         }
       }
     ];
-    // 다크 판타지 수학 몬스터 및 캐릭터 SVG 렌더러
+
     const MonsterSvgRenderer = {
       render(unitId, tier) {
         if (unitId === 1) {
@@ -682,11 +837,8 @@
             return `
               <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #059669)">
                 <path d="M25 85 Q40 30 60 25 Q80 30 95 85 Q60 105 25 85 Z" fill="#022c22" stroke="#10b981" stroke-width="3"/>
-                <path d="M30 40 L15 25 L35 30" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
-                <path d="M90 40 L105 25 L85 30" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"/>
                 <ellipse cx="45" cy="55" rx="5" ry="8" fill="#ef4444"/>
                 <ellipse cx="75" cy="55" rx="5" ry="8" fill="#ef4444"/>
-                <path d="M40 78 L50 86 L60 78 L70 86 L80 78" fill="none" stroke="#ecfdf5" stroke-width="3"/>
                 <text x="60" y="48" text-anchor="middle" fill="#34d399" font-size="16" font-weight="900" font-family="monospace">√x</text>
               </svg>
             `;
@@ -694,11 +846,9 @@
             return `
               <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 18px #047857)">
                 <circle cx="70" cy="70" r="55" fill="#022c22" stroke="#059669" stroke-width="4"/>
-                <path d="M30 110 L50 35 L70 95 L95 20 L115 110 Z" fill="none" stroke="#10b981" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
                 <circle cx="55" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/>
                 <circle cx="85" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/>
-                <path d="M48 92 Q70 108 92 92" stroke="#fbbf24" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <text x="70" y="125" text-anchor="middle" fill="#6ee7b7" font-size="18" font-weight="900">RADIX TITAN</text>
+                <text x="70" y="125" text-anchor="middle" fill="#6ee7b7" font-size="16" font-weight="900">RADIX TITAN</text>
               </svg>
             `;
           }
@@ -709,7 +859,6 @@
                 <rect x="25" y="25" width="50" height="50" rx="10" fill="#2e1065" stroke="#a78bfa" stroke-width="3"/>
                 <line x1="38" y1="46" x2="62" y2="46" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
                 <line x1="38" y1="56" x2="62" y2="56" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/>
-                <circle cx="50" cy="51" r="3" fill="#fff"/>
               </svg>
             `;
           } else if (tier === 2) {
@@ -717,9 +866,6 @@
               <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #7c3aed)">
                 <rect x="30" y="25" width="60" height="70" rx="8" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="3"/>
                 <circle cx="60" cy="60" r="22" fill="#0f172a" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,4"/>
-                <ellipse cx="60" cy="46" rx="8" ry="4" fill="#ef4444" filter="drop-shadow(0 0 5px #ef4444)"/>
-                <line x1="42" y1="72" x2="78" y2="72" stroke="#fbbf24" stroke-width="4"/>
-                <line x1="42" y1="82" x2="78" y2="82" stroke="#fbbf24" stroke-width="4"/>
                 <text x="60" y="66" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900">x²</text>
               </svg>
             `;
@@ -729,8 +875,6 @@
                 <polygon points="70,10 120,40 120,100 70,130 20,100 20,40" fill="#1e1b4b" stroke="#a855f7" stroke-width="4"/>
                 <circle cx="52" cy="55" r="8" fill="#38bdf8"/>
                 <circle cx="88" cy="55" r="8" fill="#f43f5e"/>
-                <line x1="45" y1="85" x2="95" y2="85" stroke="#eab308" stroke-width="5"/>
-                <line x1="45" y1="97" x2="95" y2="97" stroke="#eab308" stroke-width="5"/>
                 <text x="70" y="42" text-anchor="middle" fill="#e9d5ff" font-size="16" font-weight="bold">α · β</text>
               </svg>
             `;
@@ -741,18 +885,12 @@
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #38bdf8)">
                 <ellipse cx="50" cy="50" rx="30" ry="18" fill="#082f49" stroke="#38bdf8" stroke-width="3"/>
                 <path d="M25 45 Q50 75 75 45" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="40" cy="46" r="3.5" fill="#bae6fd"/>
-                <circle cx="60" cy="46" r="3.5" fill="#bae6fd"/>
               </svg>
             `;
           } else if (tier === 2) {
             return `
               <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #0284c7)">
                 <path d="M20 75 Q60 15 100 75 Q60 115 20 75 Z" fill="#0c4a6e" stroke="#38bdf8" stroke-width="3"/>
-                <path d="M25 80 Q60 30 95 80" fill="none" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/>
-                <polygon points="60,20 54,32 66,32" fill="#ef4444"/>
-                <circle cx="48" cy="58" r="5" fill="#facc15"/>
-                <circle cx="72" cy="58" r="5" fill="#facc15"/>
                 <text x="60" y="98" text-anchor="middle" fill="#7dd3fc" font-size="14" font-weight="900">f(x)=ax²</text>
               </svg>
             `;
@@ -760,11 +898,7 @@
             return `
               <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #0369a1)">
                 <path d="M15 90 Q70 10 125 90 L110 125 L30 125 Z" fill="#082f49" stroke="#0ea5e9" stroke-width="4"/>
-                <path d="M25 95 Q70 30 115 95" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round"/>
                 <circle cx="70" cy="30" r="10" fill="#f43f5e" filter="drop-shadow(0 0 10px #f43f5e)"/>
-                <circle cx="50" cy="72" r="7" fill="#fbbf24"/>
-                <circle cx="90" cy="72" r="7" fill="#fbbf24"/>
-                <path d="M52 105 Q70 120 88 105" stroke="#f8fafc" stroke-width="4" fill="none"/>
               </svg>
             `;
           }
@@ -774,16 +908,12 @@
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f59e0b)">
                 <polygon points="25,75 75,75 75,25" fill="#451a03" stroke="#fbbf24" stroke-width="3"/>
                 <rect x="63" y="63" width="12" height="12" fill="none" stroke="#fbbf24" stroke-width="2"/>
-                <circle cx="56" cy="60" r="3.5" fill="#fef3c7"/>
               </svg>
             `;
           } else if (tier === 2) {
             return `
               <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #d97706)">
                 <polygon points="20,95 100,95 100,20" fill="#292524" stroke="#f59e0b" stroke-width="4"/>
-                <rect x="82" y="77" width="18" height="18" fill="none" stroke="#facc15" stroke-width="2.5"/>
-                <ellipse cx="78" cy="55" rx="6" ry="10" fill="#ef4444"/>
-                <line x1="20" y1="95" x2="100" y2="20" stroke="#f43f5e" stroke-width="3" stroke-dasharray="4,3"/>
                 <text x="50" y="85" fill="#fef08a" font-size="14" font-weight="900">tan θ</text>
               </svg>
             `;
@@ -791,10 +921,7 @@
             return `
               <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #b45309)">
                 <polygon points="15,115 125,115 125,15" fill="#1c1917" stroke="#f59e0b" stroke-width="5"/>
-                <rect x="100" y="90" width="25" height="25" fill="none" stroke="#fde047" stroke-width="4"/>
-                <circle cx="95" cy="55" r="9" fill="#ef4444" filter="drop-shadow(0 0 8px #ef4444)"/>
-                <path d="M40 115 A35 35 0 0 0 65 92" fill="none" stroke="#38bdf8" stroke-width="4"/>
-                <text x="48" y="108" fill="#38bdf8" font-size="12" font-weight="bold">θ</text>
+                <circle cx="95" cy="55" r="9" fill="#ef4444"/>
                 <text x="70" y="55" fill="#fbbf24" font-size="16" font-weight="900">ARCHDEMON</text>
               </svg>
             `;
@@ -805,18 +932,12 @@
               <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f43f5e)">
                 <circle cx="50" cy="50" r="32" fill="#4c0519" stroke="#fb7185" stroke-width="3"/>
                 <circle cx="50" cy="50" r="16" fill="none" stroke="#fda4af" stroke-width="2" stroke-dasharray="5,3"/>
-                <circle cx="42" cy="46" r="3.5" fill="#fff"/>
-                <circle cx="58" cy="46" r="3.5" fill="#fff"/>
               </svg>
             `;
           } else if (tier === 2) {
             return `
               <svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #e11d48)">
                 <circle cx="60" cy="60" r="44" fill="#200109" stroke="#f43f5e" stroke-width="4"/>
-                <path d="M25 80 L60 20 L95 80 Z" fill="none" stroke="#fb7185" stroke-width="3"/>
-                <circle cx="60" cy="60" r="10" fill="#f59e0b" filter="drop-shadow(0 0 8px #f59e0b)"/>
-                <circle cx="44" cy="50" r="5" fill="#f43f5e"/>
-                <circle cx="76" cy="50" r="5" fill="#f43f5e"/>
                 <text x="60" y="102" text-anchor="middle" fill="#fda4af" font-size="14" font-weight="900">2θ</text>
               </svg>
             `;
@@ -824,11 +945,6 @@
             return `
               <svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #be123c)">
                 <circle cx="70" cy="70" r="58" fill="#1a0006" stroke="#f43f5e" stroke-width="4" stroke-dasharray="10,5"/>
-                <circle cx="70" cy="70" r="42" fill="none" stroke="#fb7185" stroke-width="3"/>
-                <circle cx="70" cy="70" r="20" fill="#e11d48" filter="drop-shadow(0 0 15px #e11d48)"/>
-                <circle cx="50" cy="55" r="7" fill="#facc15"/>
-                <circle cx="90" cy="55" r="7" fill="#facc15"/>
-                <path d="M50 90 Q70 110 90 90" stroke="#fff" stroke-width="4" fill="none"/>
                 <text x="70" y="32" text-anchor="middle" fill="#fecdd3" font-size="15" font-weight="900">OUROBOROS</text>
               </svg>
             `;
@@ -836,10 +952,8 @@
         }
       },
 
-      // 던전별 고유 이름과 수학 테마가 생생하게 살아있는 고품질 던전 배경 렌더러
       renderBackground(unitId) {
         if (unitId === 1) {
-          // 1. 루트의 숲: 뒤틀린 거대 근호목(√), 신비로운 덩굴안개, 발광 포자, 이끼 낀 고대 석판 바닥
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
               <defs>
@@ -848,226 +962,45 @@
                   <stop offset="60%" stop-color="#042e20"/>
                   <stop offset="100%" stop-color="#064e3b"/>
                 </linearGradient>
-                <linearGradient id="forestFloor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#064e3b"/>
-                  <stop offset="100%" stop-color="#021f17"/>
-                </linearGradient>
-                <radialGradient id="rootGlow" cx="50%" cy="40%" r="50%">
-                  <stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/>
-                  <stop offset="100%" stop-color="#10b981" stop-opacity="0"/>
-                </radialGradient>
               </defs>
-              <!-- 숲 심층부 하늘 및 원경 -->
               <rect width="600" height="300" fill="url(#forestSky)"/>
-              <circle cx="300" cy="110" r="140" fill="url(#rootGlow)"/>
-              
-              <!-- 원경 실루엣 거목들 -->
-              <path d="M40 220 L70 60 Q80 40 95 60 L120 220 Z" fill="#02261b" opacity="0.8"/>
-              <path d="M480 220 L510 50 Q525 30 540 50 L570 220 Z" fill="#02261b" opacity="0.8"/>
-              
-              <!-- 중앙 뒤틀린 거대한 루트(√) 신목 -->
               <path d="M210 240 L235 240 L255 200 L275 255 L295 70 L380 70 L380 90 L310 90 L290 230 L270 170 L245 240 Z" fill="#043928" stroke="#10b981" stroke-width="2.5" opacity="0.85"/>
-              
-              <!-- 덩굴 및 형광 룬 버섯 광원 -->
-              <path d="M20 180 Q80 120 160 160 Q220 200 280 170" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-              <path d="M350 170 Q420 140 500 180 Q550 200 600 175" fill="none" stroke="#059669" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
-              
-              <!-- 부유하는 에메랄드 무리수 룬 입자 -->
-              <circle cx="140" cy="90" r="3" fill="#6ee7b7" opacity="0.7"/>
-              <circle cx="220" cy="60" r="2" fill="#a7f3d0" opacity="0.8"/>
-              <circle cx="440" cy="80" r="3.5" fill="#6ee7b7" opacity="0.6"/>
-              <circle cx="370" cy="130" r="2.5" fill="#34d399" opacity="0.75"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#10b981" stroke-width="2.5"/>
               <text x="170" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√2</text>
               <text x="430" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√3</text>
-              
-              <!-- 던전 바닥(플랫폼) 및 이끼 낀 지면 -->
-              <path d="M0 230 Q150 220 300 228 Q450 220 600 230 L600 300 L0 300 Z" fill="url(#forestFloor)"/>
-              <line x1="0" y1="230" x2="600" y2="230" stroke="#10b981" stroke-width="2" opacity="0.6"/>
-              <!-- 지면 넝쿨 질감 디테일 -->
-              <path d="M60 230 Q100 245 150 230" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
-              <path d="M320 232 Q380 248 440 232" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
-              <path d="M470 230 Q520 242 570 230" stroke="#34d399" stroke-width="2" fill="none" opacity="0.5"/>
             </svg>
           `;
         } else if (unitId === 2) {
-          // 2. 등식의 유적: 무너진 신전의 거대 석조 기둥, 공중에 뜬 등식(=)과 미지수 톱니바퀴, 신비로운 보랏빛 유적
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="ruinSky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#0f0728"/>
-                  <stop offset="60%" stop-color="#1e1045"/>
-                  <stop offset="100%" stop-color="#2e1065"/>
-                </linearGradient>
-                <linearGradient id="ruinStone" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3b1d75"/>
-                  <stop offset="100%" stop-color="#180b33"/>
-                </linearGradient>
-                <radialGradient id="portalPurple" cx="50%" cy="45%" r="50%">
-                  <stop offset="0%" stop-color="#a855f7" stop-opacity="0.4"/>
-                  <stop offset="100%" stop-color="#6b21a8" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <rect width="600" height="300" fill="url(#ruinSky)"/>
-              <circle cx="300" cy="115" r="130" fill="url(#portalPurple)"/>
-              
-              <!-- 배경 고대 신전 회랑 기둥들 -->
-              <rect x="50" y="40" width="34" height="190" fill="#1c0f3d" stroke="#6d28d9" stroke-width="1.5" opacity="0.7"/>
-              <rect x="42" y="32" width="50" height="14" fill="#281452"/>
-              <rect x="516" y="40" width="34" height="190" fill="#1c0f3d" stroke="#6d28d9" stroke-width="1.5" opacity="0.7"/>
-              <rect x="508" y="32" width="50" height="14" fill="#281452"/>
-
-              <rect x="130" y="70" width="26" height="160" fill="#180c35" opacity="0.6"/>
-              <rect x="444" y="70" width="26" height="160" fill="#180c35" opacity="0.6"/>
-              
-              <!-- 중앙 부유하는 마법 등식 기호 (=) 와 미지수 석판 -->
-              <g opacity="0.85">
-                <circle cx="300" cy="110" r="55" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="10,6"/>
-                <line x1="270" y1="102" x2="330" y2="102" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" filter="drop-shadow(0 0 6px #f59e0b)"/>
-                <line x1="270" y1="118" x2="330" y2="118" stroke="#fbbf24" stroke-width="6" stroke-linecap="round" filter="drop-shadow(0 0 6px #f59e0b)"/>
-              </g>
-
-              <!-- 공중에 떠 있는 톱니 파편 실루엣 -->
-              <circle cx="210" cy="80" r="22" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="8,4" opacity="0.6"/>
-              <circle cx="390" cy="75" r="26" fill="none" stroke="#8b5cf6" stroke-width="3" stroke-dasharray="9,5" opacity="0.6"/>
-              
-              <text x="210" y="85" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900" opacity="0.6">x²</text>
-              <text x="390" y="81" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900" opacity="0.6">D&gt;0</text>
-
-              <!-- 무너진 고대 신전 판석 바닥 -->
-              <path d="M0 230 L600 230 L600 300 L0 300 Z" fill="url(#ruinStone)"/>
-              <line x1="0" y1="230" x2="600" y2="230" stroke="#a855f7" stroke-width="2" opacity="0.8"/>
-              <!-- 바닥 판석 줄눈 -->
-              <line x1="120" y1="230" x2="90" y2="300" stroke="#581c87" stroke-width="2"/>
-              <line x1="240" y1="230" x2="220" y2="300" stroke="#581c87" stroke-width="2"/>
-              <line x1="360" y1="230" x2="380" y2="300" stroke="#581c87" stroke-width="2"/>
-              <line x1="480" y1="230" x2="510" y2="300" stroke="#581c87" stroke-width="2"/>
-              <line x1="0" y1="260" x2="600" y2="260" stroke="#581c87" stroke-width="1.5" stroke-dasharray="14,10"/>
+              <rect width="600" height="300" fill="#0f0728"/>
+              <line x1="270" y1="102" x2="330" y2="102" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+              <line x1="270" y1="118" x2="330" y2="118" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#a855f7" stroke-width="2.5"/>
             </svg>
           `;
         } else if (unitId === 3) {
-          // 3. 포물선 계곡: 아찔한 2차 곡선 궤적(y=ax²) 협곡, 솟구치는 벼락, 꼭짓점 암벽, 사이버네틱 절벽
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="valleySky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#031526"/>
-                  <stop offset="60%" stop-color="#082f49"/>
-                  <stop offset="100%" stop-color="#0c4a6e"/>
-                </linearGradient>
-                <linearGradient id="valleyFloor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#082f49"/>
-                  <stop offset="100%" stop-color="#021422"/>
-                </linearGradient>
-              </defs>
-              <rect width="600" height="300" fill="url(#valleySky)"/>
-              
-              <!-- 원경 벼락과 뇌운 -->
-              <path d="M0 120 Q150 40 300 70 Q450 40 600 110 L600 230 L0 230 Z" fill="#051f33" opacity="0.7"/>
-              <polyline points="295,0 305,45 292,85 308,125 300,160" stroke="#38bdf8" stroke-width="2.5" fill="none" opacity="0.7" filter="drop-shadow(0 0 8px #38bdf8)"/>
-              
-              <!-- 웅장한 포물선 대칭 곡선 레이어들 (y = ax²) -->
+              <rect width="600" height="300" fill="#031526"/>
               <path d="M0 240 Q300 -20 600 240" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.6"/>
-              <path d="M50 240 Q300 40 550 240" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-dasharray="8,6" opacity="0.5"/>
-              <path d="M120 240 Q300 100 480 240" fill="none" stroke="#f59e0b" stroke-width="2" opacity="0.7"/>
-
-              <!-- 꼭짓점(대칭축) 좌표 강조 레이어 -->
-              <line x1="300" y1="10" x2="300" y2="230" stroke="#facc15" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.5"/>
-              <circle cx="300" cy="100" r="5" fill="#ef4444" filter="drop-shadow(0 0 6px #ef4444)"/>
-              <text x="312" y="104" fill="#fde047" font-size="11" font-weight="bold" font-family="monospace">Apex(p,q)</text>
-
-              <!-- 좌우 주상절리 협곡 암벽 -->
-              <polygon points="0,50 90,140 70,240 0,240" fill="#041a29"/>
-              <polygon points="600,50 510,140 530,240 600,240" fill="#041a29"/>
-
-              <!-- 협곡 다리 지면 바닥 -->
-              <path d="M0 230 Q300 215 600 230 L600 300 L0 300 Z" fill="url(#valleyFloor)"/>
-              <line x1="0" y1="230" x2="600" y2="230" stroke="#38bdf8" stroke-width="2.5" opacity="0.8"/>
-              <line x1="0" y1="238" x2="600" y2="238" stroke="#0284c7" stroke-width="1.5" stroke-dasharray="12,6"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#38bdf8" stroke-width="2.5"/>
             </svg>
           `;
         } else if (unitId === 4) {
-          // 4. 직각의 탑: 천공을 찌르는 고대 대리석 첨탑, 기하학적 삼각비 스테인드글라스, 황금빛 프리즘 광선
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="towerSky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1c1106"/>
-                  <stop offset="50%" stop-color="#2d1c0b"/>
-                  <stop offset="100%" stop-color="#45260a"/>
-                </linearGradient>
-                <linearGradient id="towerFloor" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#3d2208"/>
-                  <stop offset="100%" stop-color="#140a02"/>
-                </linearGradient>
-              </defs>
-              <rect width="600" height="300" fill="url(#towerSky)"/>
-
-              <!-- 고대 천공 첨탑의 아치형 기하학적 창문과 야경 -->
-              <path d="M220 230 L220 70 Q300 20 380 70 L380 230 Z" fill="#120902" stroke="#d97706" stroke-width="2"/>
-              <circle cx="300" cy="90" r="30" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="6,4"/>
-              
-              <!-- 삼각비 특수각(30-60-90) 프리즘 형상 투영 -->
+              <rect width="600" height="300" fill="#1c1106"/>
               <polygon points="250,210 350,210 350,80" fill="#78350f" stroke="#fbbf24" stroke-width="2.5" opacity="0.6"/>
-              <rect x="332" y="192" width="18" height="18" fill="none" stroke="#fbbf24" stroke-width="2"/>
-              <text x="300" y="200" text-anchor="middle" fill="#fde68a" font-size="12" font-weight="bold">θ = 30°</text>
-
-              <!-- 기둥과 황금빛 프리즘 광원 선들 -->
-              <line x1="0" y1="0" x2="220" y2="230" stroke="#f59e0b" stroke-width="1.5" opacity="0.3"/>
-              <line x1="600" y1="0" x2="380" y2="230" stroke="#f59e0b" stroke-width="1.5" opacity="0.3"/>
-              <polygon points="30,230 60,30 90,230" fill="#241406" stroke="#b45309" stroke-width="1.5"/>
-              <polygon points="510,230 540,30 570,230" fill="#241406" stroke="#b45309" stroke-width="1.5"/>
-
-              <!-- 탑 꼭대기 테라스 대리석 바닥 -->
-              <path d="M0 230 L600 230 L600 300 L0 300 Z" fill="url(#towerFloor)"/>
-              <line x1="0" y1="230" x2="600" y2="230" stroke="#fbbf24" stroke-width="2.5" opacity="0.9"/>
-              <!-- 기하학적 바닥 무늬 -->
-              <polygon points="150,230 180,265 120,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
-              <polygon points="300,230 330,265 270,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
-              <polygon points="450,230 480,265 420,265" fill="none" stroke="#92400e" stroke-width="1.5"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#fbbf24" stroke-width="2.5"/>
             </svg>
           `;
         } else {
-          // 5. 원형 차원문: 시공을 삼키는 거대한 동심원 우로보로스 차원문, 핏빛/암자색 소용돌이 마법진
           return `
             <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
-              <defs>
-                <linearGradient id="portalSky" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1f020a"/>
-                  <stop offset="50%" stop-color="#3b0718"/>
-                  <stop offset="100%" stop-color="#4c0519"/>
-                </linearGradient>
-                <radialGradient id="vortexCore" cx="50%" cy="40%" r="50%">
-                  <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.6"/>
-                  <stop offset="50%" stop-color="#be123c" stop-opacity="0.3"/>
-                  <stop offset="100%" stop-color="#1f020a" stop-opacity="0"/>
-                </radialGradient>
-              </defs>
-              <rect width="600" height="300" fill="url(#portalSky)"/>
-              
-              <!-- 차원 왜곡 중심 소용돌이 -->
-              <circle cx="300" cy="115" r="140" fill="url(#vortexCore)"/>
-              
-              <!-- 겹겹이 회전하는 거대 동심원 궤도와 원주각 기하 라인 -->
-              <circle cx="300" cy="115" r="105" fill="none" stroke="#fb7185" stroke-width="3" stroke-dasharray="16,8" opacity="0.8"/>
-              <circle cx="300" cy="115" r="75" fill="none" stroke="#fda4af" stroke-width="2.5" stroke-dasharray="10,5" opacity="0.85"/>
-              <circle cx="300" cy="115" r="45" fill="none" stroke="#f43f5e" stroke-width="3" stroke-dasharray="6,4" opacity="0.9"/>
-              <circle cx="300" cy="115" r="16" fill="#fb7185" opacity="0.8" filter="drop-shadow(0 0 10px #f43f5e)"/>
-              
-              <!-- 원에 내접하는 기하학적 삼각형 레이저선 (원주각 = 2분의1 중심각) -->
-              <polygon points="300,10 210,180 390,180" fill="none" stroke="#fecdd3" stroke-width="2" opacity="0.5"/>
-              <line x1="300" y1="115" x2="210" y2="180" stroke="#facc15" stroke-width="2" opacity="0.6"/>
-              <line x1="300" y1="115" x2="390" y2="180" stroke="#facc15" stroke-width="2" opacity="0.6"/>
-              <text x="300" y="145" text-anchor="middle" fill="#fde047" font-size="12" font-weight="900">2θ</text>
-              <text x="300" y="32" text-anchor="middle" fill="#fecdd3" font-size="12" font-weight="900">θ</text>
-
-              <!-- 차원 제단 바닥 플랫폼 -->
-              <path d="M0 230 Q300 220 600 230 L600 300 L0 300 Z" fill="#200109"/>
-              <line x1="0" y1="230" x2="600" y2="230" stroke="#f43f5e" stroke-width="3" opacity="0.9"/>
-              
-              <!-- 제단 원형 룬 링 바닥 패턴 -->
-              <ellipse cx="300" cy="245" rx="180" ry="18" fill="none" stroke="#e11d48" stroke-width="2" stroke-dasharray="12,6" opacity="0.7"/>
-              <ellipse cx="300" cy="245" rx="100" ry="10" fill="none" stroke="#fb7185" stroke-width="2" opacity="0.6"/>
+              <rect width="600" height="300" fill="#1f020a"/>
+              <circle cx="300" cy="115" r="75" fill="none" stroke="#fda4af" stroke-width="2.5" stroke-dasharray="10,5"/>
+              <line x1="0" y1="230" x2="600" y2="230" stroke="#f43f5e" stroke-width="2.5"/>
             </svg>
           `;
         }
@@ -1234,62 +1167,24 @@
             };
           }
         } else if (tier === 2) {
-          const type = this.getRandomInt(1, 3);
-          if (type === 1) {
-            const a = this.getRandomChoice([2, 3, 5]);
-            const mul = this.getRandomInt(2, 6);
-            const top = a * mul;
-            return {
-              topic: "[제곱근] 분모의 유리화",
-              question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, $k$의 값은?`,
-              answer: mul,
-              solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다.`
-            };
-          } else if (type === 2) {
-            const n = this.getRandomChoice([12, 18, 20, 24, 27, 45]);
-            let ans = 3;
-            if (n === 12 || n === 27) ans = 3;
-            else if (n === 18) ans = 2;
-            else if (n === 20 || n === 45) ans = 5;
-            else if (n === 24) ans = 6;
-            return {
-              topic: "[제곱근] 근호 안이 제곱수가 되는 조건",
-              question: `$\\sqrt{${n}x}$ 가 가장 작은 자연수가 되도록 하는 자연수 $x$의 값은?`,
-              answer: ans,
-              solution: `$${n}$ 을 소인수분해하여 지수가 홀수인 소인수를 짝수로 만들어야 하므로 가장 작은 자연수 $x = ${ans}$ 입니다.`
-            };
-          } else {
-            const a = this.getRandomInt(2, 4);
-            const b = this.getRandomChoice([2, 3]);
-            return {
-              topic: "[제곱근] 제곱근의 곱셈 연산",
-              question: `$\\sqrt{${a * 2}} \\times \\sqrt{${a * b * 2}}$ 를 간단히 했을 때의 정수 계수는?`,
-              answer: a * 2,
-              solution: `$\\sqrt{${a * 2} \\times ${a * b * 2}} = \\sqrt{(${a * 2})^2 \\times ${b}} = ${a * 2}\\sqrt{${b}}$ 입니다.`
-            };
-          }
+          const a = this.getRandomChoice([2, 3, 5]);
+          const mul = this.getRandomInt(2, 6);
+          const top = a * mul;
+          return {
+            topic: "[제곱근] 분모의 유리화",
+            question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, $k$의 값은?`,
+            answer: mul,
+            solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다.`
+          };
         } else {
-          const type = this.getRandomInt(1, 2);
-          if (type === 1) {
-            const n = this.getRandomInt(4, 9);
-            const add = this.getRandomInt(1, 3);
-            return {
-              topic: "[제곱근 보스] 무리수의 정수 부분",
-              question: `$\\sqrt{${n * n + add}}$ 의 정수 부분을 구하시오. (단답형 정수 입력)`,
-              answer: n,
-              solution: `$${n}^2 = ${n * n} < ${n * n + add} < ${(n + 1) * (n + 1)} = ${(n + 1) ** 2}$ 이므로,<br>$\\sqrt{${n * n + add}}$ 의 정수 부분은 $${n}$ 입니다.`
-            };
-          } else {
-            const a = this.getRandomInt(2, 5);
-            const b = this.getRandomChoice([2, 3]);
-            const inside = a * a * b;
-            return {
-              topic: "[제곱근 보스] 근호 밖의 정수 계수",
-              question: `$\\sqrt{${inside}}$ 를 $k\\sqrt{${b}}$ 로 나타낼 때의 자연수 $k$의 값을 구하시오. (단답형 정수 입력)`,
-              answer: a,
-              solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 이므로 $k = ${a}$ 입니다.`
-            };
-          }
+          const n = this.getRandomInt(4, 9);
+          const add = this.getRandomInt(1, 3);
+          return {
+            topic: "[제곱근 보스] 무리수의 정수 부분",
+            question: `$\\sqrt{${n * n + add}}$ 의 정수 부분을 구하시오. (단답형 정수 입력)`,
+            answer: n,
+            solution: `$${n}^2 = ${n * n} < ${n * n + add} < ${(n + 1) * (n + 1)} = ${(n + 1) ** 2}$ 이므로,<br>$\\sqrt{${n * n + add}}$ 의 정수 부분은 $${n}$ 입니다.`
+          };
         }
       },
 
@@ -1302,50 +1197,19 @@
         const cSign = c < 0 ? `${c}` : `+${c}`;
 
         if (tier === 1) {
-          const type = this.getRandomInt(1, 3);
-          if (type === 1) {
-            return {
-              topic: "[이차방정식] 인수분해와 해 구하기",
-              question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 양수인 두 근 중 더 큰 근은?`,
-              answer: Math.max(r1, r2),
-              solution: `좌변을 인수분해하면 $(x - ${r1})(x - ${r2}) = 0$ 이므로<br>두 근은 $x = ${r1}$ 또는 $x = ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
-            };
-          } else if (type === 2) {
-            return {
-              topic: "[이차방정식] 한 근 대입과 미지수",
-              question: `이차방정식 $x^2 ${bSign} + k = 0$ 의 한 근이 $x = ${r1}$ 일 때, 상수 $k$의 값은?`,
-              answer: c,
-              solution: `$x = ${r1}$ 을 대입하면 $(${r1})^2 ${b < 0 ? `${b} \\times ${r1}` : `+ ${b} \\times ${r1}`} + k = 0 \\implies k = ${c}$ 입니다.`
-            };
-          } else {
-            const k = this.getRandomInt(2, 7);
-            return {
-              topic: "[이차방정식] 중근을 가질 조건",
-              question: `이차방정식 $x^2 - ${2 * k}x + m = 0$ 이 중근을 가질 때, 상수 $m$의 값은?`,
-              answer: k * k,
-              solution: `일차항 계수의 반의 제곱이 상수항이어야 하므로<br>$m = \\left(-\\frac{${2 * k}}{2}\\right)^2 = (-${k})^2 = ${k * k}$ 입니다.`
-            };
-          }
+          return {
+            topic: "[이차방정식] 인수분해와 해 구하기",
+            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 양수인 두 근 중 더 큰 근은?`,
+            answer: Math.max(r1, r2),
+            solution: `좌변을 인수분해하면 $(x - ${r1})(x - ${r2}) = 0$ 이므로<br>두 근은 $x = ${r1}$ 또는 $x = ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
+          };
         } else if (tier === 2) {
-          const type = this.getRandomInt(1, 2);
-          if (type === 1) {
-            return {
-              topic: "[이차방정식] 두 근의 합",
-              question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 합은?`,
-              answer: r1 + r2,
-              solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${r1 + r2}$ 입니다.`
-            };
-          } else {
-            const p = this.getRandomInt(1, 4);
-            const k = this.getRandomChoice([4, 9, 16, 25]);
-            const rootK = Math.round(Math.sqrt(k));
-            return {
-              topic: "[이차방정식] 제곱근을 이용한 해",
-              question: `이차방정식 $(x - ${p})^2 = ${k}$ 의 양수인 해는?`,
-              answer: p + rootK,
-              solution: `$x - ${p} = \\pm ${rootK}$ 이므로 $x = ${p} + ${rootK} = ${p + rootK}$ 또는 $x = ${p} - ${rootK} = ${p - rootK}$ 입니다.`
-            };
-          }
+          return {
+            topic: "[이차방정식] 두 근의 합",
+            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 합은?`,
+            answer: r1 + r2,
+            solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${r1 + r2}$ 입니다.`
+          };
         } else {
           return {
             topic: "[이차방정식 보스] 두 근의 곱",
@@ -1361,48 +1225,19 @@
         const q = this.getRandomInt(2, 8);
 
         if (tier === 1) {
-          const type = this.getRandomInt(1, 3);
-          if (type === 1) {
-            return {
-              topic: "[이차함수] 꼭짓점의 y좌표",
-              question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
-              answer: q,
-              solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
-            };
-          } else if (type === 2) {
-            return {
-              topic: "[이차함수] 꼭짓점의 x좌표",
-              question: `이차함수 $y = 2(x - ${p})^2 + ${q}$ 의 꼭짓점의 $x$좌표는?`,
-              answer: p,
-              solution: `꼭짓점의 좌표는 $(${p}, ${q})$ 이므로 꼭짓점의 $x$좌표는 $${p}$ 입니다.`
-            };
-          } else {
-            const ans = p * p + q;
-            return {
-              topic: "[이차함수] y축과의 교점(y절편)",
-              question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 그래프가 $y$축과 만나는 점의 $y$좌표는?`,
-              answer: ans,
-              solution: `$x = 0$ 을 대입하면 $y = (0 - ${p})^2 + ${q} = ${p * p} + ${q} = ${ans}$ 입니다.`
-            };
-          }
+          return {
+            topic: "[이차함수] 꼭짓점의 y좌표",
+            question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
+            answer: q,
+            solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
+          };
         } else if (tier === 2) {
-          const type = this.getRandomInt(1, 2);
-          if (type === 1) {
-            return {
-              topic: "[이차함수] 대칭축의 방정식",
-              question: `이차함수 $y = -(x + ${p})^2 + ${q}$ 의 대칭축의 방정식 $x = k$ 에서 $k$의 값은?`,
-              answer: -p,
-              solution: `대칭축은 $x + ${p} = 0 \\implies x = -${p}$ 입니다.`
-            };
-          } else {
-            const a = this.getRandomInt(2, 4);
-            return {
-              topic: "[이차함수] 함수의 최솟값",
-              question: `이차함수 $y = ${a}(x - ${p})^2 + ${q}$ 의 최솟값은?`,
-              answer: q,
-              solution: `아래로 볼록한 포물선이므로 꼭짓점의 $y$좌표인 $${q}$ 가 최솟값입니다.`
-            };
-          }
+          return {
+            topic: "[이차함수] 대칭축의 방정식",
+            question: `이차함수 $y = -(x + ${p})^2 + ${q}$ 의 대칭축의 방정식 $x = k$ 에서 $k$의 값은?`,
+            answer: -p,
+            solution: `대칭축은 $x + ${p} = 0 \\implies x = -${p}$ 입니다.`
+          };
         } else {
           return {
             topic: "[이차함수 보스] 함수의 최댓값",
@@ -1415,144 +1250,49 @@
 
       genUnit4(tier) {
         if (tier === 1) {
-          const type = this.getRandomInt(1, 5);
-          if (type === 1) {
-            return {
-              topic: "[삼각비] 특수각의 삼각비 연산",
-              question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
-              answer: 1,
-              solution: `$\\sin 30^\\circ = \\frac{1}{2}$, $\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
-            };
-          } else if (type === 2) {
-            const mul = this.getRandomInt(2, 5);
-            return {
-              topic: "[삼각비] 탄젠트와 사인 특수각",
-              question: `$\\tan 45^\\circ \\times ${mul} + 1$ 의 값은?`,
-              answer: mul + 1,
-              solution: `$\\tan 45^\\circ = 1$ 이므로 $1 \\times ${mul} + 1 = ${mul + 1}$ 입니다.`
-            };
-          } else if (type === 3) {
-            return {
-              topic: "[삼각비] 0도와 90도의 삼각비",
-              question: `$\\cos 0^\\circ + \\sin 90^\\circ$ 의 값은?`,
-              answer: 2,
-              solution: `$\\cos 0^\\circ = 1$, $\\sin 90^\\circ = 1$ 이므로 $1 + 1 = 2$ 입니다.`
-            };
-          } else if (type === 4) {
-            const n = this.getRandomChoice([4, 6, 8, 10]);
-            return {
-              topic: "[삼각비] 코사인 60도 연산",
-              question: `$${n} \\times \\cos 60^\\circ$ 의 값을 계산하면?`,
-              answer: n / 2,
-              solution: `$\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $${n} \\times \\frac{1}{2} = ${n / 2}$ 입니다.`
-            };
-          } else {
-            const mul = this.getRandomChoice([2, 4, 6]);
-            return {
-              topic: "[삼각비] 45도 삼각비의 곱",
-              question: `$\\sin 45^\\circ \\times \\cos 45^\\circ \\times ${mul * 2}$ 의 값은?`,
-              answer: mul,
-              solution: `$\\sin 45^\\circ = \\frac{\\sqrt{2}}{2}$, $\\cos 45^\\circ = \\frac{\\sqrt{2}}{2}$ 이므로 $\\frac{2}{4} \\times ${mul * 2} = ${mul}$ 입니다.`
-            };
-          }
+          return {
+            topic: "[삼각비] 특수각의 삼각비 연산",
+            question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
+            answer: 1,
+            solution: `$\\sin 30^\\circ = \\frac{1}{2}$, $\\cos 60^\\circ = \\frac{1}{2}$ 이므로 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
+          };
         } else if (tier === 2) {
-          const type = this.getRandomInt(1, 3);
-          if (type === 1) {
-            const k = this.getRandomInt(2, 6);
-            return {
-              topic: "[삼각비] 특수각 혼합 사칙연산",
-              question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
-              answer: k - 1,
-              solution: `$\\tan 45^\\circ = 1$, $\\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k} \\times 1 - 2 \\times \\frac{1}{2} = ${k} - 1 = ${k - 1}$ 입니다.`
-            };
-          } else if (type === 2) {
-            const mul = this.getRandomInt(1, 3);
-            const a = 3 * mul;
-            const b = 4 * mul;
-            const c = 5 * mul;
-            return {
-              topic: "[삼각비] 직각삼각형 빗변과 삼각비",
-              question: `밑변이 $${a}$, 높이가 $${b}$ 인 직각삼각형의 빗변의 길이는?`,
-              answer: c,
-              solution: `피타고라스 정리에 의해 $\\sqrt{${a}^2 + ${b}^2} = \\sqrt{${a * a} + ${b * b}} = \\sqrt{${c * c}} = ${c}$ 입니다.`
-            };
-          } else {
-            const hypo = this.getRandomChoice([8, 10, 12, 16]);
-            return {
-              topic: "[삼각비] 특수각 직각삼각형 높이",
-              question: `빗변이 $${hypo}$ 이고 밑각이 $30^\\circ$ 인 직각삼각형의 높이는?`,
-              answer: hypo / 2,
-              solution: `$\\text{높이} = \\text{빗변} \\times \\sin 30^\\circ = ${hypo} \\times \\frac{1}{2} = ${hypo / 2}$ 입니다.`
-            };
-          }
+          const k = this.getRandomInt(2, 6);
+          return {
+            topic: "[삼각비] 특수각 혼합 사칙연산",
+            question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
+            answer: k - 1,
+            solution: `$\\tan 45^\\circ = 1$, $\\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k} \\times 1 - 2 \\times \\frac{1}{2} = ${k} - 1 = ${k - 1}$ 입니다.`
+          };
         } else {
-          const type = this.getRandomInt(1, 2);
-          if (type === 1) {
-            const base = this.getRandomChoice([4, 6, 8, 10]);
-            return {
-              topic: "[삼각비 보스] 직각삼각형 빗변 계산",
-              question: `밑변이 $${base}$ 이고 각도가 $60^\\circ$ 인 직각삼각형에서 빗변의 길이를 구하시오. (단답형 정수 입력)`,
-              answer: base * 2,
-              solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2}$ 이므로, 빗변 $= ${base} \\times 2 = ${base * 2}$ 입니다.`
-            };
-          } else {
-            const base = this.getRandomChoice([5, 7, 9, 12]);
-            return {
-              topic: "[삼각비 보스] 45도 직각삼각형 높이",
-              question: `밑각이 $45^\\circ$ 이고 밑변이 $${base}$ 인 직각삼각형의 높이를 구하시오. (단답형 정수 입력)`,
-              answer: base,
-              solution: `$\\tan 45^\\circ = \\frac{\\text{높이}}{\\text{밑변}} = 1$ 이므로 높이는 밑변과 같은 $${base}$ 입니다.`
-            };
-          }
+          const base = this.getRandomChoice([4, 6, 8, 10]);
+          return {
+            topic: "[삼각비 보스] 직각삼각형 빗변 계산",
+            question: `밑변이 $${base}$ 이고 각도가 $60^\\circ$ 인 직각삼각형에서 빗변의 길이를 구하시오. (단답형 정수 입력)`,
+            answer: base * 2,
+            solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2}$ 이므로, 빗변 $= ${base} \\times 2 = ${base * 2}$ 입니다.`
+          };
         }
       },
 
       genUnit5(tier) {
         if (tier === 1) {
-          const type = this.getRandomInt(1, 3);
-          if (type === 1) {
-            const centerAngle = this.getRandomChoice([50, 60, 70, 80, 100, 120, 140]);
-            const inscribedAngle = centerAngle / 2;
-            return {
-              topic: "[원의 성질] 중심각과 원주각",
-              question: `한 호에 대한 중심각의 크기가 $${centerAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
-              answer: inscribedAngle,
-              solution: `원주각의 크기는 중심각의 절반이므로 $\\frac{${centerAngle}^\\circ}{2} = ${inscribedAngle}^\\circ$ 입니다.`
-            };
-          } else if (type === 2) {
-            const inscribedAngle = this.getRandomChoice([25, 30, 35, 45, 55, 60]);
-            return {
-              topic: "[원의 성질] 원주각으로 중심각 구하기",
-              question: `한 호에 대한 원주각의 크기가 $${inscribedAngle}^\\circ$ 일 때, 중심각의 크기는 몇 도($^\\circ$)인가?`,
-              answer: inscribedAngle * 2,
-              solution: `중심각의 크기는 원주각의 2배이므로 $${inscribedAngle}^\\circ \\times 2 = ${inscribedAngle * 2}^\\circ$ 입니다.`
-            };
-          } else {
-            return {
-              topic: "[원의 성질] 지름에 대한 원주각",
-              question: `원의 지름을 한 변으로 하는 내접 삼각형의 원주각 크기는 몇 도($^\\circ$)인가?`,
-              answer: 90,
-              solution: `지름에 대한 호의 중심각이 $180^\\circ$ 이므로, 그 원주각은 절반인 $90^\\circ$ 입니다.`
-            };
-          }
+          const centerAngle = this.getRandomChoice([50, 60, 70, 80, 100, 120, 140]);
+          const inscribedAngle = centerAngle / 2;
+          return {
+            topic: "[원의 성질] 중심각과 원주각",
+            question: `한 호에 대한 중심각의 크기가 $${centerAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: inscribedAngle,
+            solution: `원주각의 크기는 중심각의 절반이므로 $\\frac{${centerAngle}^\\circ}{2} = ${inscribedAngle}^\\circ$ 입니다.`
+          };
         } else if (tier === 2) {
-          const type = this.getRandomInt(1, 2);
-          if (type === 1) {
-            const angleA = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
-            return {
-              topic: "[원의 성질] 원에 내접하는 사각형",
-              question: `원에 내접하는 사각형의 한 각의 크기가 $${angleA}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
-              answer: 180 - angleA,
-              solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 항상 $180^\\circ$ 이므로 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
-            };
-          } else {
-            return {
-              topic: "[원의 성질] 원의 접선과 반지름",
-              question: `원의 접선과 그 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
-              answer: 90,
-              solution: `원의 중심에서 접점에 그은 반지름은 접선과 항상 수직($90^\\circ$)을 이룹니다.`
-            };
-          }
+          const angleA = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
+          return {
+            topic: "[원의 성질] 원에 내접하는 사각형",
+            question: `원에 내접하는 사각형의 한 각의 크기가 $${angleA}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: 180 - angleA,
+            solution: `원에 내접하는 사각형의 마주 보는 두 대각의 합은 항상 $180^\\circ$ 이므로 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
+          };
         } else {
           const angleA = this.getRandomChoice([60, 70, 75, 80, 85, 110, 115]);
           return {
@@ -1567,8 +1307,8 @@
 
     const App = {
       backendUrl: "https://script.google.com/macros/s/AKfycbxwhVUO2iLNCuJ9uRuKwUgZWz0q08D63psh8M6wiUWG6GmsD3SC7UVMXa0_EcU71V59/exec",
-      MAX_POTIONS: 5,
 
+      // 게임 기본 상태
       state: {
         pin: "",
         level: 1,
@@ -1580,7 +1320,12 @@
         def: 5,
         weapon: 0,
         armor: 0,
-        inventory: { potion: 3 },
+        maxPotionCapacity: 5, // 기본 5칸 -> 8칸 -> 10칸 -> 12칸 (골드 유료 확장)
+        potions: {
+          minor: 2,   // 20% 회복 (40 G)
+          normal: 1,  // 45% 회복 (120 G)
+          major: 0    // 75% 회복 (280 G)
+        },
         materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
         progress: { tier1: {}, tier2: {}, tier3: {} },
         stats: { solved: 0, correct: 0 }
@@ -1590,7 +1335,7 @@
       currentBattle: null,
       isTurnBusy: false,
       keypadInput: "",
-      wavePotionCount: 0,
+      wavePotionCount: 0, // 구역당 최대 2회 제한 유지
 
       init() {
         this.loadFromLocalStorage();
@@ -1598,6 +1343,10 @@
         this.renderLobbyDungeons();
         this.updateHeaderUI();
         this.setupAlchemySelects();
+      },
+
+      getTotalPotionCount() {
+        return (this.state.potions.minor || 0) + (this.state.potions.normal || 0) + (this.state.potions.major || 0);
       },
 
       calculateStats() {
@@ -1744,7 +1493,7 @@
 
         document.getElementById("battle-dungeon-badge").textContent = dungeon.name;
         document.getElementById("battle-tier-badge").textContent = tier === 1 ? "T1 하급 마물림" : (tier === 2 ? "T2 정예 유적" : "T3 보스 성소");
-        document.getElementById("battle-potion-count").textContent = `${Math.min(this.MAX_POTIONS, this.state.inventory.potion || 0)}/${this.MAX_POTIONS}`;
+        document.getElementById("battle-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
 
         document.getElementById("arena-player-atk").textContent = Math.round(this.state.atk);
         document.getElementById("arena-player-def").textContent = Math.round(this.state.def);
@@ -1844,7 +1593,6 @@
         });
       },
 
-      // 확실한 횡방향 공방 돌진 & 타격 피격 시퀀스
       handlePlayerAnswer(selectedVal) {
         if (this.isTurnBusy || !this.currentBattle) return;
         this.isTurnBusy = true;
@@ -1861,11 +1609,9 @@
           const mSprite = document.getElementById("monster-svg-target");
           const mSlash = document.getElementById("monster-slash-fx");
 
-          // 1단계: 플레이어 대기 모션 해제 후 적 진영으로 전력 돌진
           pSprite.classList.remove("anim-idle");
           pSprite.classList.add("anim-player-attack");
 
-          // 2단계: 정점 타격 순간(약 300ms) 피격 이펙트 및 몬스터 넉백
           setTimeout(() => {
             SoundManager.playHit();
             if (mSlash) {
@@ -1880,7 +1626,6 @@
             this.showDamagePopup("monster-damage-pos", `-${dmg}`);
             this.updateBattleStageHpUI();
 
-            // 3단계: 플레이어 원위치 복귀
             setTimeout(() => {
               pSprite.classList.remove("anim-player-attack");
               pSprite.classList.add("anim-idle");
@@ -1894,7 +1639,6 @@
               if (b.monster.hp <= 0) {
                 this.handleMonsterDefeat();
               } else {
-                // 살아있으면 몬스터가 즉시 반격 돌진!
                 setTimeout(() => {
                   this.executeMonsterCounterAttack();
                 }, 350);
@@ -1934,11 +1678,9 @@
         const pSprite = document.getElementById("battle-player-sprite");
         const pSlash = document.getElementById("player-slash-fx");
 
-        // 1단계: 몬스터 대기 모션 해제 후 플레이어 진영으로 역돌진
         mSprite.classList.remove("anim-idle");
         mSprite.classList.add("anim-monster-attack");
 
-        // 2단계: 플레이어 충돌 순간(약 300ms) 피격 플래시 & 넉백 흔들림
         setTimeout(() => {
           SoundManager.playHit();
           if (pSlash) {
@@ -1953,7 +1695,6 @@
           this.showDamagePopup("player-damage-pos", `-${rawDmg}`);
           this.updateHeaderUI();
 
-          // 3단계: 몬스터 원위치 복귀 및 다음 턴 준비
           setTimeout(() => {
             mSprite.classList.remove("anim-monster-attack");
             mSprite.classList.add("anim-idle");
@@ -2005,10 +1746,11 @@
         this.state.materials[dungeon.matKey] = (this.state.materials[dungeon.matKey] || 0) + dropCount;
         b.accumulatedRewards.materials += dropCount;
 
+        // 20% 확률로 상급 마나 영약 획득
         let potionDropped = false;
-        if (Math.random() < 0.20 && (this.state.inventory.potion || 0) < this.MAX_POTIONS) {
+        if (Math.random() < 0.20 && this.getTotalPotionCount() < this.state.maxPotionCapacity) {
           potionDropped = true;
-          this.state.inventory.potion = (this.state.inventory.potion || 0) + 1;
+          this.state.potions.normal = (this.state.potions.normal || 0) + 1;
           b.accumulatedRewards.potions += 1;
         }
 
@@ -2029,7 +1771,7 @@
             </div>
             <div class="flex justify-between"><span>• 골드 / EXP</span><span class="font-mono text-slate-200">+${currentMon.gold} G / +${currentMon.exp} EXP</span></div>
             <div class="flex justify-between"><span>• 특산물 획득</span><span class="font-mono text-emerald-400 font-bold">${dungeon.matName} +${dropCount}개</span></div>
-            ${potionDropped ? `<div class="flex justify-between text-rose-400 font-bold"><span>• 보너스 드랍</span><span>생명의 마나 물약 +1개 (가방 보관)</span></div>` : ``}
+            ${potionDropped ? `<div class="flex justify-between text-rose-400 font-bold"><span>• 보너스 드랍</span><span>상급 마나 영약 +1개 (가방 보관)</span></div>` : ``}
           `;
 
           document.getElementById("modal-wave-clear").classList.remove("hidden");
@@ -2039,7 +1781,7 @@
         const tierKey = `tier${b.tier}`;
         this.state.progress[tierKey][`u${dungeon.id}`] = (this.state.progress[tierKey][`u${dungeon.id}`] || 0) + 1;
 
-        const bonusGold = b.tier * 25;
+        const bonusGold = b.tier * 30;
         const bonusMat = b.tier * 1;
         this.state.gold += bonusGold;
         this.state.materials[dungeon.matKey] += bonusMat;
@@ -2053,7 +1795,7 @@
           `• 던전 정복 횟수: ${this.state.progress[tierKey][`u${dungeon.id}`]}회 달성!`;
 
         if (b.accumulatedRewards.potions > 0) {
-          clearMsg += `\n• 획득한 물약: 총 ${b.accumulatedRewards.potions}개`;
+          clearMsg += `\n• 획득한 영약: 총 ${b.accumulatedRewards.potions}개`;
         }
 
         this.showModal("🏆 던전 완전 정복! 🏆", clearMsg, "fa-solid fa-trophy text-amber-400");
@@ -2078,7 +1820,7 @@
         SoundManager.playDefeat();
         this.showModal(
           "모험 실패...",
-          "마물의 맹공을 버티지 못하고 쓰러졌습니다!\n체력이 20%로 감소한 채 수도로 후송되었습니다. 물약과 방어구 강화를 준비하세요.",
+          "마물의 맹공을 버티지 못하고 쓰러졌습니다!\n체력이 20%로 감소한 채 수도로 후송되었습니다. 상점에서 엘릭서와 방어구를 정비하세요.",
           "fa-solid fa-skull text-rose-500"
         );
         this.state.hp = Math.max(10, Math.round(this.state.maxHp * 0.2));
@@ -2094,95 +1836,182 @@
         this.triggerCloudSave(false);
       },
 
-      usePotionInLobby() {
-        if ((this.state.inventory.potion || 0) <= 0) {
-          this.showToast("보유한 물약이 없습니다! 50골드로 구매하세요.", "error");
+      // --- [신규 만물 상점 시스템] ---
+      openShopModal() {
+        document.getElementById("shop-gold-display").textContent = this.state.gold;
+        document.getElementById("shop-bag-status").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+
+        // 가방 확장 상태 갱신
+        const cap = this.state.maxPotionCapacity || 5;
+        const btnBag = document.getElementById("btn-upgrade-bag");
+        const descBag = document.getElementById("bag-upgrade-desc");
+
+        if (cap < 8) {
+          descBag.textContent = "가방 1차 확장 (최대 8칸까지 물약 소지)";
+          btnBag.textContent = "가방 확장 (400 G)";
+          btnBag.disabled = false;
+          btnBag.className = "w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-sky-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl transition shadow";
+        } else if (cap < 10) {
+          descBag.textContent = "가방 2차 확장 (최대 10칸까지 물약 소지)";
+          btnBag.textContent = "가방 확장 (1,000 G)";
+          btnBag.disabled = false;
+          btnBag.className = "w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-sky-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl transition shadow";
+        } else if (cap < 12) {
+          descBag.textContent = "가방 최종 확장 (최대 12칸까지 물약 소지)";
+          btnBag.textContent = "가방 확장 (2,000 G)";
+          btnBag.disabled = false;
+          btnBag.className = "w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-sky-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl transition shadow";
+        } else {
+          descBag.textContent = "가방 최고 단계 확장 완료 (최대 12칸 소지)";
+          btnBag.textContent = "최대 확장 완료 (MAX)";
+          btnBag.disabled = true;
+          btnBag.className = "w-full sm:w-auto bg-slate-800 text-slate-500 font-bold px-4 py-2 rounded-xl cursor-not-allowed";
+        }
+
+        // 5대 특산물 구매 그리드 주입
+        const matGrid = document.getElementById("shop-materials-grid");
+        matGrid.innerHTML = "";
+        DUNGEON_DATA.forEach(d => {
+          const currentCount = this.state.materials[d.matKey] || 0;
+          const box = document.createElement("div");
+          box.className = "bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex flex-col justify-between";
+          box.innerHTML = `
+            <div>
+              <div class="text-[11px] font-bold text-amber-300 truncate">${d.matName}</div>
+              <div class="text-[10px] text-slate-400 font-mono">보유: ${currentCount}개</div>
+            </div>
+            <button onclick="App.buyMaterial('${d.matKey}', '${d.matName}')" class="mt-2 w-full bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/50 text-amber-300 text-[11px] font-bold py-1 rounded-lg transition">
+              1개 구입 (180G)
+            </button>
+          `;
+          matGrid.appendChild(box);
+        });
+
+        document.getElementById("modal-shop").classList.remove("hidden");
+      },
+
+      buyPotion(type) {
+        if (this.getTotalPotionCount() >= this.state.maxPotionCapacity) {
+          this.showToast(`물약 가방이 가득 찼습니다! (최대 ${this.state.maxPotionCapacity}개 소지 가능)`, "info");
           return;
         }
-        if (this.state.hp >= this.state.maxHp) {
-          this.showToast("이미 체력이 가득 차 있습니다.", "info");
+
+        const prices = { minor: 40, normal: 120, major: 280 };
+        const names = { minor: "하급 생명수", normal: "상급 마나 영약", major: "기원의 엘릭서" };
+        const cost = prices[type];
+
+        if (this.state.gold < cost) {
+          this.showToast(`골드가 부족합니다! (${cost} G 필요)`, "error");
           return;
         }
-        this.state.inventory.potion--;
-        this.state.hp = Math.min(this.state.maxHp, this.state.hp + Math.round(this.state.maxHp * 0.45));
+
+        this.state.gold -= cost;
+        this.state.potions[type] = (this.state.potions[type] || 0) + 1;
         SoundManager.playPotion();
-        this.showToast("생명의 물약을 복용하여 HP를 회복했습니다!", "success");
+        this.showToast(`${names[type]} 1개 구매 완료! (보유: ${this.getTotalPotionCount()}/${this.state.maxPotionCapacity})`, "success");
         this.updateHeaderUI();
+        this.openShopModal();
         this.saveToLocalStorage();
       },
 
-      usePotionInBattle() {
-        if ((this.state.inventory.potion || 0) <= 0) {
-          this.showToast("보유한 물약이 없습니다!", "error");
+      upgradeBagCapacity() {
+        const cap = this.state.maxPotionCapacity || 5;
+        let cost = 0;
+        let nextCap = 0;
+
+        if (cap < 8) { cost = 400; nextCap = 8; }
+        else if (cap < 10) { cost = 1000; nextCap = 10; }
+        else if (cap < 12) { cost = 2000; nextCap = 12; }
+        else {
+          this.showToast("이미 가방이 최대 용량(12칸)에 도달했습니다!", "info");
           return;
         }
+
+        if (this.state.gold < cost) {
+          this.showToast(`가방 확장에 필요한 골드가 부족합니다! (${cost} G 필요)`, "error");
+          return;
+        }
+
+        this.state.gold -= cost;
+        this.state.maxPotionCapacity = nextCap;
+        SoundManager.playVictory();
+        this.showToast(`🎉 가방 슬롯 확장 완료! (최대 ${nextCap}개 소지 가능)`, "success");
+        this.updateHeaderUI();
+        this.openShopModal();
+        this.saveToLocalStorage();
+      },
+
+      buyMaterial(matKey, matName) {
+        const cost = 180;
+        if (this.state.gold < cost) {
+          this.showToast("골드가 부족합니다! (180 G 필요)", "error");
+          return;
+        }
+
+        this.state.gold -= cost;
+        this.state.materials[matKey] = (this.state.materials[matKey] || 0) + 1;
+        SoundManager.playPotion();
+        this.showToast(`[${matName}] 1개 조달 완료! (보유: ${this.state.materials[matKey]}개)`, "success");
+        this.updateHeaderUI();
+        this.openShopModal();
+        this.saveToLocalStorage();
+      },
+
+      // --- [물약 선택 복용 인터페이스] ---
+      openLobbyPotionModal() {
+        this.openPotionSelectModal("마을 휴식 중입니다. 회복할 물약을 선택하세요.");
+      },
+
+      openBattlePotionSelectModal() {
         if (this.wavePotionCount >= 2) {
           this.showToast("물약 과다 복용 방지! 한 구역에서는 최대 2번만 복용할 수 있습니다.", "error");
           return;
         }
+        this.openPotionSelectModal(`전투 중입니다! (이번 구역 복용: ${this.wavePotionCount}/2회)`);
+      },
+
+      openPotionSelectModal(infoText) {
+        document.getElementById("potion-modal-info").textContent = infoText;
+        document.getElementById("pos-count-minor").textContent = this.state.potions.minor || 0;
+        document.getElementById("pos-count-normal").textContent = this.state.potions.normal || 0;
+        document.getElementById("pos-count-major").textContent = this.state.potions.major || 0;
+        document.getElementById("modal-potion-select").classList.remove("hidden");
+      },
+
+      consumePotion(type) {
+        if ((this.state.potions[type] || 0) <= 0) {
+          this.showToast("보유한 해당 물약이 없습니다! 만물 상점에서 구매하세요.", "error");
+          return;
+        }
         if (this.state.hp >= this.state.maxHp) {
           this.showToast("이미 체력이 가득 차 있습니다.", "info");
           return;
         }
-        this.wavePotionCount++;
-        this.state.inventory.potion--;
-        const healAmt = Math.round(this.state.maxHp * 0.45);
+
+        if (this.currentBattle) {
+          if (this.wavePotionCount >= 2) {
+            this.showToast("한 구역에서는 최대 2번만 복용할 수 있습니다!", "error");
+            return;
+          }
+          this.wavePotionCount++;
+        }
+
+        this.state.potions[type]--;
+        const rates = { minor: 0.20, normal: 0.45, major: 0.75 };
+        const names = { minor: "하급 생명수", normal: "상급 마나 영약", major: "기원의 엘릭서" };
+        const healAmt = Math.round(this.state.maxHp * rates[type]);
+
         this.state.hp = Math.min(this.state.maxHp, this.state.hp + healAmt);
         SoundManager.playPotion();
-        document.getElementById("battle-potion-count").textContent = `${this.state.inventory.potion}/${this.MAX_POTIONS}`;
-        this.showDamagePopup("player-damage-pos", `+${healAmt}`);
-        this.updateHeaderUI();
-        this.saveToLocalStorage();
-      },
 
-      buyPotionWithGold() {
-        if ((this.state.inventory.potion || 0) >= this.MAX_POTIONS) {
-          this.showToast(`물약 가방이 가득 찼습니다! (최대 ${this.MAX_POTIONS}개 소지 가능)`, "info");
-          return;
-        }
-        const cost = 50;
-        if (this.state.gold < cost) {
-          this.showToast("골드가 부족합니다! (50G 필요)", "error");
-          return;
-        }
-        this.state.gold -= cost;
-        this.state.inventory.potion = (this.state.inventory.potion || 0) + 1;
-        SoundManager.playPotion();
-        this.showToast(`물약 1개 구매 완료! (보유: ${this.state.inventory.potion}/${this.MAX_POTIONS})`, "success");
-        this.updateHeaderUI();
-        this.saveToLocalStorage();
         if (this.currentBattle) {
-          document.getElementById("battle-potion-count").textContent = `${this.state.inventory.potion}/${this.MAX_POTIONS}`;
+          this.showDamagePopup("player-damage-pos", `+${healAmt}`);
         }
-      },
 
-      craftPotion() {
-        if ((this.state.inventory.potion || 0) >= this.MAX_POTIONS) {
-          this.showToast(`물약 가방이 가득 찼습니다! (최대 ${this.MAX_POTIONS}개)`, "info");
-          return;
-        }
-        let chosenKey = null;
-        for (const d of DUNGEON_DATA) {
-          if ((this.state.materials[d.matKey] || 0) >= 3) {
-            chosenKey = d.matKey;
-            break;
-          }
-        }
-        if (!chosenKey) {
-          this.showToast("어떤 단원의 재료든 3개 이상 보유해야 연성할 수 있습니다.", "error");
-          return;
-        }
-        if (this.state.gold < 20) {
-          this.showToast("연금 비용(20G)이 부족합니다.", "error");
-          return;
-        }
-        this.state.materials[chosenKey] -= 3;
-        this.state.gold -= 20;
-        this.state.inventory.potion = (this.state.inventory.potion || 0) + 1;
-        SoundManager.playPotion();
-        this.showToast(`물약 연성 성공! (보유: ${this.state.inventory.potion}/${this.MAX_POTIONS})`, "success");
+        this.showToast(`${names[type]} 복용! HP +${healAmt} 회복!`, "success");
         this.updateHeaderUI();
         this.saveToLocalStorage();
+        this.openPotionSelectModal("물약을 성공적으로 복용했습니다.");
       },
 
       checkLevelUp() {
@@ -2206,9 +2035,17 @@
         }
       },
 
+      // 장비 레벨별 비용 공식 (중후반 +6~+15강 골드 대폭 상향)
       getUpgradeCost(currentLv) {
         const reqMat = Math.floor(4 + currentLv * 3.5);
-        const reqGold = (currentLv + 1) * 70 + currentLv * currentLv * 8;
+        // +6강 이상부터 골드 소모 대폭 상향 (기존의 1.8~2.2배)
+        let reqGold = (currentLv + 1) * 90 + currentLv * currentLv * 12;
+        if (currentLv >= 5) {
+          reqGold += (currentLv - 4) * 220;
+        }
+        if (currentLv >= 10) {
+          reqGold += (currentLv - 9) * 450;
+        }
         return { reqMat, reqGold };
       },
 
@@ -2259,7 +2096,7 @@
         if (wLv >= 15 && aLv >= 15) {
           guideEl.innerHTML = `"오오! 모든 장비가 전설의 +15강에 도달했네! 그대는 진정한 수학의 마도 군주일세!"`;
         } else if (missingList.length > 0) {
-          guideEl.innerHTML = `"음! 무기 강화에 <strong>${missingList[0]}</strong>이(가) 더 필요하군! 해당 던전을 여러 번 탐험하여 연마하고 오게나!"`;
+          guideEl.innerHTML = `"음! 무기 강화에 <strong>${missingList[0]}</strong>이(가) 더 필요하군! 던전을 돌거나 <strong>만물 상점</strong>에서 골드로 사오게나!"`;
         } else {
           guideEl.innerHTML = `"모든 재료와 골드가 충분히 모였네! 지금 즉시 모험가를 위해 장비를 제련하겠네!"`;
         }
@@ -2281,7 +2118,7 @@
         }
         for (const d of DUNGEON_DATA) {
           if ((this.state.materials[d.matKey] || 0) < reqMat) {
-            this.showToast(`${d.matName}이(가) 부족합니다! (필요: ${reqMat}개)`, "error");
+            this.showToast(`${d.matName}이(가) 부족합니다! (만물 상점에서 조달 가능)`, "error");
             return;
           }
         }
@@ -2378,7 +2215,8 @@
           def: 5,
           weapon: 0,
           armor: 0,
-          inventory: { potion: 3 },
+          maxPotionCapacity: 5,
+          potions: { minor: 2, normal: 1, major: 0 },
           materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
           progress: { tier1: {}, tier2: {}, tier3: {} },
           stats: { solved: 0, correct: 0 }
@@ -2431,13 +2269,22 @@
               this.state.weapon = u.weapon || 0;
               this.state.armor = u.armor || 0;
               this.state.materials = u.materials || this.state.materials;
-              this.state.inventory = u.inventory || this.state.inventory;
               this.state.progress = u.progress || this.state.progress;
               this.state.stats = u.stats || this.state.stats;
 
-              if (u.inventory && u.inventory._savedHp !== undefined) {
-                this.state.hp = u.inventory._savedHp;
+              // 인벤토리 호환 파싱
+              if (u.inventory) {
+                this.state.maxPotionCapacity = u.inventory.maxPotionCapacity || 5;
+                if (u.inventory.potions) {
+                  this.state.potions = u.inventory.potions;
+                } else if (u.inventory.potion !== undefined) {
+                  this.state.potions = { minor: 1, normal: u.inventory.potion, major: 0 };
+                }
+                if (u.inventory._savedHp !== undefined) {
+                  this.state.hp = u.inventory._savedHp;
+                }
               }
+
               this.calculateStats();
               this.showToast(`PIN ${pinInput} 불러오기 성공!`, "success");
             } else {
@@ -2463,7 +2310,11 @@
         this.saveToLocalStorage();
         if (!this.state.pin) return;
 
-        this.state.inventory._savedHp = this.state.hp;
+        const inventoryData = {
+          maxPotionCapacity: this.state.maxPotionCapacity,
+          potions: this.state.potions,
+          _savedHp: this.state.hp
+        };
 
         try {
           await fetch(this.backendUrl, {
@@ -2479,7 +2330,7 @@
                 weapon: this.state.weapon,
                 armor: this.state.armor,
                 materials: this.state.materials,
-                inventory: this.state.inventory,
+                inventory: inventoryData,
                 progress: this.state.progress,
                 stats: this.state.stats
               }
@@ -2501,6 +2352,11 @@
           if (raw) {
             const parsed = JSON.parse(raw);
             Object.assign(this.state, parsed);
+            // 구버전 인벤토리 단일 potion 호환
+            if (parsed.inventory && parsed.inventory.potion !== undefined && !parsed.potions) {
+              this.state.potions = { minor: 1, normal: parsed.inventory.potion, major: 0 };
+              this.state.maxPotionCapacity = 5;
+            }
           }
         } catch (e) {}
       },
@@ -2525,7 +2381,12 @@
         document.getElementById("header-hp-bar").style.width = `${hpPct}%`;
 
         document.getElementById("header-gold").textContent = this.state.gold;
-        document.getElementById("lobby-potion-count").textContent = `${Math.min(this.MAX_POTIONS, this.state.inventory.potion || 0)}/${this.MAX_POTIONS}`;
+        document.getElementById("lobby-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+
+        const battlePotCount = document.getElementById("battle-potion-count");
+        if (battlePotCount) {
+          battlePotCount.textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+        }
 
         const pinLabel = document.getElementById("header-pin-label");
         const pinIcon = document.getElementById("header-pin-icon");
