@@ -68,8 +68,8 @@
       to { transform: rotate(360deg); }
     }
     @keyframes petFly {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-8px) rotate(4deg); }
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      50% { transform: translateY(-10px) rotate(4deg) scale(1.05); }
     }
 
     .anim-idle { animation: floatingIdle 3s ease-in-out infinite; }
@@ -79,7 +79,7 @@
     .anim-slash { animation: slashFlash 0.4s ease-out forwards; }
     .damage-popup { animation: damageFloat 0.9s forwards ease-out; }
     .anim-aura-spin { animation: rotateAura 18s linear infinite; }
-    .anim-pet-idle { animation: petFly 2.6s ease-in-out infinite; }
+    .anim-pet-idle { animation: petFly 2.4s ease-in-out infinite; }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
@@ -171,6 +171,11 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
+          <!-- 마도 비전서 (오답 복습 보관함) -->
+          <button onclick="App.openGrimoireModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-rose-700 to-amber-600 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-amber-400/50">
+            <i class="fa-solid fa-book-skull text-amber-300"></i> 마도 비전서
+            <span id="lobby-grimoire-badge" class="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">0</span>
+          </button>
           <button onclick="App.openArmoryModal()" class="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-purple-400/40">
             <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> 무기 & 슈트 성소
           </button>
@@ -248,7 +253,7 @@
       <div id="battle-arena" class="relative w-full h-64 sm:h-72 rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden shadow-2xl flex items-center justify-between px-6 sm:px-14">
         
         <!-- 동적 SVG 테마 배경 레이어 -->
-        <div id="battle-bg-layer" class="absolute inset-0 z-0 pointer-events-none opacity-85"></div>
+        <div id="battle-bg-layer" class="absolute inset-0 z-0 pointer-events-none opacity-90"></div>
 
         <!-- 좌측: 플레이어 캐릭터 영역 -->
         <div class="relative z-10 flex flex-col items-center">
@@ -261,8 +266,8 @@
           </div>
 
           <div class="relative flex items-center justify-center">
-            <!-- 수호 정령(펫) 스프라이트 -->
-            <div id="battle-pet-sprite" class="absolute -top-7 -right-7 w-12 h-12 pointer-events-none anim-pet-idle hidden"></div>
+            <!-- 수호 정령(펫) 스프라이트: 확대된 80px 크기로 플레이어 우측 상단 배치 -->
+            <div id="battle-pet-sprite" class="absolute -top-12 -right-14 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none anim-pet-idle hidden z-20"></div>
 
             <!-- 플레이어 아바타 -->
             <div id="battle-player-sprite" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center anim-idle transition"></div>
@@ -354,7 +359,76 @@
 
   </main>
 
-  <!-- [모달: 무기 & 슈트 성소 (3대 무기, 3대 슈트, 4대 정령, 전설 오라)] -->
+  <!-- [모달: 마도 비전서 (오답 복습 보관함)] -->
+  <div id="modal-grimoire" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-rose-500/70 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center text-lg border border-rose-500/40">
+            <i class="fa-solid fa-book-skull"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-amber-300">마도 비전서 (오답 복습 서재)</h3>
+            <p class="text-[11px] text-slate-400">던전에서 영창에 실패했던 취약 주문을 다시 연마하고 극복 보상을 수령하세요.</p>
+          </div>
+        </div>
+        <button onclick="App.closeModal('modal-grimoire')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- 2대 탭 메뉴 -->
+      <div class="flex border-b border-slate-800 mb-3 gap-1 text-xs">
+        <button id="grimoire-tab-unsolved" onclick="App.switchGrimoireTab('unsolved')" class="px-3.5 py-1.5 rounded-lg font-bold bg-rose-600 text-white shadow">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i>미극복 취약 주문 (<span id="grimoire-count-unsolved" class="font-mono">0</span>)
+        </button>
+        <button id="grimoire-tab-solved" onclick="App.switchGrimoireTab('solved')" class="px-3.5 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-circle-check mr-1 text-emerald-400"></i>완전 정복 서고 (<span id="grimoire-count-solved" class="font-mono">0</span>)
+        </button>
+      </div>
+
+      <!-- 오답 리스트 컨테이너 -->
+      <div id="grimoire-list-container" class="overflow-y-auto space-y-2.5 pr-1 text-xs flex-1 min-h-[280px]"></div>
+
+      <div class="border-t border-slate-800 pt-2.5 mt-2 flex justify-between items-center text-[11px] text-slate-400">
+        <div>
+          <span class="text-amber-400 font-bold">※ 극복 보상:</span> 오답 문제를 재도전하여 정답을 맞히면 <strong class="text-amber-300">+100 G</strong> 와 <strong class="text-sky-300">+50 EXP</strong> 를 지급합니다!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달: 마도 비전서 오답 극복 시험대] -->
+  <div id="modal-grimoire-challenge" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-amber-500/80 max-w-lg w-full rounded-2xl p-5 shadow-2xl flex flex-col space-y-3">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+          <span id="g-challenge-topic" class="font-bold text-amber-300 text-xs sm:text-sm">오답 극복 도전</span>
+        </div>
+        <button onclick="App.closeModal('modal-grimoire-challenge')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-center min-h-[5rem] flex items-center justify-center">
+        <div id="g-challenge-question" class="text-sm sm:text-base font-bold text-slate-100 leading-relaxed"></div>
+      </div>
+
+      <div id="g-challenge-choices" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+
+      <div id="g-challenge-keypad" class="hidden flex flex-col items-center gap-2.5">
+        <div class="flex items-center gap-2 w-full">
+          <input type="text" id="g-challenge-input" placeholder="정답 입력" class="flex-1 bg-slate-950 border border-indigo-500/60 rounded-xl px-4 py-2 text-center text-base font-mono font-bold text-amber-300">
+          <button onclick="App.submitGrimoireKeypadAnswer()" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl text-xs transition">
+            제출
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달: 무기 & 슈트 성소] -->
   <div id="modal-armory" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border border-purple-500/60 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[92vh]">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
@@ -377,7 +451,6 @@
         </div>
       </div>
 
-      <!-- 4대 탭 메뉴 -->
       <div class="flex border-b border-slate-800 mb-3 gap-1 overflow-x-auto pb-1 text-xs">
         <button id="armory-tab-btn-weapons" onclick="App.switchArmoryTab('weapons')" class="px-3 py-1.5 rounded-lg font-bold bg-purple-600 text-white">
           <i class="fa-solid fa-khanda mr-1"></i>3대 무기
@@ -393,7 +466,6 @@
         </button>
       </div>
 
-      <!-- 탭 컨텐츠 영역 -->
       <div class="overflow-y-auto space-y-3 pr-1 text-xs flex-1">
         <div id="armory-content-weapons" class="space-y-2.5"></div>
         <div id="armory-content-suits" class="space-y-2.5 hidden"></div>
@@ -403,7 +475,7 @@
     </div>
   </div>
 
-  <!-- [모달: 만물 상점 (물약 3단계 / 가방 확장 / 특산 재료 구매)] -->
+  <!-- [모달: 만물 상점] -->
   <div id="modal-shop" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border border-emerald-500/60 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[90vh]">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
@@ -427,7 +499,7 @@
       </div>
 
       <div class="overflow-y-auto space-y-4 pr-1 text-xs">
-        <!-- 1. 물약 3단계 구매 코너 -->
+        <!-- 물약 직매소 -->
         <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
           <div class="flex items-center justify-between">
             <span class="font-bold text-rose-400 flex items-center gap-1.5">
@@ -481,7 +553,7 @@
           </div>
         </div>
 
-        <!-- 2. 가방 슬롯 확장 -->
+        <!-- 가방 슬롯 확장 -->
         <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div>
             <div class="font-bold text-cyan-300 flex items-center gap-1.5 mb-0.5">
@@ -494,7 +566,7 @@
           </button>
         </div>
 
-        <!-- 3. 부족한 특산 재료 골드 구매 코너 (개당 180G) -->
+        <!-- 특산 재료 골드 구매 -->
         <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
           <div class="flex justify-between items-center">
             <span class="font-bold text-amber-300 flex items-center gap-1.5">
@@ -509,7 +581,7 @@
     </div>
   </div>
 
-  <!-- [모달: 명예의 전당 (3+1 전교생 실시간 랭킹)] -->
+  <!-- [모달: 명예의 전당] -->
   <div id="modal-ranking" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
     <div class="bg-slate-900 border-2 border-amber-500/70 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[92vh]">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
@@ -533,7 +605,6 @@
         </div>
       </div>
 
-      <!-- 4대 랭킹 탭 -->
       <div class="flex border-b border-slate-800 mb-3 gap-1 overflow-x-auto pb-1 text-xs">
         <button id="rank-tab-btn-power" onclick="App.switchRankTab('power')" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950">
           <i class="fa-solid fa-crown mr-1"></i>절대 패왕 (종합 스펙)
@@ -549,7 +620,6 @@
         </button>
       </div>
 
-      <!-- 랭킹 리스트 컨테이너 -->
       <div id="ranking-list-container" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 min-h-[280px]">
         <div class="py-12 text-center text-slate-400">
           <i class="fa-solid fa-spinner fa-spin text-2xl text-amber-400 mb-2"></i>
@@ -566,7 +636,7 @@
     </div>
   </div>
 
-  <!-- [모달: 안전한 PIN 클라우드 저장 및 프로필 설정] -->
+  <!-- [모달: PIN 클라우드 저장 설정] -->
   <div id="modal-pin" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-5 shadow-2xl text-center">
       <div class="w-12 h-12 mx-auto mb-2 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl">
@@ -574,10 +644,9 @@
       </div>
       <h3 class="text-base font-bold text-amber-300 mb-1">안전한 PIN 연동 및 프로필 설정</h3>
 
-      <!-- ⚠️ 실명 / 선정적 닉네임 경고문 박스 -->
       <div class="bg-rose-950/60 border border-rose-500/60 rounded-xl p-2.5 my-2.5 text-[11px] text-rose-200 text-left leading-relaxed">
         <i class="fa-solid fa-triangle-exclamation text-rose-400 mr-1"></i>
-        <strong>경고:</strong> 실명(본명)이나 부적절·선정적인 닉네임을 사용할 경우 사전 경고 없이 <strong>랭킹 및 계정 데이터가 영구 삭제</strong>됩니다.
+        <strong>경고:</strong> 실명(본명)이나 부적절한 닉네임을 사용할 경우 랭킹에서 제재될 수 있습니다.
       </div>
 
       <div class="space-y-2.5 mb-3 text-left">
@@ -1041,9 +1110,9 @@
 
     const PET_CATALOG = {
       squirrel: { id: "squirrel", name: "황금 태엽 다람쥐", cost: 1500, perk: "골드 보너스 +30%", desc: "탐험 클리어 시 골드 획득량 +30%" },
-      bird: { id: "bird", name: "에테르 수호새", cost: 1500, perk: "모든 피격 대미지 -25%", desc: "적에게 받는 모든 피해(정답 후 반격 + 오답 피격) 25% 상시 경감" },
+      bird: { id: "bird", name: "에테르 수호새", cost: 1500, perk: "모든 피격 대미지 -25%", desc: "적에게 받는 모든 피해 25% 상시 경감" },
       fox: { id: "fox", name: "시공의 번개 여우", cost: 1500, perk: "크리티컬 1.6배 (25% 확률)", desc: "정답 공격 시 25% 확률로 1.6배 벼락 크리티컬 발동" },
-      butterfly: { id: "butterfly", name: "치유의 크로노 나비", cost: 1500, perk: "구역 클리어 시 HP 20% 회복", desc: "각 구역(Wave) 돌파 성공 시 최대 HP의 20% 자동 수복" }
+      butterfly: { id: "butterfly", name: "치유의 크로노 나비", cost: 1500, perk: "구역 클리어 시 HP 20% 회복", desc: "각 구역 돌파 성공 시 최대 HP의 20% 자동 수복" }
     };
 
     const AURA_CATALOG = {
@@ -1100,36 +1169,129 @@
 
       renderBackground(unitId) {
         if (unitId === 1) {
-          return `<svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none"><defs><linearGradient id="forestSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#021a12"/><stop offset="60%" stop-color="#042e20"/><stop offset="100%" stop-color="#064e3b"/></linearGradient></defs><rect width="600" height="300" fill="url(#forestSky)"/><path d="M210 240 L235 240 L255 200 L275 255 L295 70 L380 70 L380 90 L310 90 L290 230 L270 170 L245 240 Z" fill="#043928" stroke="#10b981" stroke-width="2.5" opacity="0.85"/><line x1="0" y1="230" x2="600" y2="230" stroke="#10b981" stroke-width="2.5"/><text x="170" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√2</text><text x="430" y="110" fill="#34d399" font-size="14" font-family="serif" opacity="0.4" font-weight="bold">√3</text></svg>`;
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="forestSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#021a12"/>
+                  <stop offset="50%" stop-color="#033022"/>
+                  <stop offset="100%" stop-color="#064e3b"/>
+                </linearGradient>
+                <radialGradient id="forestGlow" cx="50%" cy="30%" r="50%">
+                  <stop offset="0%" stop-color="#34d399" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#021a12" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#forestSky)"/>
+              <rect width="600" height="300" fill="url(#forestGlow)"/>
+              <path d="M0 260 Q80 200 160 250 T320 220 T480 250 T600 220 L600 300 L0 300 Z" fill="#022c22" opacity="0.8"/>
+              <path d="M60 270 Q140 120 200 130 Q220 135 240 170" fill="none" stroke="#044d37" stroke-width="12" stroke-linecap="round"/>
+              <path d="M420 280 Q480 110 540 125" fill="none" stroke="#044d37" stroke-width="14" stroke-linecap="round"/>
+              <path d="M210 240 L235 240 L255 200 L275 255 L295 70 L390 70" fill="none" stroke="#10b981" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="120" cy="180" r="3" fill="#6ee7b7"/>
+              <circle cx="180" cy="140" r="2.5" fill="#a7f3d0"/>
+              <circle cx="340" cy="130" r="3.5" fill="#34d399"/>
+              <line x1="0" y1="240" x2="600" y2="240" stroke="#059669" stroke-width="3"/>
+              <text x="310" y="125" fill="#34d399" font-size="18" font-family="serif" font-weight="bold" opacity="0.6">√a²=a</text>
+            </svg>
+          `;
         } else if (unitId === 2) {
-          return `<svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none"><rect width="600" height="300" fill="#0f0728"/><line x1="270" y1="102" x2="330" y2="102" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/><line x1="270" y1="118" x2="330" y2="118" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/><line x1="0" y1="230" x2="600" y2="230" stroke="#a855f7" stroke-width="2.5"/></svg>`;
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="ruinSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0a051b"/>
+                  <stop offset="60%" stop-color="#1e103f"/>
+                  <stop offset="100%" stop-color="#2e1065"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#ruinSky)"/>
+              <rect x="50" y="40" width="30" height="200" fill="#1b1137" stroke="#7c3aed" stroke-width="2"/>
+              <rect x="42" y="30" width="46" height="15" fill="#241447" stroke="#a78bfa" stroke-width="1.5"/>
+              <rect x="520" y="40" width="30" height="200" fill="#1b1137" stroke="#7c3aed" stroke-width="2"/>
+              <rect x="512" y="30" width="46" height="15" fill="#241447" stroke="#a78bfa" stroke-width="1.5"/>
+              <rect x="250" y="65" width="100" height="55" rx="8" fill="#1e1b4b" stroke="#fbbf24" stroke-width="2.5"/>
+              <line x1="270" y1="84" x2="330" y2="84" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+              <line x1="270" y1="100" x2="330" y2="100" stroke="#fbbf24" stroke-width="6" stroke-linecap="round"/>
+              <line x1="0" y1="240" x2="600" y2="240" stroke="#8b5cf6" stroke-width="3"/>
+              <text x="300" y="160" fill="#c084fc" font-size="14" font-family="monospace" text-anchor="middle" opacity="0.5">D = b² - 4ac</text>
+            </svg>
+          `;
         } else if (unitId === 3) {
-          return `<svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none"><rect width="600" height="300" fill="#031526"/><path d="M0 240 Q300 -20 600 240" fill="none" stroke="#38bdf8" stroke-width="3" opacity="0.6"/><line x1="0" y1="230" x2="600" y2="230" stroke="#38bdf8" stroke-width="2.5"/></svg>`;
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="valleySky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#021424"/>
+                  <stop offset="60%" stop-color="#072b4a"/>
+                  <stop offset="100%" stop-color="#0c4a6e"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#valleySky)"/>
+              <polygon points="0,90 90,160 130,240 0,260" fill="#041d33"/>
+              <polygon points="600,80 500,150 460,240 600,260" fill="#041d33"/>
+              <path d="M0 250 Q300 -10 600 250" fill="none" stroke="#38bdf8" stroke-width="3.5"/>
+              <circle cx="300" cy="55" r="5" fill="#facc15"/>
+              <line x1="300" y1="55" x2="300" y2="240" stroke="#facc15" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.6"/>
+              <line x1="0" y1="240" x2="600" y2="240" stroke="#0284c7" stroke-width="3"/>
+              <text x="300" y="42" fill="#bae6fd" font-size="12" font-family="monospace" text-anchor="middle" font-weight="bold">V(p, q)</text>
+            </svg>
+          `;
         } else if (unitId === 4) {
-          return `<svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none"><rect width="600" height="300" fill="#1c1106"/><polygon points="250,210 350,210 350,80" fill="#78350f" stroke="#fbbf24" stroke-width="2.5" opacity="0.6"/><line x1="0" y1="230" x2="600" y2="230" stroke="#fbbf24" stroke-width="2.5"/></svg>`;
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="towerSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1c1106"/>
+                  <stop offset="60%" stop-color="#361f08"/>
+                  <stop offset="100%" stop-color="#78350f"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#towerSky)"/>
+              <polygon points="70,240 180,240 180,70" fill="#2d1704" stroke="#d97706" stroke-width="2"/>
+              <rect x="160" y="220" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+              <polygon points="530,240 420,240 420,70" fill="#2d1704" stroke="#d97706" stroke-width="2"/>
+              <rect x="420" y="220" width="20" height="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+              <polygon points="230,240 370,240 370,45" fill="#451a03" stroke="#fbbf24" stroke-width="3"/>
+              <rect x="345" y="215" width="25" height="25" fill="none" stroke="#fde047" stroke-width="2.5"/>
+              <line x1="0" y1="240" x2="600" y2="240" stroke="#f59e0b" stroke-width="3"/>
+              <text x="300" y="150" fill="#fef08a" font-size="15" font-family="serif" text-anchor="middle" font-weight="bold">a² + b² = c²</text>
+            </svg>
+          `;
         } else {
-          return `<svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none"><rect width="600" height="300" fill="#1f020a"/><circle cx="300" cy="115" r="75" fill="none" stroke="#fda4af" stroke-width="2.5" stroke-dasharray="10,5"/><line x1="0" y1="230" x2="600" y2="230" stroke="#f43f5e" stroke-width="2.5"/></svg>`;
+          return `
+            <svg viewBox="0 0 600 300" class="w-full h-full" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="portalSky" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#1f020a"/>
+                  <stop offset="60%" stop-color="#3b0716"/>
+                  <stop offset="100%" stop-color="#881337"/>
+                </linearGradient>
+              </defs>
+              <rect width="600" height="300" fill="url(#portalSky)"/>
+              <ellipse cx="300" cy="150" rx="140" ry="75" fill="none" stroke="#f43f5e" stroke-width="4" stroke-dasharray="12,6"/>
+              <ellipse cx="300" cy="150" rx="90" ry="45" fill="none" stroke="#fb7185" stroke-width="3" stroke-dasharray="8,4"/>
+              <line x1="0" y1="240" x2="600" y2="240" stroke="#e11d48" stroke-width="3"/>
+              <text x="300" y="155" fill="#fecdd3" font-size="15" font-family="monospace" text-anchor="middle" font-weight="bold">x² + y² = r²</text>
+            </svg>
+          `;
         }
       },
 
-      // 플레이어 및 착용 장비(무기 3종, 슈트 3종, 오라 4종) 고화질 그래픽
       renderPlayer(weaponLv, armorLv, weaponId = "staff", suitId = "robe", auraId = null) {
-        // [1] 오라 레이어
         let auraHtml = "";
         if (auraId === "pantheon") {
           auraHtml = `<ellipse cx="50" cy="88" rx="34" ry="8" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,4" class="anim-aura-spin"/>`;
         } else if (auraId === "gear") {
           auraHtml = `<circle cx="50" cy="45" r="42" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,6" class="anim-aura-spin" opacity="0.75"/>`;
         } else if (auraId === "rune") {
-          auraHtml = `<circle cx="28" cy="40" r="5" fill="#a855f7" filter="drop-shadow(0 0 6px #c084fc)"/><circle cx="72" cy="40" r="5" fill="#a855f7" filter="drop-shadow(0 0 6px #c084fc)"/>`;
+          auraHtml = `<circle cx="28" cy="40" r="5" fill="#a855f7"/><circle cx="72" cy="40" r="5" fill="#a855f7"/>`;
         } else if (auraId === "lightning") {
-          auraHtml = `<path d="M72 10 L68 25 L75 32 L70 50" stroke="#38bdf8" stroke-width="2" fill="none" filter="drop-shadow(0 0 6px #38bdf8)"/>`;
+          auraHtml = `<path d="M72 10 L68 25 L75 32 L70 50" stroke="#38bdf8" stroke-width="2" fill="none"/>`;
         }
 
-        // [2] 슈트 레이어 (로브, 티탄 중갑, 시공 망토)
         let suitHtml = "";
         if (suitId === "titan") {
-          // 거신 티탄 중갑: 황금 판금 갑옷, 거대 견갑
           suitHtml = `
             <polygon points="26,40 40,36 34,54" fill="#d97706" stroke="#fbbf24" stroke-width="2"/>
             <polygon points="74,40 60,36 66,54" fill="#d97706" stroke="#fbbf24" stroke-width="2"/>
@@ -1137,16 +1299,14 @@
             <rect x="44" y="48" width="12" height="14" rx="2" fill="#d97706" stroke="#fde047" stroke-width="1.5"/>
           `;
         } else if (suitId === "mirage") {
-          // 신기루 시공 망토: 별빛 헤일로, 에테르 성좌 깃털 날개
           suitHtml = `
             <circle cx="50" cy="30" r="22" fill="none" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,4" class="anim-aura-spin"/>
             <path d="M38 45 C15 50 15 80 28 88 C34 75 36 60 38 45 Z" fill="#4c1d95" stroke="#a855f7" stroke-width="2" opacity="0.9"/>
             <path d="M62 45 C85 50 85 80 72 88 C66 75 64 60 62 45 Z" fill="#4c1d95" stroke="#a855f7" stroke-width="2" opacity="0.9"/>
             <path d="M36 85 L42 42 L58 42 L64 85 Z" fill="#2e1065" stroke="#c084fc" stroke-width="2.5"/>
-            <circle cx="50" cy="50" r="4.5" fill="#f43f5e" filter="drop-shadow(0 0 5px #f43f5e)"/>
+            <circle cx="50" cy="50" r="4.5" fill="#f43f5e"/>
           `;
         } else {
-          // 견습 로브
           const armorColor = armorLv >= 10 ? "#6366f1" : (armorLv >= 5 ? "#3b82f6" : "#475569");
           suitHtml = `
             <path d="M36 85 L42 42 L58 42 L64 85 Z" fill="${armorColor}" stroke="#cbd5e1" stroke-width="2.5"/>
@@ -1154,58 +1314,25 @@
           `;
         }
 
-        // [3] 무기 레이어 (지팡이, 흑요석 대검, 뇌전 레이피어)
         let weaponHtml = "";
         if (weaponId === "greatsword") {
-          // 차원 단절 대검: 묵직한 거대 붉은 대검
           weaponHtml = `
             <rect x="73" y="80" width="4" height="15" fill="#334155" stroke="#1e293b" stroke-width="1.5"/>
             <rect x="65" y="77" width="20" height="4" rx="1.5" fill="#f59e0b" stroke="#b45309" stroke-width="1"/>
-            <polygon points="75,8 67,20 68,77 82,77 83,20" fill="#1c1917" stroke="#ef4444" stroke-width="2.5" filter="drop-shadow(0 0 8px #ef4444)"/>
+            <polygon points="75,8 67,20 68,77 82,77 83,20" fill="#1c1917" stroke="#ef4444" stroke-width="2.5"/>
             <line x1="75" y1="22" x2="75" y2="72" stroke="#ef4444" stroke-width="2"/>
             <circle cx="75" cy="40" r="3.5" fill="#ef4444"/>
             <circle cx="75" cy="55" r="3.5" fill="#ef4444"/>
           `;
         } else if (weaponId === "rapier") {
-          // 포물선 뇌전 레이피어: 5,000G 종결 신화급 뇌전 성검 (황금 와이드 윙 가드 + 육중한 시안 플라즈마 광검 + 번개 방전 아크)
           weaponHtml = `
-            <defs>
-              <linearGradient id="rapierBladeGlow" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#ffffff"/>
-                <stop offset="30%" stop-color="#67e8f9"/>
-                <stop offset="70%" stop-color="#0284c7"/>
-                <stop offset="100%" stop-color="#082f49"/>
-              </linearGradient>
-              <radialGradient id="plasmaGem" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stop-color="#fef08a"/>
-                <stop offset="60%" stop-color="#38bdf8"/>
-                <stop offset="100%" stop-color="#0369a1"/>
-              </radialGradient>
-            </defs>
-            <!-- 손잡이 & 황금 폼멜 -->
             <rect x="73.5" y="81" width="3" height="15" fill="#1e293b" stroke="#facc15" stroke-width="1" rx="1.5"/>
             <circle cx="75" cy="97" r="3.5" fill="#f59e0b" stroke="#fef08a" stroke-width="1.5"/>
-            <!-- 웅장한 황금 날개 가드 (대검보다 넓은 30px 와이드 윙 가드) -->
-            <path d="M60 77 Q68 70 75 75 Q82 70 90 77 Q82 83 75 79 Q68 83 60 77 Z" fill="#d97706" stroke="#fde047" stroke-width="1.5" filter="drop-shadow(0 0 6px #facc15)"/>
-            <polygon points="75,72 69,76 75,80 81,76" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
-            <circle cx="75" cy="76" r="2.5" fill="#ffffff" filter="drop-shadow(0 0 5px #38bdf8)"/>
-            <!-- 뇌전 성검 본체 (너비 14px의 육중하고 날카로운 광선 검신) -->
-            <polygon points="75,3 68,18 69,74 81,74 82,18" fill="url(#rapierBladeGlow)" stroke="#38bdf8" stroke-width="2.5" filter="drop-shadow(0 0 14px #00f0ff)"/>
-            <!-- 검신 내부 고출력 플라즈마 코어 라인 & 뇌전 젬 -->
-            <line x1="75" y1="12" x2="75" y2="70" stroke="#ffffff" stroke-width="2" stroke-linecap="round" filter="drop-shadow(0 0 6px #ffffff)"/>
-            <circle cx="75" cy="32" r="3.5" fill="url(#plasmaGem)" stroke="#ffffff" stroke-width="1"/>
-            <circle cx="75" cy="52" r="3.5" fill="url(#plasmaGem)" stroke="#ffffff" stroke-width="1"/>
-            <!-- 좌우 지그재그 벼락 플라즈마 방전 아크 -->
-            <path d="M68 20 L64 28 L70 36 L63 48 L69 58 L64 68" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" filter="drop-shadow(0 0 6px #fde047)"/>
-            <path d="M82 20 L86 28 L80 36 L87 48 L81 58 L86 68" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round" filter="drop-shadow(0 0 6px #fde047)"/>
-            <!-- 검신 주위를 공전하는 2중 플라즈마 궤도 링 -->
-            <ellipse cx="75" cy="24" rx="12" ry="4.5" fill="none" stroke="#67e8f9" stroke-width="1.8" stroke-dasharray="5,3" class="anim-aura-spin"/>
-            <ellipse cx="75" cy="48" rx="13" ry="5" fill="none" stroke="#fde047" stroke-width="1.8" stroke-dasharray="6,4" class="anim-aura-spin"/>
-            <!-- 검끝 십자 성좌 섬광 -->
-            <polygon points="75,-1 76.5,3 80,4.5 76.5,6 75,10 73.5,6 70,4.5 73.5,3" fill="#ffffff" filter="drop-shadow(0 0 8px #67e8f9)"/>
+            <path d="M60 77 Q68 70 75 75 Q82 70 90 77 Q82 83 75 79 Q68 83 60 77 Z" fill="#d97706" stroke="#fde047" stroke-width="1.5"/>
+            <polygon points="75,3 68,18 69,74 81,74 82,18" fill="#0284c7" stroke="#38bdf8" stroke-width="2.5"/>
+            <line x1="75" y1="12" x2="75" y2="70" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
           `;
         } else {
-          // 마도 지팡이
           const staffGlow = weaponLv >= 10 ? "#f59e0b" : (weaponLv >= 5 ? "#38bdf8" : "#94a3b8");
           weaponHtml = `
             <line x1="72" y1="18" x2="72" y2="88" stroke="${staffGlow}" stroke-width="4" stroke-linecap="round"/>
@@ -1218,7 +1345,6 @@
           <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 10px rgba(99,102,241,0.5))">
             ${auraHtml}
             ${suitHtml}
-            <!-- 머리 & 눈동자 -->
             <circle cx="50" cy="32" r="16" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/>
             <ellipse cx="45" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
             <ellipse cx="55" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
@@ -1227,172 +1353,57 @@
         `;
       },
 
-      // 4대 수호 환상수(펫) 렌더러 - 화려한 정통 판타지 영수 디자인
       renderPet(petId) {
         if (!petId) return "";
         if (petId === "squirrel") {
-          // 1. 황금 태엽 다람쥐: 등 뒤의 정교한 거대 태엽 기어 회랑 + 스팀펑크 고글 + 금빛 회전 아케인 코어
           return `
             <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 10px #f59e0b)">
-              <defs>
-                <linearGradient id="sqTail" x1="0" y1="1" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#78350f"/>
-                  <stop offset="50%" stop-color="#d97706"/>
-                  <stop offset="100%" stop-color="#fef08a"/>
-                </linearGradient>
-                <radialGradient id="sqCore" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stop-color="#fef08a"/>
-                  <stop offset="60%" stop-color="#f59e0b"/>
-                  <stop offset="100%" stop-color="#b45309"/>
-                </radialGradient>
-              </defs>
-              <!-- 거대한 황금 태엽 꼬리 -->
-              <path d="M42 68 C25 65 15 50 18 32 C22 14 42 10 56 16 C68 22 72 38 65 48 C60 55 50 56 46 50 C42 44 46 36 52 36 C56 36 58 40 56 43" fill="none" stroke="url(#sqTail)" stroke-width="8" stroke-linecap="round"/>
-              <circle cx="56" cy="18" r="4.5" fill="#facc15" stroke="#78350f" stroke-width="1.5"/>
-              <circle cx="36" cy="22" r="3.5" fill="#facc15" stroke="#78350f" stroke-width="1.5"/>
-              <!-- 몸체 & 가슴 털 -->
-              <ellipse cx="58" cy="62" rx="18" ry="22" fill="#92400e" stroke="#fbbf24" stroke-width="2.5"/>
-              <ellipse cx="63" cy="64" rx="10" ry="14" fill="#fef3c7" opacity="0.9"/>
-              <!-- 가슴팍 황금 태엽 코어 -->
-              <circle cx="63" cy="64" r="6" fill="url(#sqCore)" stroke="#78350f" stroke-width="1.5"/>
-              <line x1="63" y1="59" x2="63" y2="69" stroke="#78350f" stroke-width="1.5"/>
-              <line x1="58" y1="64" x2="68" y2="64" stroke="#78350f" stroke-width="1.5"/>
-              <!-- 머리 & 귀 -->
-              <circle cx="60" cy="38" r="16" fill="#b45309" stroke="#fbbf24" stroke-width="2.5"/>
-              <polygon points="50,26 44,12 56,20" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/>
-              <polygon points="68,26 76,12 72,22" fill="#78350f" stroke="#fbbf24" stroke-width="1.5"/>
-              <polygon points="51,24 47,15 54,20" fill="#fde68a"/>
-              <!-- 브론즈 기계 고글 -->
-              <rect x="47" y="32" width="12" height="9" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
-              <rect x="61" y="32" width="12" height="9" rx="3" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
-              <line x1="58" y1="36" x2="62" y2="36" stroke="#fbbf24" stroke-width="2"/>
-              <circle cx="53" cy="36.5" r="2.5" fill="#38bdf8"/>
-              <circle cx="67" cy="36.5" r="2.5" fill="#38bdf8"/>
-              <!-- 코 & 볼 -->
-              <polygon points="59,44 63,44 61,47" fill="#451a03"/>
-              <ellipse cx="50" cy="42" rx="3" ry="2" fill="#fca5a5" opacity="0.8"/>
-              <ellipse cx="72" cy="42" rx="3" ry="2" fill="#fca5a5" opacity="0.8"/>
-              <!-- 품에 든 황금 마도 도토리 -->
-              <ellipse cx="68" cy="56" rx="6" ry="7" fill="#f59e0b" stroke="#78350f" stroke-width="1.5" transform="rotate(15 68 56)"/>
-              <path d="M63 50 Q68 48 73 51" stroke="#78350f" stroke-width="2" fill="none"/>
+              <circle cx="30" cy="50" r="22" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
+              <ellipse cx="62" cy="62" rx="22" ry="24" fill="#b45309" stroke="#fbbf24" stroke-width="2.5"/>
+              <ellipse cx="62" cy="65" rx="14" ry="16" fill="#fef3c7"/>
+              <circle cx="62" cy="38" r="19" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
+              <circle cx="48" cy="22" r="7" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
+              <circle cx="76" cy="22" r="7" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
+              <circle cx="55" cy="36" r="3.5" fill="#1e1b4b"/>
+              <circle cx="69" cy="36" r="3.5" fill="#1e1b4b"/>
+              <ellipse cx="50" cy="42" rx="3.5" ry="2" fill="#f43f5e" opacity="0.6"/>
+              <ellipse cx="74" cy="42" rx="3.5" ry="2" fill="#f43f5e" opacity="0.6"/>
             </svg>
           `;
         } else if (petId === "bird") {
-          // 2. 에테르 수호새: 웅장하게 펼친 3중 시안 에테르 날개 + 성좌 깃털관 + 황금 수호 방패 심볼
           return `
             <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 12px #38bdf8)">
-              <defs>
-                <linearGradient id="birdWing" x1="0" y1="1" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#0c4a6e"/>
-                  <stop offset="60%" stop-color="#0284c7"/>
-                  <stop offset="100%" stop-color="#67e8f9"/>
-                </linearGradient>
-                <linearGradient id="shieldGold" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#fef08a"/>
-                  <stop offset="100%" stop-color="#d97706"/>
-                </linearGradient>
-              </defs>
-              <!-- 좌우 화려한 에테르 깃털 날개 -->
-              <path d="M46 52 C32 40 10 38 4 50 C12 60 26 62 38 60 C24 66 12 74 16 80 C26 82 40 74 46 64 Z" fill="url(#birdWing)" stroke="#a5f3fc" stroke-width="1.5"/>
-              <path d="M54 52 C68 40 90 38 96 50 C88 60 74 62 62 60 C76 66 88 74 84 80 C74 82 60 74 54 64 Z" fill="url(#birdWing)" stroke="#a5f3fc" stroke-width="1.5"/>
-              <!-- 꼬리 깃털 -->
-              <polygon points="50,68 42,92 50,86 58,92" fill="#0369a1" stroke="#38bdf8" stroke-width="1.5"/>
-              <!-- 몸체 -->
-              <path d="M38 48 C38 32 62 32 62 48 C62 64 54 74 50 74 C46 74 38 64 38 48 Z" fill="#075985" stroke="#7dd3fc" stroke-width="2"/>
-              <!-- 가슴팍 황금 수호 방패 심볼 -->
-              <polygon points="50,52 59,56 57,68 50,74 43,68 41,56" fill="url(#shieldGold)" stroke="#78350f" stroke-width="1.5"/>
-              <polygon points="50,56 55,59 54,66 50,70 46,66 45,59" fill="#0284c7"/>
-              <circle cx="50" cy="62" r="2" fill="#fef08a"/>
-              <!-- 머리 & 관모(성좌 깃털관) -->
-              <circle cx="50" cy="34" r="14" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
-              <path d="M45 22 L50 8 L55 22" fill="#38bdf8" stroke="#facc15" stroke-width="1.5"/>
-              <circle cx="50" cy="8" r="2.5" fill="#fef08a"/>
-              <!-- 눈 & 황금 부리 -->
-              <ellipse cx="44" cy="33" rx="2.5" ry="3.5" fill="#e0f2fe"/>
-              <ellipse cx="56" cy="33" rx="2.5" ry="3.5" fill="#e0f2fe"/>
-              <circle cx="44" cy="33" r="1.5" fill="#0c4a6e"/>
-              <circle cx="56" cy="33" r="1.5" fill="#0c4a6e"/>
-              <polygon points="46,37 54,37 50,47" fill="#f59e0b" stroke="#b45309" stroke-width="1.5"/>
+              <ellipse cx="26" cy="54" rx="14" ry="10" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
+              <ellipse cx="74" cy="54" rx="14" ry="10" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
+              <circle cx="50" cy="52" r="26" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5"/>
+              <ellipse cx="50" cy="60" rx="16" ry="14" fill="#f0f9ff"/>
+              <path d="M46 26 L50 14 L54 26" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+              <circle cx="41" cy="46" r="3.5" fill="#0f172a"/>
+              <circle cx="59" cy="46" r="3.5" fill="#0f172a"/>
+              <polygon points="50,47 45,53 55,53" fill="#f59e0b" stroke="#d97706" stroke-width="1"/>
             </svg>
           `;
         } else if (petId === "fox") {
-          // 3. 시공의 번개 여우: 영험한 3갈래 벼락 꼬리 + 키츠네 룬 마스크 + 벼락 번개 스파크 아크
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 12px #c084fc)">
-              <defs>
-                <linearGradient id="foxTail" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#e879f9"/>
-                  <stop offset="50%" stop-color="#9333ea"/>
-                  <stop offset="100%" stop-color="#3b0764"/>
-                </linearGradient>
-              </defs>
-              <!-- 3갈래 번개 여우 꼬리 & 플라즈마 아크 -->
-              <path d="M38 65 C20 60 10 40 18 20 C28 32 35 44 42 55" fill="none" stroke="url(#foxTail)" stroke-width="7" stroke-linecap="round"/>
-              <path d="M50 62 C50 38 42 16 54 8 C62 22 58 40 54 58" fill="none" stroke="url(#foxTail)" stroke-width="7" stroke-linecap="round"/>
-              <path d="M62 65 C80 60 90 40 82 20 C72 32 65 44 58 55" fill="none" stroke="url(#foxTail)" stroke-width="7" stroke-linecap="round"/>
-              <!-- 꼬리 끝 황금 번개 스파크 -->
-              <polygon points="18,16 24,24 16,24 22,34 10,26 18,26" fill="#facc15"/>
-              <polygon points="82,16 90,26 78,26 84,34 76,24 82,24" fill="#facc15"/>
-              <polygon points="54,6 58,14 50,14 56,22 46,16 52,16" fill="#facc15"/>
-              <!-- 몸체 -->
-              <ellipse cx="50" cy="68" rx="16" ry="18" fill="#581c87" stroke="#e879f9" stroke-width="2"/>
-              <path d="M44 58 Q50 78 56 58 Z" fill="#f8fafc"/>
-              <!-- 귀 -->
-              <polygon points="34,36 24,10 44,24" fill="#6b21a8" stroke="#e879f9" stroke-width="2"/>
-              <polygon points="66,36 76,10 56,24" fill="#6b21a8" stroke="#e879f9" stroke-width="2"/>
-              <polygon points="33,32 28,16 40,24" fill="#f43f5e"/>
-              <polygon points="67,32 72,16 60,24" fill="#f43f5e"/>
-              <!-- 머리 & 신령 여우 마스크 -->
-              <polygon points="50,56 28,34 40,26 60,26 72,34" fill="#faf5ff" stroke="#a855f7" stroke-width="2.5"/>
-              <polygon points="50,56 34,36 66,36" fill="#f3e8ff"/>
-              <!-- 이마 뇌전 룬 & 눈 -->
-              <polygon points="50,28 53,34 49,36 53,42 47,38 49,34" fill="#facc15" stroke="#b45309" stroke-width="1"/>
-              <path d="M38 38 Q43 35 45 40" stroke="#dc2626" stroke-width="2" fill="none"/>
-              <path d="M62 38 Q57 35 55 40" stroke="#dc2626" stroke-width="2" fill="none"/>
-              <ellipse cx="42" cy="40" rx="2" ry="3" fill="#dc2626"/>
-              <ellipse cx="58" cy="40" rx="2" ry="3" fill="#dc2626"/>
-              <circle cx="50" cy="53" r="2" fill="#3b0764"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 14px #c084fc)">
+              <path d="M26 68 C12 60 14 36 30 32 C38 42 42 56 40 68 Z" fill="#9333ea" stroke="#f3e8ff" stroke-width="2.5"/>
+              <ellipse cx="56" cy="64" rx="20" ry="22" fill="#7e22ce" stroke="#e9d5ff" stroke-width="2.5"/>
+              <polygon points="40,32 30,10 50,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
+              <polygon points="72,32 82,10 62,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
+              <ellipse cx="56" cy="42" rx="22" ry="18" fill="#faf5ff" stroke="#a855f7" stroke-width="2.5"/>
+              <ellipse cx="46" cy="41" rx="4" ry="5" fill="#581c87"/>
+              <ellipse cx="66" cy="41" rx="4" ry="5" fill="#581c87"/>
+              <ellipse cx="38" cy="46" rx="4" ry="2.2" fill="#f43f5e" opacity="0.6"/>
+              <ellipse cx="74" cy="46" rx="4" ry="2.2" fill="#f43f5e" opacity="0.6"/>
             </svg>
           `;
         } else if (petId === "butterfly") {
-          // 4. 치유의 크로노 나비: 스테인드글라스 에메랄드/로즈 날개 + 시계바늘 더듬이 + 힐링 스타더스트
           return `
             <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 12px #f43f5e)">
-              <defs>
-                <linearGradient id="bfUpper" x1="0" y1="1" x2="1" y2="0">
-                  <stop offset="0%" stop-color="#881337"/>
-                  <stop offset="50%" stop-color="#e11d48"/>
-                  <stop offset="100%" stop-color="#fda4af"/>
-                </linearGradient>
-                <linearGradient id="bfLower" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#047857"/>
-                  <stop offset="60%" stop-color="#10b981"/>
-                  <stop offset="100%" stop-color="#a7f3d0"/>
-                </linearGradient>
-              </defs>
-              <!-- 상단 대형 날개 (로즈골드/크림슨) -->
-              <path d="M48 48 C36 20 8 16 10 40 C12 56 32 64 48 54 Z" fill="url(#bfUpper)" stroke="#fecdd3" stroke-width="2"/>
-              <path d="M52 48 C64 20 92 16 90 40 C88 56 68 64 52 54 Z" fill="url(#bfUpper)" stroke="#fecdd3" stroke-width="2"/>
-              <!-- 날개 안쪽 마법 보석창 -->
-              <ellipse cx="30" cy="38" rx="8" ry="12" fill="#ffe4e6" opacity="0.6" transform="rotate(-20 30 38)"/>
-              <ellipse cx="70" cy="38" rx="8" ry="12" fill="#ffe4e6" opacity="0.6" transform="rotate(20 70 38)"/>
-              <circle cx="30" cy="38" r="3" fill="#facc15"/>
-              <circle cx="70" cy="38" r="3" fill="#facc15"/>
-              <!-- 하단 치유 날개 (에메랄드/민트) -->
-              <path d="M48 56 C34 62 18 68 24 84 C32 94 46 82 48 64 Z" fill="url(#bfLower)" stroke="#6ee7b7" stroke-width="2"/>
-              <path d="M52 56 C66 62 82 68 76 84 C68 94 54 82 52 64 Z" fill="url(#bfLower)" stroke="#6ee7b7" stroke-width="2"/>
-              <circle cx="34" cy="76" r="3.5" fill="#fef08a"/>
-              <circle cx="66" cy="76" r="3.5" fill="#fef08a"/>
-              <!-- 금빛 시계바늘 더듬이 -->
-              <path d="M48 34 C44 20 36 14 34 16 C32 18 36 24 46 32" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
-              <path d="M52 34 C56 20 64 14 66 16 C68 18 64 24 54 32" fill="none" stroke="#facc15" stroke-width="2" stroke-linecap="round"/>
-              <circle cx="34" cy="16" r="2.5" fill="#fef08a"/>
-              <circle cx="66" cy="16" r="2.5" fill="#fef08a"/>
-              <!-- 요정 몸체 & 심장 젬 -->
-              <ellipse cx="50" cy="54" rx="4" ry="18" fill="#1c1917" stroke="#fbbf24" stroke-width="1.5"/>
-              <circle cx="50" cy="36" r="5" fill="#fbbf24"/>
-              <circle cx="50" cy="50" r="3" fill="#34d399" filter="drop-shadow(0 0 5px #10b981)"/>
-              <circle cx="50" cy="62" r="2.5" fill="#f43f5e"/>
+              <path d="M48 48 C32 24 12 26 14 46 C16 60 36 64 48 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2"/>
+              <path d="M52 48 C68 24 88 26 86 46 C84 60 64 64 52 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2"/>
+              <ellipse cx="50" cy="52" rx="7" ry="16" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2"/>
+              <circle cx="50" cy="38" r="6" fill="#fbcfe8"/>
             </svg>
           `;
         }
@@ -1648,14 +1659,14 @@
         maxHp: 100,
         atk: 22,
         def: 5,
-        weapon: 0, // 대장간 기초 공격력 강화 (+0 ~ +15)
-        armor: 0,  // 대장간 기초 방어구 강화 (+0 ~ +15)
+        weapon: 0,
+        armor: 0,
         maxPotionCapacity: 5,
         potions: { minor: 2, normal: 1, major: 0 },
         materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
         progress: { tier1: {}, tier2: {}, tier3: {} },
         stats: { solved: 0, correct: 0 },
-        // 특화 장비, 펫, 오라, 프로필
+        grimoire: [],
         equippedWeapon: "staff",
         equippedSuit: "robe",
         ownedWeapons: ["staff"],
@@ -1675,10 +1686,13 @@
       wavePotionCount: 0,
       currentArmoryTab: "weapons",
       currentRankTab: "power",
+      currentGrimoireTab: "unsolved",
+      activeGrimoireItem: null,
       cachedRankings: null,
 
       init() {
         this.loadFromLocalStorage();
+        if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
         this.calculateStats();
         this.renderLobbyDungeons();
         this.updateHeaderUI();
@@ -1689,18 +1703,15 @@
         return (this.state.potions.minor || 0) + (this.state.potions.normal || 0) + (this.state.potions.major || 0);
       },
 
-      // 정직한 1:1 방어력 감산 & 장비 곱연산 스탯 계산
       calculateStats() {
         const lv = Math.min(30, this.state.level);
         const weaponDef = WEAPON_CATALOG[this.state.equippedWeapon] || WEAPON_CATALOG.staff;
         const suitDef = SUIT_CATALOG[this.state.equippedSuit] || SUIT_CATALOG.robe;
 
-        // 기초 스탯 (레벨 + 대장간 강화)
         const baseAtk = 22 + (lv - 1) * 3 + this.state.weapon * 10;
         const baseDef = 5 + (lv - 1) * 1.5 + this.state.armor * 5;
         const baseMaxHp = 100 + (lv - 1) * 12 + this.state.armor * 35;
 
-        // 특화 장비 보너스 적용
         this.state.atk = Math.round(baseAtk * weaponDef.atkMultiplier);
         this.state.def = Math.round(baseDef + (suitDef.defBonus || 0));
         this.state.maxHp = Math.round(baseMaxHp + (suitDef.hpBonus || 0));
@@ -1853,7 +1864,6 @@
         document.getElementById("battle-bg-layer").innerHTML = MonsterSvgRenderer.renderBackground(unitId);
         document.getElementById("battle-player-sprite").innerHTML = MonsterSvgRenderer.renderPlayer(this.state.weapon, this.state.armor, this.state.equippedWeapon, this.state.equippedSuit, this.state.activeAura);
 
-        // 펫 스프라이트 설정
         const petEl = document.getElementById("battle-pet-sprite");
         if (this.state.activePet) {
           petEl.innerHTML = MonsterSvgRenderer.renderPet(this.state.activePet);
@@ -1931,7 +1941,6 @@
         }
       },
 
-      // 정답 처리 및 무기 특수 효과(흡혈, 크리티컬, 골드) 발동
       handlePlayerAnswer(selectedVal) {
         if (this.isTurnBusy || !this.currentBattle) return;
         this.isTurnBusy = true;
@@ -1943,7 +1952,6 @@
         if (isCorrect) this.state.stats.correct++;
 
         if (isCorrect) {
-          // 크리티컬 계산 (레이피어 40% 확률로 2.0배, 번개여우 25% 확률로 1.6배)
           let isCrit = false;
           let critMultiplier = 1.0;
 
@@ -1979,7 +1987,6 @@
             this.showDamagePopup("monster-damage-pos", isCrit ? `⚡CRIT! -${dmg}` : `-${dmg}`);
             this.updateBattleStageHpUI();
 
-            // [무기 특성: 지팡이 흡혈 20%]
             if (this.state.equippedWeapon === "staff") {
               const leechAmt = Math.max(2, Math.round(dmg * 0.20));
               this.state.hp = Math.min(this.state.maxHp, this.state.hp + leechAmt);
@@ -2006,8 +2013,41 @@
           }, 300);
         } else {
           SoundManager.playDefeat();
+          this.recordWrongAnswer(b);
           this.showSolutionModal();
         }
+      },
+
+      recordWrongAnswer(battle) {
+        if (!battle || !battle.currentProblem) return;
+        const prob = battle.currentProblem;
+        if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
+
+        const existingIdx = this.state.grimoire.findIndex(item => item.question === prob.question);
+        if (existingIdx >= 0) {
+          this.state.grimoire[existingIdx].solved = false;
+          this.state.grimoire[existingIdx].failCount = (this.state.grimoire[existingIdx].failCount || 1) + 1;
+          this.state.grimoire[existingIdx].updatedAt = Date.now();
+        } else {
+          this.state.grimoire.unshift({
+            id: "grim_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+            dungeonId: battle.dungeon.id,
+            dungeonName: battle.dungeon.name,
+            tier: battle.tier,
+            topic: prob.topic,
+            question: prob.question,
+            answer: prob.answer,
+            choices: prob.choices || [],
+            solution: prob.solution,
+            solved: false,
+            failCount: 1,
+            createdAt: Date.now(),
+            updatedAt: Date.now()
+          });
+        }
+
+        this.updateHeaderUI();
+        this.saveToLocalStorage();
       },
 
       showSolutionModal() {
@@ -2028,12 +2068,10 @@
         this.executeMonsterCounterAttack();
       },
 
-      // 정직한 1:1 방어력 감산 (피격 대미지 = 몬스터 공격력 - 플레이어 방어력)
       executeMonsterCounterAttack() {
         const b = this.currentBattle;
         if (!b || b.monster.hp <= 0) return;
 
-        // [슈트 특성: 신기루 시공 망토 30% 확률 완전 회피]
         if (this.state.equippedSuit === "mirage" && Math.random() < 0.30) {
           this.showDamagePopup("player-damage-pos", `MISS! (회피)`);
           this.showToast("신기루 잔상으로 몬스터의 공격을 완전히 회피했습니다!", "info");
@@ -2057,20 +2095,16 @@
           pSprite.classList.remove("anim-idle");
           pSprite.classList.add("anim-hit-shake");
 
-          // 순수 1:1 감산 공식 (인위적 35% 강제 관통 없음!)
           let finalDmg = Math.max(1, Math.round(b.monster.atk - this.state.def));
 
-          // [슈트 특성: 거신 티탄 중갑 -20% 고정 경감]
           if (this.state.equippedSuit === "titan") {
             finalDmg = Math.max(1, Math.round(finalDmg * 0.80));
           }
 
-          // [무기 패널티: 대검 착용 시 받는 피해 +15%]
           if (this.state.equippedWeapon === "greatsword") {
             finalDmg = Math.round(finalDmg * 1.15);
           }
 
-          // [수호 정령 특성: 에테르 수호새 -25% 고정 경감]
           if (this.state.activePet === "bird") {
             finalDmg = Math.max(1, Math.round(finalDmg * 0.75));
           }
@@ -2115,14 +2149,12 @@
         this.handlePlayerAnswer(this.keypadInput);
       },
 
-      // 몬스터 처치 및 보상 정산
       handleMonsterDefeat() {
         SoundManager.playVictory();
         const b = this.currentBattle;
         const dungeon = b.dungeon;
         const currentMon = b.monster;
 
-        // 골드 보너스 계산 (다람쥐 +30%, 레이피어 +25%)
         let goldMultiplier = 1.0;
         if (this.state.activePet === "squirrel") goldMultiplier += 0.30;
         if (this.state.equippedWeapon === "rapier") goldMultiplier += 0.25;
@@ -2137,7 +2169,6 @@
         this.state.materials[dungeon.matKey] = (this.state.materials[dungeon.matKey] || 0) + dropCount;
         b.accumulatedRewards.materials += dropCount;
 
-        // 20% 확률로 상급 마나 영약 획득
         let potionDropped = false;
         if (Math.random() < 0.20 && this.getTotalPotionCount() < this.state.maxPotionCapacity) {
           potionDropped = true;
@@ -2148,7 +2179,6 @@
         this.checkLevelUp();
         this.triggerCloudSave(false);
 
-        // [수호 정령: 크로노 나비 20% 자동 회복]
         if (this.state.activePet === "butterfly") {
           const heal = Math.round(this.state.maxHp * 0.20);
           this.state.hp = Math.min(this.state.maxHp, this.state.hp + heal);
@@ -2190,7 +2220,7 @@
           `• 획득 골드: +${b.accumulatedRewards.gold + bonusGold} G (보너스 포함)\n` +
           `• 획득 경험치: +${b.accumulatedRewards.exp} EXP\n` +
           `• 확보한 특산물: ${dungeon.matName} 총 ${b.accumulatedRewards.materials + bonusMat}개 획득!\n` +
-          `• 던전 정복 횟수: ${this.state.progress[tierKey][`u${dungeon.id}`]}회 달성!`;
+          `• 던전 정복 횟수: ${this.state.progress[tierKey]["u" + dungeon.id]}회 달성!`;
 
         if (b.accumulatedRewards.potions > 0) clearMsg += `\n• 획득한 영약: 총 ${b.accumulatedRewards.potions}개`;
 
@@ -2230,6 +2260,201 @@
         this.updateHeaderUI();
         this.renderLobbyDungeons();
         this.triggerCloudSave(false);
+      },
+
+      openGrimoireModal() {
+        if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
+        this.switchGrimoireTab(this.currentGrimoireTab || "unsolved");
+        document.getElementById("modal-grimoire").classList.remove("hidden");
+      },
+
+      switchGrimoireTab(tab) {
+        this.currentGrimoireTab = tab;
+        const unsolvedBtn = document.getElementById("grimoire-tab-unsolved");
+        const solvedBtn = document.getElementById("grimoire-tab-solved");
+
+        if (tab === "unsolved") {
+          unsolvedBtn.className = "px-3.5 py-1.5 rounded-lg font-bold bg-rose-600 text-white shadow";
+          solvedBtn.className = "px-3.5 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+        } else {
+          solvedBtn.className = "px-3.5 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950 shadow";
+          unsolvedBtn.className = "px-3.5 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+        }
+
+        this.renderGrimoireList();
+      },
+
+      renderGrimoireList() {
+        const container = document.getElementById("grimoire-list-container");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const all = this.state.grimoire || [];
+        const unsolved = all.filter(item => !item.solved);
+        const solved = all.filter(item => item.solved);
+
+        document.getElementById("grimoire-count-unsolved").textContent = unsolved.length;
+        document.getElementById("grimoire-count-solved").textContent = solved.length;
+
+        const currentList = this.currentGrimoireTab === "unsolved" ? unsolved : solved;
+
+        if (currentList.length === 0) {
+          if (this.currentGrimoireTab === "unsolved") {
+            container.innerHTML = `
+              <div class="py-16 text-center text-slate-400 space-y-2">
+                <i class="fa-solid fa-circle-check text-4xl text-emerald-400 mb-2"></i>
+                <p class="font-bold text-slate-200 text-sm">보관된 미해결 오답이 없습니다!</p>
+                <p class="text-[11px] text-slate-400">모든 수학 마도 주문을 완벽하게 이해하고 지배하셨습니다.</p>
+              </div>
+            `;
+          } else {
+            container.innerHTML = `
+              <div class="py-16 text-center text-slate-400 space-y-2">
+                <i class="fa-solid fa-scroll text-4xl text-slate-600 mb-2"></i>
+                <p class="font-bold text-slate-300 text-sm">완전 정복한 오답이 아직 없습니다.</p>
+                <p class="text-[11px] text-slate-400">미극복 탭의 오답 문제에 도전하여 정복 보상을 획득하세요!</p>
+              </div>
+            `;
+          }
+          return;
+        }
+
+        currentList.forEach(item => {
+          const card = document.createElement("div");
+          card.className = "bg-slate-950 border border-slate-800 hover:border-rose-500/50 rounded-xl p-3.5 space-y-2 transition shadow";
+
+          const isUnsolved = !item.solved;
+          card.innerHTML = `
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold ${isUnsolved ? 'bg-rose-950 text-rose-300 border border-rose-600/50' : 'bg-emerald-950 text-emerald-300 border border-emerald-500/50'}">
+                  ${isUnsolved ? '⚠️ 미극복 취약점' : '✨ 마스터 완료'}
+                </span>
+                <span class="font-bold text-xs text-amber-300">${item.topic}</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">${item.dungeonName || '던전'} (T${item.tier})</span>
+            </div>
+
+            <div class="text-xs sm:text-sm font-bold text-slate-200 py-1" id="grimoire-q-${item.id}"></div>
+
+            <div class="flex items-center justify-between pt-1">
+              <div class="text-[10px] text-slate-400">
+                ${isUnsolved ? `<span class="text-rose-400 font-bold font-mono">오답 횟수: ${item.failCount || 1}회</span>` : '<span class="text-emerald-400 font-bold">오답 극복 보너스 수령 완료</span>'}
+              </div>
+              <div class="flex gap-2">
+                ${isUnsolved ? `
+                  <button onclick="App.startGrimoireChallenge('${item.id}')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black px-3.5 py-1.5 rounded-lg text-xs transition shadow flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>오답 극복 도전!</span>
+                  </button>
+                ` : `
+                  <button onclick="App.viewGrimoireSolution('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700 transition">
+                    풀이 다시 보기
+                  </button>
+                `}
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+
+          const qEl = document.getElementById(`grimoire-q-${item.id}`);
+          if (qEl) this.renderFormulaInto(qEl, item.question);
+        });
+      },
+
+      viewGrimoireSolution(itemId) {
+        const item = (this.state.grimoire || []).find(g => g.id === itemId);
+        if (!item) return;
+        this.showModal(`[풀이 복습] ${item.topic}`, `정답: ${item.answer}\n\n[상세 해설]\n${item.solution.replace(/<br>/g, '\n')}`, "fa-solid fa-book-open text-amber-400");
+      },
+
+      startGrimoireChallenge(itemId) {
+        const item = (this.state.grimoire || []).find(g => g.id === itemId);
+        if (!item) return;
+
+        this.activeGrimoireItem = item;
+        document.getElementById("g-challenge-topic").textContent = `${item.topic} (극복 도전)`;
+        const qEl = document.getElementById("g-challenge-question");
+        this.renderFormulaInto(qEl, item.question);
+
+        const choiceArea = document.getElementById("g-challenge-choices");
+        const keypadArea = document.getElementById("g-challenge-keypad");
+
+        if (item.tier === 3 || !item.choices || item.choices.length === 0) {
+          choiceArea.classList.add("hidden");
+          keypadArea.classList.remove("hidden");
+          const inputEl = document.getElementById("g-challenge-input");
+          inputEl.value = "";
+          inputEl.focus();
+        } else {
+          choiceArea.classList.remove("hidden");
+          keypadArea.classList.add("hidden");
+          choiceArea.innerHTML = "";
+
+          const shuffled = [...item.choices].sort(() => Math.random() - 0.5);
+          shuffled.forEach(val => {
+            const btn = document.createElement("button");
+            btn.className = "bg-slate-800 hover:bg-indigo-900 border border-slate-700 hover:border-indigo-400 p-3 rounded-xl font-bold text-slate-100 flex items-center justify-between transition shadow group";
+            
+            const span = document.createElement("span");
+            span.className = "math-render text-sm";
+            span.setAttribute("data-math", String(val));
+            btn.appendChild(span);
+
+            btn.innerHTML += `<i class="fa-solid fa-chevron-right text-xs text-slate-500 group-hover:text-indigo-300"></i>`;
+            btn.onclick = () => this.handleGrimoireAnswer(val);
+            choiceArea.appendChild(btn);
+          });
+          this.renderMath();
+        }
+
+        document.getElementById("modal-grimoire-challenge").classList.remove("hidden");
+      },
+
+      submitGrimoireKeypadAnswer() {
+        const val = document.getElementById("g-challenge-input").value.trim();
+        if (!val) {
+          this.showToast("답안을 입력해주세요!", "error");
+          return;
+        }
+        this.handleGrimoireAnswer(val);
+      },
+
+      handleGrimoireAnswer(selectedVal) {
+        if (!this.activeGrimoireItem) return;
+        const item = this.activeGrimoireItem;
+        const isCorrect = String(selectedVal).trim() === String(item.answer).trim();
+
+        if (isCorrect) {
+          SoundManager.playVictory();
+          item.solved = true;
+          item.solvedAt = Date.now();
+
+          const bonusGold = 100;
+          const bonusExp = 50;
+          this.state.gold += bonusGold;
+          this.state.exp += bonusExp;
+
+          this.checkLevelUp();
+          this.updateHeaderUI();
+          this.saveToLocalStorage();
+          this.triggerCloudSave(false);
+
+          document.getElementById("modal-grimoire-challenge").classList.add("hidden");
+          this.renderGrimoireList();
+
+          this.showModal(
+            "🎉 오답 완전 극복 성공! 🎉",
+            `취약했던 [${item.topic}] 주문을 완벽하게 재시전하여 극복했습니다!\n\n` +
+            `• 오답 극복 보너스 골드: +${bonusGold} G\n` +
+            `• 오답 극복 보너스 경험치: +${bonusExp} EXP\n\n` +
+            `마도 비전서에 '완전 정복' 훈장이 날인되었습니다.`,
+            "fa-solid fa-award text-amber-400"
+          );
+        } else {
+          SoundManager.playDefeat();
+          this.showToast("아쉽습니다! 정답이 아닙니다. 차근차근 다시 풀어보세요.", "error");
+        }
       },
 
       openArmoryModal() {
@@ -2399,7 +2624,7 @@
           const card = document.createElement("div");
           card.className = `p-3 rounded-xl border flex items-center justify-between gap-3 ${isEquipped ? 'bg-amber-950/30 border-amber-500/70' : 'bg-slate-950 border-slate-800'}`;
           card.innerHTML = `
-            <div class="w-14 h-14 flex-shrink-0 flex items-center justify-center bg-slate-900/90 rounded-xl p-1 border border-slate-800 shadow-inner">
+            <div class="w-16 h-16 flex-shrink-0 flex items-center justify-center bg-slate-900/90 rounded-xl p-1 border border-slate-800 shadow-inner">
               ${MonsterSvgRenderer.renderPet(p.id)}
             </div>
             <div class="flex-1">
@@ -2577,7 +2802,6 @@
         container.innerHTML = "";
         const tab = this.currentRankTab || "power";
 
-        // 학급 대항전
         if (tab === "class") {
           const classList = this.cachedRankings.classBattle || [];
           if (classList.length === 0) {
@@ -2607,7 +2831,6 @@
           return;
         }
 
-        // 개인전 3개 부문
         const list = (this.cachedRankings.rankings[tab] || []);
         if (list.length === 0) {
           container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>해당 부문에 기록된 학생이 없습니다.</p></div>`;
@@ -2814,7 +3037,7 @@
         const names = { minor: "하급 생명수", normal: "상급 마나 영약", major: "기원의 엘릭서" };
 
         let boostMultiplier = 1.0;
-        if (this.state.equippedSuit === "mirage") boostMultiplier = 1.30; // 망토 착용 시 회복량 +30%
+        if (this.state.equippedSuit === "mirage") boostMultiplier = 1.30;
 
         const healAmt = Math.round(this.state.maxHp * rates[type] * boostMultiplier);
         this.state.hp = Math.min(this.state.maxHp, this.state.hp + healAmt);
@@ -2864,10 +3087,6 @@
         document.getElementById("bs-weapon-lv").textContent = `+${wLv} / 15`;
         document.getElementById("bs-armor-lv").textContent = `+${aLv} / 15`;
 
-        const nextAtk = 22 + (this.state.level - 1) * 3 + (wLv + 1) * 10;
-        const nextDef = 5 + (this.state.level - 1) * 1.5 + (aLv + 1) * 5;
-        const nextHp = 100 + (this.state.level - 1) * 12 + (aLv + 1) * 35;
-
         document.getElementById("bs-weapon-spec").textContent = `기초 공격력: +${wLv * 10} → +${(wLv + 1) * 10} (+10)`;
         document.getElementById("bs-armor-spec").textContent = `기초 방어/HP: DEF +${Math.round(wLv * 5)} / HP +${wLv * 35} → DEF +${Math.round((aLv + 1) * 5)} / HP +${(aLv + 1) * 35}`;
 
@@ -2876,12 +3095,10 @@
         const reqMat = weaponCost.reqMat;
 
         let wCostHtml = `<div class="flex justify-between font-bold ${this.state.gold >= reqGold ? 'text-amber-300' : 'text-rose-400'}"><span>필요 골드</span><span>${this.state.gold} / ${reqGold} G</span></div>`;
-        let missingList = [];
 
         DUNGEON_DATA.forEach(d => {
           const count = this.state.materials[d.matKey] || 0;
           const ok = count >= reqMat;
-          if (!ok) missingList.push(`${d.name}의 [${d.matName}] ${reqMat - count}개`);
           wCostHtml += `<div class="flex justify-between ${ok ? 'text-slate-300' : 'text-rose-400'}"><span>• ${d.matName}</span><span>${count} / ${reqMat}개</span></div>`;
         });
         document.getElementById("bs-weapon-cost").innerHTML = wCostHtml;
@@ -3014,6 +3231,7 @@
           materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
           progress: { tier1: {}, tier2: {}, tier3: {} },
           stats: { solved: 0, correct: 0 },
+          grimoire: [],
           equippedWeapon: "staff",
           equippedSuit: "robe",
           ownedWeapons: ["staff"],
@@ -3092,6 +3310,7 @@
               this.state.materials = u.materials || this.state.materials;
               this.state.progress = u.progress || this.state.progress;
               this.state.stats = u.stats || this.state.stats;
+              if (Array.isArray(u.grimoire)) this.state.grimoire = u.grimoire;
 
               if (u.inventory) {
                 this.state.maxPotionCapacity = u.inventory.maxPotionCapacity || 5;
@@ -3118,7 +3337,6 @@
             this.renderLobbyDungeons();
             this.saveToLocalStorage();
           } else {
-            // 핀번호가 다를 때 또는 인증 에러
             this.showToast(result.message || "핀번호가 다릅니다.", "error");
             this.showModal("접속 실패", result.message || "핀번호가 다릅니다.\n등록된 닉네임과 일치하는 핀번호를 입력하세요.", "fa-solid fa-triangle-exclamation text-rose-500");
           }
@@ -3162,7 +3380,8 @@
                 materials: this.state.materials,
                 inventory: inventoryData,
                 progress: this.state.progress,
-                stats: this.state.stats
+                stats: this.state.stats,
+                grimoire: this.state.grimoire
               }
             })
           });
@@ -3208,6 +3427,17 @@
         document.getElementById("header-gold").textContent = this.state.gold;
         document.getElementById("lobby-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
 
+        const grimoireBadge = document.getElementById("lobby-grimoire-badge");
+        if (grimoireBadge) {
+          const unsolvedCount = (this.state.grimoire || []).filter(item => !item.solved).length;
+          grimoireBadge.textContent = unsolvedCount;
+          if (unsolvedCount > 0) {
+            grimoireBadge.className = "bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono animate-pulse";
+          } else {
+            grimoireBadge.className = "bg-emerald-500 text-slate-950 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono";
+          }
+        }
+
         const battlePotCount = document.getElementById("battle-potion-count");
         if (battlePotCount) battlePotCount.textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
 
@@ -3221,7 +3451,6 @@
           const classTag = this.state.classNo ? `[${this.state.classNo}] ` : "";
           if (lobbyUserLabel) lobbyUserLabel.textContent = `${classTag}${displayNick}`;
 
-          // PIN 번호는 절대 화면에 노출하지 않고 닉네임과 연동 상태만 표시
           pinLabel.textContent = `${displayNick} (연동됨)`;
           pinLabel.className = "text-emerald-300 font-bold font-mono";
           pinIcon.className = "fa-solid fa-shield-halved text-emerald-400";
