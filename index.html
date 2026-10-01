@@ -71,6 +71,14 @@
       0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
       50% { transform: translateY(-10px) rotate(4deg) scale(1.05); }
     }
+    @keyframes lightningPulse {
+      0%, 100% { opacity: 0.85; filter: drop-shadow(0 0 6px #38bdf8); }
+      50% { opacity: 0.3; filter: drop-shadow(0 0 2px #0284c7); }
+    }
+    @keyframes runeGlow {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 10px #c084fc); }
+    }
 
     .anim-idle { animation: floatingIdle 3s ease-in-out infinite; }
     .anim-player-attack { animation: playerRush 0.55s cubic-bezier(0.22, 1, 0.36, 1) !important; z-index: 30; }
@@ -78,8 +86,11 @@
     .anim-hit-shake { animation: hitShake 0.5s ease-in-out !important; }
     .anim-slash { animation: slashFlash 0.4s ease-out forwards; }
     .damage-popup { animation: damageFloat 0.9s forwards ease-out; }
-    .anim-aura-spin { animation: rotateAura 18s linear infinite; }
+    .anim-aura-spin { animation: rotateAura 14s linear infinite; transform-origin: 50px 50px; }
+    .anim-aura-spin-reverse { animation: rotateAura 10s linear infinite reverse; transform-origin: 50px 88px; }
     .anim-pet-idle { animation: petFly 2.4s ease-in-out infinite; }
+    .anim-lightning-pulse { animation: lightningPulse 0.4s ease-in-out infinite; }
+    .anim-rune-pulse { animation: runeGlow 1.8s ease-in-out infinite; transform-origin: center; }
 
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: #0f172a; }
@@ -266,8 +277,8 @@
           </div>
 
           <div class="relative flex items-center justify-center">
-            <!-- 수호 정령(펫) 스프라이트 -->
-            <div id="battle-pet-sprite" class="absolute -top-12 -right-14 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none anim-pet-idle hidden z-20"></div>
+            <!-- 수호 정령(펫) 스프라이트: 수치 텍스트를 가리지 않도록 우측 어깨 옆(살짝 아래/바깥)으로 재배치 및 적정 크기(w-14 sm:w-16) 조정 -->
+            <div id="battle-pet-sprite" class="absolute top-2 -right-12 sm:-right-14 w-14 h-14 sm:w-16 sm:h-16 pointer-events-none anim-pet-idle hidden z-20"></div>
 
             <!-- 플레이어 아바타 -->
             <div id="battle-player-sprite" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center anim-idle transition"></div>
@@ -448,6 +459,20 @@
           <button onclick="App.closeModal('modal-armory')" class="text-slate-400 hover:text-white">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
+        </div>
+      </div>
+
+      <!-- 상단 마도사 실시간 아바타 & 장비 상태 미리보기 -->
+      <div class="bg-slate-950/90 border border-purple-500/40 rounded-xl p-2.5 mb-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div id="armory-player-preview" class="w-14 h-14 bg-slate-900 rounded-lg flex items-center justify-center border border-slate-800 p-1"></div>
+          <div>
+            <div class="text-xs font-bold text-purple-300">현재 마도사 장착 미리보기</div>
+            <div id="armory-current-summary" class="text-[10px] text-slate-400 font-mono">장착 상태 로딩 중...</div>
+          </div>
+        </div>
+        <div class="text-right text-[10px] text-amber-300 font-mono">
+          <i class="fa-solid fa-sparkles mr-1"></i>장착 즉시 실시간 반영
         </div>
       </div>
 
@@ -1283,13 +1308,39 @@
       renderPlayer(weaponLv, armorLv, weaponId = "staff", suitId = "robe", auraId = null) {
         let auraHtml = "";
         if (auraId === "pantheon") {
-          auraHtml = `<ellipse cx="50" cy="88" rx="34" ry="8" fill="none" stroke="#10b981" stroke-width="2.5" stroke-dasharray="6,4" class="anim-aura-spin"/>`;
+          auraHtml = `
+            <g class="anim-aura-spin" filter="drop-shadow(0 0 10px #10b981)">
+              <ellipse cx="50" cy="88" rx="38" ry="10" fill="#064e3b" stroke="#34d399" stroke-width="2.5" stroke-dasharray="8,4"/>
+              <ellipse cx="50" cy="88" rx="26" ry="6" fill="none" stroke="#6ee7b7" stroke-width="1.5"/>
+            </g>
+          `;
         } else if (auraId === "gear") {
-          auraHtml = `<circle cx="50" cy="45" r="42" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="8,6" class="anim-aura-spin" opacity="0.75"/>`;
+          auraHtml = `
+            <g class="anim-aura-spin" filter="drop-shadow(0 0 8px #f59e0b)">
+              <circle cx="50" cy="50" r="44" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="10,6" fill="none"/>
+              <rect x="47" y="3" width="6" height="6" fill="#fbbf24"/>
+              <rect x="47" y="91" width="6" height="6" fill="#fbbf24"/>
+              <rect x="3" y="47" width="6" height="6" fill="#fbbf24"/>
+              <rect x="91" y="47" width="6" height="6" fill="#fbbf24"/>
+            </g>
+          `;
         } else if (auraId === "rune") {
-          auraHtml = `<circle cx="28" cy="40" r="5" fill="#a855f7"/><circle cx="72" cy="40" r="5" fill="#a855f7"/>`;
+          auraHtml = `
+            <g filter="drop-shadow(0 0 8px #c084fc)">
+              <circle cx="24" cy="38" r="8" fill="#581c87" stroke="#c084fc" stroke-width="2" stroke-dasharray="4,2"/>
+              <text x="24" y="41" text-anchor="middle" fill="#f5d0fe" font-size="7" font-weight="900">∑</text>
+              <circle cx="76" cy="38" r="8" fill="#581c87" stroke="#c084fc" stroke-width="2" stroke-dasharray="4,2"/>
+              <text x="76" y="41" text-anchor="middle" fill="#f5d0fe" font-size="7" font-weight="900">∏</text>
+            </g>
+          `;
         } else if (auraId === "lightning") {
-          auraHtml = `<path d="M72 10 L68 25 L75 32 L70 50" stroke="#38bdf8" stroke-width="2" fill="none"/>`;
+          auraHtml = `
+            <g filter="drop-shadow(0 0 8px #38bdf8)">
+              <path d="M18 65 L26 48 L22 46 L30 30" stroke="#38bdf8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <path d="M72 15 L80 32 L75 35 L86 55" stroke="#7dd3fc" stroke-width="3" fill="none" stroke-linecap="round"/>
+              <circle cx="78" cy="20" r="3" fill="#ffffff"/>
+            </g>
+          `;
         }
 
         let suitHtml = "";
@@ -1506,70 +1557,70 @@
       genUnit1(tier) {
         const type = this.getRandomInt(1, 7);
         if (type === 1) {
-          const a = this.getRandomInt(2, 6);
-          const b = this.getRandomChoice([2, 3, 5, 7]);
+          const a = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 7) : this.getRandomInt(7, 12));
+          const b = this.getRandomChoice(tier === 1 ? [2, 3] : [2, 3, 5]);
           const inside = a * a * b;
           return {
-            topic: "[제곱근] 1. 근호 밖으로 꺼내기",
+            topic: `[제곱근] 1. 근호 밖으로 꺼내기 (T${tier})`,
             question: `$\\sqrt{${inside}}$ 를 $a\\sqrt{${b}}$ 꼴로 나타낼 때, $a$의 값은?`,
             answer: a,
             solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 이므로 $a = ${a}$ 입니다.`
           };
         } else if (type === 2) {
-          const a = this.getRandomChoice([2, 3, 5]);
-          const mul = this.getRandomInt(2, 6);
+          const a = this.getRandomChoice(tier === 1 ? [2, 3] : [2, 3, 5]);
+          const mul = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 8) : this.getRandomInt(8, 14));
           const top = a * mul;
           return {
-            topic: "[제곱근] 2. 분모의 유리화",
+            topic: `[제곱근] 2. 분모의 유리화 (T${tier})`,
             question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, 유리수 $k$의 값은?`,
             answer: mul,
             solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다. 따라서 $k = ${mul}$ 입니다.`
           };
         } else if (type === 3) {
-          const n = this.getRandomInt(3, 8);
-          const add = this.getRandomInt(1, 4);
+          const n = tier === 1 ? this.getRandomInt(3, 5) : (tier === 2 ? this.getRandomInt(6, 9) : this.getRandomInt(10, 14));
+          const add = this.getRandomInt(1, tier === 1 ? 3 : 5);
           const inside = n * n + add;
           return {
-            topic: "[제곱근] 3. 무리수의 정수 부분",
+            topic: `[제곱근] 3. 무리수의 정수 부분 (T${tier})`,
             question: `$\\sqrt{${inside}}$ 의 정수 부분을 구하시오.`,
             answer: n,
             solution: `$${n}^2 = ${n * n} < ${inside} < ${(n + 1) * (n + 1)}$ 이므로 $\\sqrt{${inside}}$ 의 정수 부분은 $${n}$ 입니다.`
           };
         } else if (type === 4) {
-          const val = this.getRandomInt(3, 9);
+          const val = tier === 1 ? this.getRandomInt(3, 6) : (tier === 2 ? this.getRandomInt(7, 12) : this.getRandomInt(13, 20));
           return {
-            topic: "[제곱근] 4. 제곱근의 기본 성질",
+            topic: `[제곱근] 4. 제곱근의 기본 성질 (T${tier})`,
             question: `$\\sqrt{(-${val})^2} + \\sqrt{${val}^2}$ 의 값은?`,
             answer: val * 2,
-            solution: `$\\sqrt{(-${val})^2} = ${val}$, $\\sqrt{${val}^2} = ${val}$ 이므로 두 값의 합은 $${val} + ${val} = ${val * 2}$ 입니다.`
+            solution: `$\\sqrt{(-${val})^2} = ${val}$, $\\sqrt{${val}^2} = ${val}$ 이므로 $${val} + ${val} = ${val * 2}$ 입니다.`
           };
         } else if (type === 5) {
-          const a = this.getRandomInt(3, 6);
+          const a = tier === 1 ? this.getRandomInt(3, 5) : (tier === 2 ? this.getRandomInt(6, 9) : this.getRandomInt(10, 15));
           const aSq = a * a;
-          const diff = this.getRandomInt(1, 3);
+          const diff = this.getRandomInt(1, tier === 1 ? 2 : 4);
           const c = aSq - diff;
           return {
-            topic: "[제곱근] 5. 제곱근과 수의 대소 비교",
+            topic: `[제곱근] 5. 제곱근과 수의 대소 비교 (T${tier})`,
             question: `$${a}$ 와 $\\sqrt{${c}}$ 중 더 큰 수의 제곱값은?`,
             answer: aSq,
             solution: `$${a} = \\sqrt{${aSq}}$ 이고 $${aSq} > ${c}$ 이므로 더 큰 수는 $${a}$ 입니다. 그 제곱값은 $${aSq}$ 입니다.`
           };
         } else if (type === 6) {
           const c = this.getRandomChoice([2, 3, 5]);
-          const k1 = this.getRandomInt(2, 5);
-          const k2 = this.getRandomInt(2, 4);
+          const k1 = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 9) : this.getRandomInt(10, 18));
+          const k2 = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 8) : this.getRandomInt(8, 15));
           return {
-            topic: "[제곱근] 6. 동류근의 덧셈",
+            topic: `[제곱근] 6. 동류근의 덧셈 (T${tier})`,
             question: `$${k1}\\sqrt{${c}} + ${k2}\\sqrt{${c}} = k\\sqrt{${c}}$ 일 때, 유리수 $k$의 값은?`,
             answer: k1 + k2,
             solution: `동류근끼리 계수를 더하면 $(${k1} + ${k2})\\sqrt{${c}} = ${k1 + k2}\\sqrt{${c}}$ 이므로 $k = ${k1 + k2}$ 입니다.`
           };
         } else {
-          const a = this.getRandomInt(2, 5);
-          const b = this.getRandomChoice([2, 3, 5]);
+          const a = tier === 1 ? this.getRandomInt(2, 3) : (tier === 2 ? this.getRandomInt(3, 5) : this.getRandomInt(5, 7));
+          const b = this.getRandomChoice(tier === 1 ? [2, 5] : [3, 7]);
           const inside = a * b;
           return {
-            topic: "[제곱근] 7. 근호의 곱셈",
+            topic: `[제곱근] 7. 근호의 곱셈 (T${tier})`,
             question: `$\\sqrt{${a}} \\times \\sqrt{${b}}$ 의 값은 $\\sqrt{k}$ 입니다. $k$의 값은?`,
             answer: inside,
             solution: `$\\sqrt{${a}} \\times \\sqrt{${b}} = \\sqrt{${a} \\times ${b}} = \\sqrt{${inside}}$ 이므로 $k = ${inside}$ 입니다.`
@@ -1580,77 +1631,88 @@
       genUnit2(tier) {
         const type = this.getRandomInt(1, 7);
         if (type === 1) {
-          const r1 = this.getRandomInt(1, 4);
-          const r2 = this.getRandomInt(r1 + 1, 6);
+          let r1, r2;
+          if (tier === 1) {
+            r1 = this.getRandomInt(1, 3);
+            r2 = this.getRandomInt(r1 + 1, 5);
+          } else if (tier === 2) {
+            r1 = -this.getRandomInt(1, 4);
+            r2 = this.getRandomInt(2, 6);
+          } else {
+            r1 = -this.getRandomInt(3, 7);
+            r2 = this.getRandomInt(5, 10);
+          }
           const b = -(r1 + r2);
           const c = r1 * r2;
-          const bSign = b < 0 ? `${b}x` : `+${b}x`;
+          const bSign = b === 0 ? "" : (b < 0 ? `${b}x` : `+${b}x`);
           const cSign = c < 0 ? `${c}` : `+${c}`;
+          const maxRoot = Math.max(r1, r2);
           return {
-            topic: "[이차방정식] 1. 인수분해를 이용한 해 구하기",
+            topic: `[이차방정식] 1. 인수분해를 이용한 해 구하기 (T${tier})`,
             question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근 중 더 큰 근은?`,
-            answer: r2,
-            solution: `$(x - ${r1})(x - ${r2}) = 0$ 이므로 두 근은 $x = ${r1}, ${r2}$ 입니다. 따라서 더 큰 근은 $${r2}$ 입니다.`
+            answer: maxRoot,
+            solution: `$(x ${r1 >= 0 ? '-' + r1 : '+' + (-r1)})(x ${r2 >= 0 ? '-' + r2 : '+' + (-r2)}) = 0$ 이므로 두 근은 $x = ${r1}, ${r2}$ 입니다. 더 큰 근은 $${maxRoot}$ 입니다.`
           };
         } else if (type === 2) {
-          const p = this.getRandomInt(2, 7);
+          const p = tier === 1 ? this.getRandomInt(2, 5) : (tier === 2 ? this.getRandomInt(6, 9) : this.getRandomInt(10, 15));
           const doubleP = 2 * p;
           const pSq = p * p;
           return {
-            topic: "[이차방정식] 2. 완전제곱식과 중근",
+            topic: `[이차방정식] 2. 완전제곱식과 중근 (T${tier})`,
             question: `이차방정식 $x^2 - ${doubleP}x + ${pSq} = 0$ 의 중근 $x$의 값은?`,
             answer: p,
             solution: `좌변이 완전제곱식 $(x - ${p})^2 = 0$ 으로 인수분해되므로 중근은 $x = ${p}$ 입니다.`
           };
         } else if (type === 3) {
-          const r1 = this.getRandomInt(1, 5);
-          const r2 = this.getRandomInt(2, 6);
+          const r1 = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-6, -1);
+          const r2 = tier === 1 ? this.getRandomInt(2, 5) : this.getRandomInt(2, 8);
           const sum = r1 + r2;
           const b = -sum;
           const c = r1 * r2;
           return {
-            topic: "[이차방정식] 3. 두 근의 합",
-            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x + ${c} = 0$ 의 두 근의 합은?`,
+            topic: `[이차방정식] 3. 두 근의 합 (T${tier})`,
+            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x ${c < 0 ? c : '+' + c} = 0$ 의 두 근의 합은?`,
             answer: sum,
-            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${sum}$ 입니다.`
+            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 합은 $${r1} + (${r2}) = ${sum}$ 입니다.`
           };
         } else if (type === 4) {
           const a = 1;
-          const b = this.getRandomChoice([4, 6, 8]);
-          const c = this.getRandomInt(1, 5);
+          const b = tier === 1 ? this.getRandomChoice([4, 6]) : (tier === 2 ? this.getRandomChoice([6, 8, 10]) : this.getRandomChoice([10, 12, 14]));
+          const c = tier === 1 ? this.getRandomInt(1, 3) : (tier === 2 ? this.getRandomInt(2, 6) : this.getRandomInt(4, 9));
           const d = b * b - 4 * a * c;
           return {
-            topic: "[이차방정식] 4. 판별식(D) 값 계산",
+            topic: `[이차방정식] 4. 판별식(D) 값 계산 (T${tier})`,
             question: `이차방정식 $x^2 + ${b}x + ${c} = 0$ 의 판별식 $D = b^2 - 4ac$ 의 값은?`,
             answer: d,
             solution: `판별식 $D = ${b}^2 - 4 \\times 1 \\times ${c} = ${b * b} - ${4 * c} = ${d}$ 입니다.`
           };
         } else if (type === 5) {
-          const r1 = this.getRandomInt(1, 5);
-          const r2 = this.getRandomInt(2, 6);
+          const r1 = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-5, -1);
+          const r2 = tier === 1 ? this.getRandomInt(2, 5) : this.getRandomInt(3, 7);
           const prod = r1 * r2;
           const b = -(r1 + r2);
           return {
-            topic: "[이차방정식] 5. 두 근의 곱",
-            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x + ${prod} = 0$ 의 두 근의 곱은?`,
+            topic: `[이차방정식] 5. 두 근의 곱 (T${tier})`,
+            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x ${prod < 0 ? prod : '+' + prod} = 0$ 의 두 근의 곱은?`,
             answer: prod,
-            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 곱은 $${r1} \\times ${r2} = ${prod}$ 입니다.`
+            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 곱은 $(${r1}) \\times (${r2}) = ${prod}$ 입니다.`
           };
         } else if (type === 6) {
-          const r = this.getRandomInt(2, 5);
+          const r = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 7) : this.getRandomInt(6, 10));
           const k = this.getRandomInt(1, 4);
           const c = r * (r + k);
           return {
-            topic: "[이차방정식] 6. 한 근이 주어질 때 미지수 구하기",
+            topic: `[이차방정식] 6. 한 근이 주어질 때 미지수 구하기 (T${tier})`,
             question: `이차방정식 $x^2 - ${2 * r + k}x + c = 0$ 의 한 근이 $x = ${r}$ 일 때, 상수 $c$의 값은?`,
             answer: c,
             solution: `$x = ${r}$ 을 대입하면 $${r}^2 - ${2 * r + k}(${r}) + c = 0 \\implies c = ${c}$ 입니다.`
           };
         } else {
-          const q = this.getRandomChoice([4, 9, 16, 25]);
+          const cand = tier === 1 ? [4, 9, 16, 25] : (tier === 2 ? [36, 49, 64, 81] : [100, 121, 144, 169]);
+          const q = this.getRandomChoice(cand);
           const sqrtQ = Math.round(Math.sqrt(q));
           return {
-            topic: "[이차방정식] 7. 제곱근을 이용한 풀이",
+            topic: `[이차방정식] 7. 제곱근을 이용한 풀이 (T${tier})`,
             question: `이차방정식 $x^2 = ${q}$ 의 양수인 해는?`,
             answer: sqrtQ,
             solution: `$x = \\pm \\sqrt{${q}} = \\pm ${sqrtQ}$ 이므로 양수인 해는 $${sqrtQ}$ 입니다.`
@@ -1661,63 +1723,66 @@
       genUnit3(tier) {
         const type = this.getRandomInt(1, 7);
         if (type === 1) {
-          const p = this.getRandomInt(1, 5);
-          const q = this.getRandomInt(2, 9);
+          const p = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-6, 6);
+          const q = tier === 1 ? this.getRandomInt(2, 6) : (tier === 2 ? this.getRandomInt(-8, 8) : this.getRandomInt(-15, 15));
+          const pTerm = p === 0 ? "x" : (p > 0 ? `(x - ${p})` : `(x + ${-p})`);
+          const qTerm = q >= 0 ? `+ ${q}` : `- ${-q}`;
           return {
-            topic: "[이차함수] 1. 꼭짓점의 y좌표",
-            question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
+            topic: `[이차함수] 1. 꼭짓점의 y좌표 (T${tier})`,
+            question: `이차함수 $y = ${pTerm}^2 ${qTerm}$ 의 꼭짓점의 $y$좌표는?`,
             answer: q,
-            solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
+            solution: `표준형에서 꼭짓점의 좌표는 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
           };
         } else if (type === 2) {
-          const p = this.getRandomInt(1, 6);
+          const p = tier === 1 ? this.getRandomInt(1, 5) : (tier === 2 ? this.getRandomInt(-7, 7) : this.getRandomInt(-12, 12));
           const q = this.getRandomInt(1, 8);
+          const pTerm = p >= 0 ? `(x - ${p})` : `(x + ${-p})`;
           return {
-            topic: "[이차함수] 2. 대칭축의 방정식",
-            question: `이차함수 $y = -(x - ${p})^2 + ${q}$ 의 축의 방정식 $x = k$ 에서 $k$의 값은?`,
+            topic: `[이차함수] 2. 대칭축의 방정식 (T${tier})`,
+            question: `이차함수 $y = -${pTerm}^2 + ${q}$ 의 축의 방정식 $x = k$ 에서 $k$의 값은?`,
             answer: p,
-            solution: `대칭축의 방정식은 $x - ${p} = 0 \\implies x = ${p}$ 이므로 $k = ${p}$ 입니다.`
+            solution: `대칭축의 방정식은 $x = ${p}$ 이므로 $k = ${p}$ 입니다.`
           };
         } else if (type === 3) {
-          const q = this.getRandomInt(2, 7);
+          const q = tier === 1 ? this.getRandomInt(2, 5) : (tier === 2 ? this.getRandomInt(6, 12) : this.getRandomInt(13, 22));
           return {
-            topic: "[이차함수] 3. y축 방향 평행이동",
+            topic: `[이차함수] 3. y축 방향 평행이동 (T${tier})`,
             question: `이차함수 $y = x^2$ 의 그래프를 $y$축 방향으로 $${q}$만큼 평행이동한 식의 $y$절편은?`,
             answer: q,
             solution: `평행이동한 식은 $y = x^2 + ${q}$ 이며, $x = 0$ 일 때 $y = ${q}$ 입니다.`
           };
         } else if (type === 4) {
-          const p = this.getRandomInt(1, 4);
-          const q = this.getRandomInt(1, 5);
+          const p = tier === 1 ? this.getRandomInt(1, 3) : (tier === 2 ? this.getRandomInt(3, 5) : this.getRandomInt(5, 7));
+          const q = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-4, 6);
           const yInt = p * p + q;
           return {
-            topic: "[이차함수] 4. y절편 구하기",
-            question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 그래프와 $y$축이 만나는 점의 $y$좌표는?`,
+            topic: `[이차함수] 4. y절편 구하기 (T${tier})`,
+            question: `이차함수 $y = (x - ${p})^2 ${q >= 0 ? '+' + q : q}$ 의 그래프와 $y$축이 만나는 점의 $y$좌표는?`,
             answer: yInt,
-            solution: `$x = 0$ 을 대입하면 $y = (0 - ${p})^2 + ${q} = ${p * p} + ${q} = ${yInt}$ 입니다.`
+            solution: `$x = 0$ 을 대입하면 $y = (0 - ${p})^2 ${q >= 0 ? '+' + q : q} = ${p * p} ${q >= 0 ? '+' + q : q} = ${yInt}$ 입니다.`
           };
         } else if (type === 5) {
-          const a = this.getRandomInt(1, 3);
-          const xVal = this.getRandomInt(2, 4);
+          const a = tier === 1 ? 1 : (tier === 2 ? this.getRandomInt(2, 3) : this.getRandomInt(3, 5));
+          const xVal = tier === 1 ? this.getRandomInt(2, 3) : (tier === 2 ? this.getRandomInt(3, 4) : this.getRandomInt(4, 6));
           const yVal = a * xVal * xVal;
           return {
-            topic: "[이차함수] 5. 특정 함숫값 계산",
+            topic: `[이차함수] 5. 특정 함숫값 계산 (T${tier})`,
             question: `이차함수 $f(x) = ${a > 1 ? a : ''}x^2$ 에 대하여 $f(${xVal})$ 의 값은?`,
             answer: yVal,
             solution: `$f(${xVal}) = ${a} \\times (${xVal})^2 = ${a} \\times ${xVal * xVal} = ${yVal}$ 입니다.`
           };
         } else if (type === 6) {
-          const p = this.getRandomInt(2, 6);
+          const p = tier === 1 ? this.getRandomInt(2, 5) : (tier === 2 ? this.getRandomInt(6, 10) : this.getRandomInt(11, 18));
           return {
-            topic: "[이차함수] 6. x축 방향 평행이동",
+            topic: `[이차함수] 6. x축 방향 평행이동 (T${tier})`,
             question: `이차함수 $y = x^2$ 의 그래프를 $x$축의 양의 방향으로 $${p}$만큼 평행이동한 꼭짓점의 $x$좌표는?`,
             answer: p,
             solution: `평행이동한 식은 $y = (x - ${p})^2$ 이므로 꼭짓점의 $x$좌표는 $${p}$ 입니다.`
           };
         } else {
-          const a = this.getRandomInt(2, 5);
+          const a = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 8) : this.getRandomInt(9, 15));
           return {
-            topic: "[이차함수] 7. 기본형의 꼭짓점",
+            topic: `[이차함수] 7. 기본형의 꼭짓점 (T${tier})`,
             question: `이차함수 $y = ${a}x^2$ 의 꼭짓점의 $x$좌표는?`,
             answer: 0,
             solution: `기본형 $y = ax^2$ 의 꼭짓점은 원점 $(0, 0)$ 이므로 꼭짓점의 $x$좌표는 $0$ 입니다.`
@@ -1728,57 +1793,76 @@
       genUnit4(tier) {
         const type = this.getRandomInt(1, 7);
         if (type === 1) {
-          return {
-            topic: "[삼각비] 1. 특수각 삼각비 기본 연산",
-            question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
-            answer: 1,
-            solution: `$\\sin 30^\\circ = \\frac{1}{2}, \\cos 60^\\circ = \\frac{1}{2}$ 이므로 합은 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
-          };
+          if (tier === 1) {
+            return {
+              topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T1)`,
+              question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
+              answer: 1,
+              solution: `$\\sin 30^\\circ = \\frac{1}{2}, \\cos 60^\\circ = \\frac{1}{2}$ 이므로 합은 $1$ 입니다.`
+            };
+          } else if (tier === 2) {
+            return {
+              topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T2)`,
+              question: `$\\tan 45^\\circ + \\sin 90^\\circ - \\cos 0^\\circ$ 의 값은?`,
+              answer: 1,
+              solution: `$1 + 1 - 1 = 1$ 입니다.`
+            };
+          } else {
+            return {
+              topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T3)`,
+              question: `$2\\sin 30^\\circ + 3\\tan 45^\\circ - 4\\cos 60^\\circ$ 의 값은?`,
+              answer: 2,
+              solution: `$2(\\frac{1}{2}) + 3(1) - 4(\\frac{1}{2}) = 1 + 3 - 2 = 2$ 입니다.`
+            };
+          }
         } else if (type === 2) {
-          const k = this.getRandomInt(2, 5);
+          const k = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 8) : this.getRandomInt(9, 14));
           return {
-            topic: "[삼각비] 2. 탄젠트와 사인의 혼합 연산",
+            topic: `[삼각비] 2. 탄젠트와 사인의 혼합 연산 (T${tier})`,
             question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
             answer: k - 1,
-            solution: `$\\tan 45^\\circ = 1, \\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k}(1) - 2(\\frac{1}{2}) = ${k} - 1 = ${k - 1}$ 입니다.`
+            solution: `$\\tan 45^\\circ = 1, \\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k}(1) - 2(\\frac{1}{2}) = ${k - 1}$ 입니다.`
           };
         } else if (type === 3) {
-          const base = this.getRandomChoice([3, 4, 5, 6]);
+          const base = tier === 1 ? this.getRandomChoice([3, 4, 5]) : (tier === 2 ? this.getRandomChoice([6, 8, 10]) : this.getRandomChoice([12, 15, 20]));
           const hyp = base * 2;
           return {
-            topic: "[삼각비] 3. 코사인과 빗변의 길이",
+            topic: `[삼각비] 3. 코사인과 빗변의 길이 (T${tier})`,
             question: `직각삼각형에서 예각이 $60^\\circ$ 이고 밑변이 $${base}$ 일 때, 빗변의 길이는?`,
             answer: hyp,
             solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2} \\implies \\text{빗변} = 2 \\times ${base} = ${hyp}$ 입니다.`
           };
         } else if (type === 4) {
+          const mul = tier === 1 ? 1 : (tier === 2 ? 2 : 4);
           return {
-            topic: "[삼각비] 4. 특수각 제곱의 합",
-            question: `$(\\sin 45^\\circ)^2 + (\\cos 45^\\circ)^2$ 의 값은?`,
-            answer: 1,
-            solution: `$(\\frac{\\sqrt{2}}{2})^2 + (\\frac{\\sqrt{2}}{2})^2 = \\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
+            topic: `[삼각비] 4. 특수각 제곱의 합 (T${tier})`,
+            question: `$${mul > 1 ? mul : ''}(\\sin 45^\\circ)^2 + ${mul > 1 ? mul : ''}(\\cos 45^\\circ)^2$ 의 값은?`,
+            answer: mul,
+            solution: `$(\\sin 45^\\circ)^2 + (\\cos 45^\\circ)^2 = 1$ 이므로 값은 $${mul}$ 입니다.`
           };
         } else if (type === 5) {
-          const base = this.getRandomInt(4, 9);
+          const base = tier === 1 ? this.getRandomInt(4, 7) : (tier === 2 ? this.getRandomInt(8, 14) : this.getRandomInt(15, 25));
           return {
-            topic: "[삼각비] 5. 탄젠트를 이용한 높이 구하기",
+            topic: `[삼각비] 5. 탄젠트를 이용한 높이 구하기 (T${tier})`,
             question: `밑변의 길이가 $${base}$ 이고 밑각이 $45^\\circ$ 인 직각삼각형의 높이는?`,
             answer: base,
             solution: `$\\tan 45^\\circ = \\frac{\\text{높이}}{\\text{밑변}} = 1 \\implies \\text{높이} = ${base}$ 입니다.`
           };
         } else if (type === 6) {
+          const c = tier === 1 ? 1 : (tier === 2 ? 3 : 5);
           return {
-            topic: "[삼각비] 6. 0도와 90도의 삼각비",
-            question: `$\\sin 90^\\circ + \\cos 0^\\circ + \\tan 0^\\circ$ 의 값은?`,
-            answer: 2,
-            solution: `$\\sin 90^\\circ = 1, \\cos 0^\\circ = 1, \\tan 0^\\circ = 0$ 이므로 합은 $1 + 1 + 0 = 2$ 입니다.`
+            topic: `[삼각비] 6. 0도와 90도의 삼각비 (T${tier})`,
+            question: `$${c}\\sin 90^\\circ + \\cos 0^\\circ + \\tan 0^\\circ$ 의 값은?`,
+            answer: c + 1,
+            solution: `$\\sin 90^\\circ = 1, \\cos 0^\\circ = 1, \\tan 0^\\circ = 0$ 이므로 $${c}(1) + 1 + 0 = ${c + 1}$ 입니다.`
           };
         } else {
+          const mul = tier === 1 ? 2 : (tier === 2 ? 4 : 6);
           return {
-            topic: "[삼각비] 7. 특수각 삼각비의 곱셈",
-            question: `$2 \\times \\sin 30^\\circ \\times \\tan 45^\\circ$ 의 값은?`,
-            answer: 1,
-            solution: `$2 \\times \\frac{1}{2} \\times 1 = 1$ 입니다.`
+            topic: `[삼각비] 7. 특수각 삼각비의 곱셈 (T${tier})`,
+            question: `$${mul} \\times \\sin 30^\\circ \\times \\tan 45^\\circ$ 의 값은?`,
+            answer: mul / 2,
+            solution: `$${mul} \\times \\frac{1}{2} \\times 1 = ${mul / 2}$ 입니다.`
           };
         }
       },
@@ -1786,55 +1870,75 @@
       genUnit5(tier) {
         const type = this.getRandomInt(1, 7);
         if (type === 1) {
-          const cAngle = this.getRandomChoice([60, 70, 80, 100, 120, 140]);
+          const cAngle = tier === 1 ? this.getRandomChoice([60, 80, 100]) : (tier === 2 ? this.getRandomChoice([110, 130, 150]) : this.getRandomChoice([144, 168, 192]));
           return {
-            topic: "[원의 성질] 1. 중심각과 원주각",
+            topic: `[원의 성질] 1. 중심각과 원주각 (T${tier})`,
             question: `한 호에 대한 중심각의 크기가 $${cAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
             answer: cAngle / 2,
             solution: `원주각의 크기는 중심각의 절반이므로 $${cAngle}^\\circ \\div 2 = ${cAngle / 2}^\\circ$ 입니다.`
           };
         } else if (type === 2) {
-          const a = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
+          const a = tier === 1 ? this.getRandomChoice([60, 70, 80]) : (tier === 2 ? this.getRandomChoice([65, 75, 85, 95]) : this.getRandomChoice([57, 68, 73, 112]));
           return {
-            topic: "[원의 성질] 2. 원에 내접하는 사각형의 대각",
+            topic: `[원의 성질] 2. 원에 내접하는 사각형의 대각 (T${tier})`,
             question: `원에 내접하는 사각형에서 한 내각이 $${a}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
             answer: 180 - a,
-            solution: `마주 보는 두 대각의 크기의 합은 $180^\\circ$ 이므로 $180^\\circ - ${a}^\\circ = ${180 - a}^\\circ$ 입니다.`
+            solution: `마주 보는 두 대각의 합은 $180^\\circ$ 이므로 $180^\\circ - ${a}^\\circ = ${180 - a}^\\circ$ 입니다.`
           };
         } else if (type === 3) {
-          return {
-            topic: "[원의 성질] 3. 반원에 대한 원주각",
-            question: `원의 지름을 한 변으로 하는 내접삼각형에서 지름에 대한 원주각의 크기는 몇 도($^\\circ$)인가?`,
-            answer: 90,
-            solution: `반원에 대한 원주각의 크기는 항상 직각인 $90^\\circ$ 입니다.`
-          };
+          if (tier === 1) {
+            return {
+              topic: `[원의 성질] 3. 반원에 대한 원주각 (T1)`,
+              question: `원의 지름을 한 변으로 하는 내접삼각형에서 지름에 대한 원주각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90,
+              solution: `반원에 대한 원주각의 크기는 항상 직각인 $90^\\circ$ 입니다.`
+            };
+          } else {
+            const acute = tier === 2 ? this.getRandomChoice([30, 40, 50]) : this.getRandomChoice([28, 37, 43, 56]);
+            return {
+              topic: `[원의 성질] 3. 반원 내접 직각삼각형의 예각 (T${tier})`,
+              question: `원의 지름을 빗변으로 하는 내접 직각삼각형에서 한 예각이 $${acute}^\\circ$ 일 때, 다른 한 예각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90 - acute,
+              solution: `지름에 대한 원주각이 $90^\\circ$ 이므로 다른 한 예각은 $90^\\circ - ${acute}^\\circ = ${90 - acute}^\\circ$ 입니다.`
+            };
+          }
         } else if (type === 4) {
-          const inAngle = this.getRandomChoice([25, 30, 35, 40, 45, 50]);
+          const inAngle = tier === 1 ? this.getRandomChoice([25, 30, 40]) : (tier === 2 ? this.getRandomChoice([45, 55, 65]) : this.getRandomChoice([68, 74, 82]));
           return {
-            topic: "[원의 성질] 4. 원주각으로 중심각 구하기",
+            topic: `[원의 성질] 4. 원주각으로 중심각 구하기 (T${tier})`,
             question: `한 호에 대한 원주각의 크기가 $${inAngle}^\\circ$ 일 때, 중심각의 크기는 몇 도($^\\circ$)인가?`,
             answer: inAngle * 2,
             solution: `중심각의 크기는 원주각의 $2$배이므로 $${inAngle}^\\circ \\times 2 = ${inAngle * 2}^\\circ$ 입니다.`
           };
         } else if (type === 5) {
-          return {
-            topic: "[원의 성질] 5. 원의 접선과 반지름",
-            question: `원의 접선과 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
-            answer: 90,
-            solution: `원의 접선은 접점을 지나는 반지름에 수직이므로 이루는 각은 $90^\\circ$ 입니다.`
-          };
+          if (tier === 1) {
+            return {
+              topic: `[원의 성질] 5. 원의 접선과 반지름 (T1)`,
+              question: `원의 접선과 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90,
+              solution: `원의 접선은 접점을 지나는 반지름에 수직이므로 $90^\\circ$ 입니다.`
+            };
+          } else {
+            const central = tier === 2 ? this.getRandomChoice([50, 60, 70]) : this.getRandomChoice([42, 54, 66]);
+            return {
+              topic: `[원의 성질] 5. 접선과 중심각 삼각형의 예각 (T${tier})`,
+              question: `원 밖의 점에서 그은 접선과 중심을 이은 직각삼각형에서 중심각이 $${central}^\\circ$ 일 때, 다른 한 예각의 크기는 몇 도($^\\circ$)인가?`,
+              answer: 90 - central,
+              solution: `접선과 반지름이 수직($90^\\circ$)을 이루므로 다른 한 각은 $90^\\circ - ${central}^\\circ = ${90 - central}^\\circ$ 입니다.`
+            };
+          }
         } else if (type === 6) {
-          const angle = this.getRandomChoice([32, 44, 52, 63]);
+          const angle = tier === 1 ? this.getRandomChoice([30, 40, 50]) : (tier === 2 ? this.getRandomChoice([37, 46, 58]) : this.getRandomChoice([63, 71, 84]));
           return {
-            topic: "[원의 성질] 6. 같은 호에 대한 원주각",
+            topic: `[원의 성질] 6. 같은 호에 대한 원주각 (T${tier})`,
             question: `원 $O$에서 한 호 $AB$에 대한 원주각 $\\angle APB = ${angle}^\\circ$ 일 때, 같은 호에 대한 다른 원주각 $\\angle AQB$의 크기는 몇 도($^\\circ$)인가?`,
             answer: angle,
             solution: `같은 호에 대한 원주각의 크기는 서로 같으므로 $\\angle AQB = ${angle}^\\circ$ 입니다.`
           };
         } else {
-          const half = this.getRandomInt(3, 8);
+          const half = tier === 1 ? this.getRandomInt(3, 5) : (tier === 2 ? this.getRandomInt(6, 10) : this.getRandomInt(11, 16));
           return {
-            topic: "[원의 성질] 7. 현의 수직이등분선",
+            topic: `[원의 성질] 7. 현의 수직이등분선 (T${tier})`,
             question: `원의 중심에서 현에 내린 수선에 의해 나누어진 한쪽 선분의 길이가 $${half}$ 일 때, 현 전체의 길이는?`,
             answer: half * 2,
             solution: `원의 중심에서 현에 내린 수선은 그 현을 수직이등분하므로 현의 전체 길이는 $${half} \\times 2 = ${half * 2}$ 입니다.`
@@ -1889,10 +1993,24 @@
       init() {
         this.loadFromLocalStorage();
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
+        this.sanitizeArmoryState();
         this.calculateStats();
         this.renderLobbyDungeons();
         this.updateHeaderUI();
         this.setupAlchemySelects();
+      },
+
+      sanitizeArmoryState() {
+        if (!Array.isArray(this.state.ownedWeapons)) this.state.ownedWeapons = ["staff"];
+        if (!this.state.ownedWeapons.includes("staff")) this.state.ownedWeapons.unshift("staff");
+        if (!this.state.equippedWeapon) this.state.equippedWeapon = "staff";
+
+        if (!Array.isArray(this.state.ownedSuits)) this.state.ownedSuits = ["robe"];
+        if (!this.state.ownedSuits.includes("robe")) this.state.ownedSuits.unshift("robe");
+        if (!this.state.equippedSuit) this.state.equippedSuit = "robe";
+
+        if (!Array.isArray(this.state.ownedPets)) this.state.ownedPets = [];
+        if (!Array.isArray(this.state.ownedAuras)) this.state.ownedAuras = [];
       },
 
       getTotalPotionCount() {
@@ -2678,9 +2796,37 @@
       },
 
       openArmoryModal() {
-        document.getElementById("armory-gold-display").textContent = this.state.gold;
-        this.switchArmoryTab(this.currentArmoryTab || "weapons");
-        document.getElementById("modal-armory").classList.remove("hidden");
+        try {
+          this.sanitizeArmoryState();
+          const goldEl = document.getElementById("armory-gold-display");
+          if (goldEl) goldEl.textContent = this.state.gold;
+          this.updateArmoryPreview();
+          this.switchArmoryTab(this.currentArmoryTab || "weapons");
+          const modal = document.getElementById("modal-armory");
+          if (modal) modal.classList.remove("hidden");
+        } catch (e) {
+          console.error("Armory modal error:", e);
+        }
+      },
+
+      updateArmoryPreview() {
+        const previewEl = document.getElementById("armory-player-preview");
+        if (previewEl) {
+          previewEl.innerHTML = MonsterSvgRenderer.renderPlayer(
+            this.state.weapon,
+            this.state.armor,
+            this.state.equippedWeapon,
+            this.state.equippedSuit,
+            this.state.activeAura
+          );
+        }
+        const summaryEl = document.getElementById("armory-current-summary");
+        if (summaryEl) {
+          const wName = (WEAPON_CATALOG[this.state.equippedWeapon] || {}).name || "지팡이";
+          const sName = (SUIT_CATALOG[this.state.equippedSuit] || {}).name || "로브";
+          const auraTitle = this.state.activeAura && AURA_CATALOG[this.state.activeAura] ? AURA_CATALOG[this.state.activeAura].title : "오라 없음";
+          summaryEl.textContent = `${wName} · ${sName} · [${auraTitle}]`;
+        }
       },
 
       switchArmoryTab(tab) {
@@ -2688,12 +2834,14 @@
         ["weapons", "suits", "pets", "auras"].forEach(t => {
           const btn = document.getElementById(`armory-tab-btn-${t}`);
           const content = document.getElementById(`armory-content-${t}`);
-          if (t === tab) {
-            btn.className = "px-3 py-1.5 rounded-lg font-bold bg-purple-600 text-white";
-            content.classList.remove("hidden");
-          } else {
-            btn.className = "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
-            content.classList.add("hidden");
+          if (btn && content) {
+            if (t === tab) {
+              btn.className = "px-3 py-1.5 rounded-lg font-bold bg-purple-600 text-white";
+              content.classList.remove("hidden");
+            } else {
+              btn.className = "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+              content.classList.add("hidden");
+            }
           }
         });
 
@@ -2705,10 +2853,13 @@
 
       renderArmoryWeapons() {
         const container = document.getElementById("armory-content-weapons");
+        if (!container) return;
         container.innerHTML = "";
+        const owned = Array.isArray(this.state.ownedWeapons) ? this.state.ownedWeapons : ["staff"];
+        this.state.ownedWeapons = owned;
         Object.values(WEAPON_CATALOG).forEach(w => {
-          const isOwned = this.state.ownedWeapons.includes(w.id);
-          const isEquipped = this.state.equippedWeapon === w.id;
+          const isOwned = owned.includes(w.id);
+          const isEquipped = (this.state.equippedWeapon || "staff") === w.id;
 
           let btnHtml = "";
           if (isEquipped) {
@@ -2748,7 +2899,8 @@
         this.calculateStats();
         SoundManager.playVictory();
         this.showToast(`🎉 [${w.name}] 구매 및 장착 완료!`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryWeapons();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2759,17 +2911,21 @@
         this.calculateStats();
         SoundManager.playPotion();
         this.showToast(`[${WEAPON_CATALOG[id].name}] 무기로 교체했습니다.`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryWeapons();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
 
       renderArmorySuits() {
         const container = document.getElementById("armory-content-suits");
+        if (!container) return;
         container.innerHTML = "";
+        const owned = Array.isArray(this.state.ownedSuits) ? this.state.ownedSuits : ["robe"];
+        this.state.ownedSuits = owned;
         Object.values(SUIT_CATALOG).forEach(s => {
-          const isOwned = this.state.ownedSuits.includes(s.id);
-          const isEquipped = this.state.equippedSuit === s.id;
+          const isOwned = owned.includes(s.id);
+          const isEquipped = (this.state.equippedSuit || "robe") === s.id;
 
           let btnHtml = "";
           if (isEquipped) {
@@ -2809,7 +2965,8 @@
         this.calculateStats();
         SoundManager.playVictory();
         this.showToast(`🎉 [${s.name}] 구매 및 착용 완료!`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmorySuits();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2820,16 +2977,20 @@
         this.calculateStats();
         SoundManager.playPotion();
         this.showToast(`[${SUIT_CATALOG[id].name}] 슈트로 교체했습니다.`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmorySuits();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
 
       renderArmoryPets() {
         const container = document.getElementById("armory-content-pets");
+        if (!container) return;
         container.innerHTML = "";
+        const owned = Array.isArray(this.state.ownedPets) ? this.state.ownedPets : [];
+        this.state.ownedPets = owned;
         Object.values(PET_CATALOG).forEach(p => {
-          const isOwned = (this.state.ownedPets || []).includes(p.id);
+          const isOwned = owned.includes(p.id);
           const isEquipped = this.state.activePet === p.id;
 
           let btnHtml = "";
@@ -2873,7 +3034,8 @@
         this.state.activePet = id;
         SoundManager.playVictory();
         this.showToast(`🎉 수호 환상수 [${p.name}] 분양 완료!`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryPets();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2882,7 +3044,8 @@
         this.state.activePet = id;
         SoundManager.playPotion();
         this.showToast(`[${PET_CATALOG[id].name}]이(가) 모험에 동반합니다.`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryPets();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2890,16 +3053,20 @@
       unequipPet() {
         this.state.activePet = null;
         this.showToast("수호 정령의 동반을 해제했습니다.", "info");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryPets();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
 
       renderArmoryAuras() {
         const container = document.getElementById("armory-content-auras");
+        if (!container) return;
         container.innerHTML = "";
+        const owned = Array.isArray(this.state.ownedAuras) ? this.state.ownedAuras : [];
+        this.state.ownedAuras = owned;
         Object.values(AURA_CATALOG).forEach(a => {
-          const isOwned = (this.state.ownedAuras || []).includes(a.id);
+          const isOwned = owned.includes(a.id);
           const isEquipped = this.state.activeAura === a.id;
 
           let btnHtml = "";
@@ -2939,7 +3106,8 @@
         this.state.activeAura = id;
         SoundManager.playVictory();
         this.showToast(`🎉 전설 오라 [${a.name}] 칭호 해금!`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryAuras();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2948,7 +3116,8 @@
         this.state.activeAura = id;
         SoundManager.playPotion();
         this.showToast(`[${AURA_CATALOG[id].title}] 칭호와 오라를 전개했습니다.`, "success");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryAuras();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -2956,7 +3125,8 @@
       unequipAura() {
         this.state.activeAura = null;
         this.showToast("오라 전개를 해제했습니다.", "info");
-        this.openArmoryModal();
+        this.updateArmoryPreview();
+        this.renderArmoryAuras();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -3001,10 +3171,12 @@
         this.currentRankTab = tab;
         ["power", "correct", "gold", "class"].forEach(t => {
           const btn = document.getElementById(`rank-tab-btn-${t}`);
-          if (t === tab) {
-            btn.className = "px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950";
-          } else {
-            btn.className = "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+          if (btn) {
+            if (t === tab) {
+              btn.className = "px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950";
+            } else {
+              btn.className = "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+            }
           }
         });
         this.renderRankingList();
