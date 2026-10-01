@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>중3 수학 RPG - 아르카니스: 수학의 수호자</title>
+  <title>중3 수학 RPG - 아르카니스 수호자</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -260,13 +260,13 @@
           <div class="text-center mb-1">
             <div class="flex items-center gap-1 justify-center">
               <span class="text-xs font-bold text-sky-300">플레이어</span>
-              <span id="arena-gear-tag" class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-950 border border-indigo-500/40 text-amber-300 font-mono">마도 & 로브</span>
+              <span id="arena-gear-tag" class="text-[9px] px-1.5 py-0.2 rounded bg-indigo-950 border border-indigo-500/40 text-amber-300 font-mono">지팡이 & 로브</span>
             </div>
             <div class="text-[10px] text-slate-400 font-mono">ATK <span id="arena-player-atk">22</span> / DEF <span id="arena-player-def">5</span></div>
           </div>
 
           <div class="relative flex items-center justify-center">
-            <!-- 수호 정령(펫) 스프라이트: 확대된 80px 크기로 플레이어 우측 상단 배치 -->
+            <!-- 수호 정령(펫) 스프라이트 -->
             <div id="battle-pet-sprite" class="absolute -top-12 -right-14 w-20 h-20 sm:w-24 sm:h-24 pointer-events-none anim-pet-idle hidden z-20"></div>
 
             <!-- 플레이어 아바타 -->
@@ -636,7 +636,7 @@
     </div>
   </div>
 
-  <!-- [모달: PIN 클라우드 저장 설정] -->
+  <!-- [모달: PIN 클라우드 저장 및 프로필 설정] -->
   <div id="modal-pin" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-5 shadow-2xl text-center">
       <div class="w-12 h-12 mx-auto mb-2 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl">
@@ -686,21 +686,21 @@
       </div>
 
       <div id="pin-current-status" class="text-xs text-slate-400 mb-3 bg-slate-950 p-2 rounded-lg border border-slate-800 hidden">
-        현재 연동된 PIN: <span id="pin-current-text" class="text-amber-300 font-mono font-bold">••••</span>
+        현재 연동된 계정: <span id="pin-current-text" class="text-amber-300 font-mono font-bold">••••</span>
       </div>
 
       <div class="flex gap-2 mb-2">
         <button onclick="App.closeModal('modal-pin')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl text-xs font-bold transition">
           닫기
         </button>
-        <button onclick="App.connectCloudPin()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition font-bold shadow-lg">
+        <button onclick="App.connectCloudPin()" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition shadow-lg">
           PIN 연동 / 저장하기
         </button>
       </div>
 
-      <button id="btn-pin-logout" onclick="App.logoutCloudPin()" class="w-full bg-rose-950/80 hover:bg-rose-900 border border-rose-600/60 text-rose-300 py-2 rounded-xl text-xs font-bold transition hidden flex items-center justify-center gap-1.5 shadow">
+      <button id="btn-pin-logout" onclick="App.logoutCloudPin()" class="w-full bg-rose-950/80 hover:bg-rose-900 border border-rose-600/60 text-rose-300 py-2 rounded-xl text-xs font-bold transition hidden flex items-center justify-center gap-1.5 shadow mt-2">
         <i class="fa-solid fa-arrow-right-from-bracket"></i>
-        <span>이 컴퓨터에서 안전하게 로그아웃</span>
+        <span>이 기기에서 안전하게 로그아웃</span>
       </button>
     </div>
   </div>
@@ -856,15 +856,17 @@
     </div>
   </div>
 
-  <!-- [모달: 오답 풀이] -->
+  <!-- [모달: 오답 풀이 & 비전서 풀이 렌더러] -->
   <div id="modal-solution" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border-2 border-rose-500/80 max-w-lg w-full rounded-2xl p-6 shadow-2xl">
       <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
         <div class="flex items-center gap-2 text-rose-400 font-bold text-sm sm:text-base">
           <i class="fa-solid fa-book-open"></i>
-          <span>마도 주문 영창 실패! (오답 풀이 비법)</span>
+          <span id="solution-modal-header">오답 풀이 비법</span>
         </div>
-        <span class="text-[10px] text-slate-400 font-mono">수학 개념 복기</span>
+        <button onclick="App.closeModal('modal-solution')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
       </div>
 
       <div class="space-y-3 mb-5">
@@ -887,7 +889,7 @@
         </div>
       </div>
 
-      <button onclick="App.closeSolutionModalAndDefense()" class="w-full bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-1.5">
+      <button id="btn-solution-action" onclick="App.closeSolutionModalAndDefense()" class="w-full bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-1.5">
         <i class="fa-solid fa-shield-halved"></i>
         <span>풀이를 이해했습니다! (몬스터 반격 방어)</span>
       </button>
@@ -1345,7 +1347,9 @@
           <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 10px rgba(99,102,241,0.5))">
             ${auraHtml}
             ${suitHtml}
-            <circle cx="50" cy="32" r="16" fill="#1e1b4b" stroke="#818cf8" stroke-width="2.5"/>
+            <polygon points="50,4 32,24 68,24" fill="#312e81" stroke="#6366f1" stroke-width="2"/>
+            <ellipse cx="50" cy="24" rx="20" ry="4" fill="#1e1b4b" stroke="#818cf8" stroke-width="1.5"/>
+            <circle cx="50" cy="32" r="14" fill="#1e1b4b" stroke="#818cf8" stroke-width="2"/>
             <ellipse cx="45" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
             <ellipse cx="55" cy="32" rx="2.5" ry="3.5" fill="#38bdf8"/>
             ${weaponHtml}
@@ -1480,7 +1484,7 @@
         } while (this.recentKeys.includes(prob.question) && attempts < 10);
 
         this.recentKeys.push(prob.question);
-        if (this.recentKeys.length > 8) this.recentKeys.shift();
+        if (this.recentKeys.length > 10) this.recentKeys.shift();
 
         const ans = prob.answer;
         const set = new Set();
@@ -1489,7 +1493,7 @@
         let tries = 0;
         while (set.size < 4 && tries < 60) {
           tries++;
-          let delta = this.getRandomInt(-5, 5);
+          let delta = this.getRandomInt(-6, 6);
           if (delta === 0) delta = 2;
           const wrong = typeof ans === "number" ? ans + delta : (String(ans).includes("-") ? String(ans).replace("-", "") : "-" + ans);
           set.add(wrong);
@@ -1500,148 +1504,340 @@
       },
 
       genUnit1(tier) {
-        if (tier === 1) {
+        const type = this.getRandomInt(1, 7);
+        if (type === 1) {
           const a = this.getRandomInt(2, 6);
           const b = this.getRandomChoice([2, 3, 5, 7]);
           const inside = a * a * b;
           return {
-            topic: "[제곱근] 근호 밖으로 꺼내기",
+            topic: "[제곱근] 1. 근호 밖으로 꺼내기",
             question: `$\\sqrt{${inside}}$ 를 $a\\sqrt{${b}}$ 꼴로 나타낼 때, $a$의 값은?`,
             answer: a,
-            solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 입니다.<br>따라서 $a = ${a}$ 입니다.`
+            solution: `$\\sqrt{${inside}} = \\sqrt{${a}^2 \\times ${b}} = ${a}\\sqrt{${b}}$ 이므로 $a = ${a}$ 입니다.`
           };
-        } else if (tier === 2) {
+        } else if (type === 2) {
           const a = this.getRandomChoice([2, 3, 5]);
           const mul = this.getRandomInt(2, 6);
           const top = a * mul;
           return {
-            topic: "[제곱근] 분모의 유리화",
-            question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, $k$의 값은?`,
+            topic: "[제곱근] 2. 분모의 유리화",
+            question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, 유리수 $k$의 값은?`,
             answer: mul,
-            solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다.`
+            solution: `분모와 분자에 $\\sqrt{${a}}$ 를 곱하면 $\\frac{${top}\\sqrt{${a}}}{${a}} = ${mul}\\sqrt{${a}}$ 입니다. 따라서 $k = ${mul}$ 입니다.`
+          };
+        } else if (type === 3) {
+          const n = this.getRandomInt(3, 8);
+          const add = this.getRandomInt(1, 4);
+          const inside = n * n + add;
+          return {
+            topic: "[제곱근] 3. 무리수의 정수 부분",
+            question: `$\\sqrt{${inside}}$ 의 정수 부분을 구하시오.`,
+            answer: n,
+            solution: `$${n}^2 = ${n * n} < ${inside} < ${(n + 1) * (n + 1)}$ 이므로 $\\sqrt{${inside}}$ 의 정수 부분은 $${n}$ 입니다.`
+          };
+        } else if (type === 4) {
+          const val = this.getRandomInt(3, 9);
+          return {
+            topic: "[제곱근] 4. 제곱근의 기본 성질",
+            question: `$\\sqrt{(-${val})^2} + \\sqrt{${val}^2}$ 의 값은?`,
+            answer: val * 2,
+            solution: `$\\sqrt{(-${val})^2} = ${val}$, $\\sqrt{${val}^2} = ${val}$ 이므로 두 값의 합은 $${val} + ${val} = ${val * 2}$ 입니다.`
+          };
+        } else if (type === 5) {
+          const a = this.getRandomInt(3, 6);
+          const aSq = a * a;
+          const diff = this.getRandomInt(1, 3);
+          const c = aSq - diff;
+          return {
+            topic: "[제곱근] 5. 제곱근과 수의 대소 비교",
+            question: `$${a}$ 와 $\\sqrt{${c}}$ 중 더 큰 수의 제곱값은?`,
+            answer: aSq,
+            solution: `$${a} = \\sqrt{${aSq}}$ 이고 $${aSq} > ${c}$ 이므로 더 큰 수는 $${a}$ 입니다. 그 제곱값은 $${aSq}$ 입니다.`
+          };
+        } else if (type === 6) {
+          const c = this.getRandomChoice([2, 3, 5]);
+          const k1 = this.getRandomInt(2, 5);
+          const k2 = this.getRandomInt(2, 4);
+          return {
+            topic: "[제곱근] 6. 동류근의 덧셈",
+            question: `$${k1}\\sqrt{${c}} + ${k2}\\sqrt{${c}} = k\\sqrt{${c}}$ 일 때, 유리수 $k$의 값은?`,
+            answer: k1 + k2,
+            solution: `동류근끼리 계수를 더하면 $(${k1} + ${k2})\\sqrt{${c}} = ${k1 + k2}\\sqrt{${c}}$ 이므로 $k = ${k1 + k2}$ 입니다.`
           };
         } else {
-          const n = this.getRandomInt(4, 9);
-          const add = this.getRandomInt(1, 3);
+          const a = this.getRandomInt(2, 5);
+          const b = this.getRandomChoice([2, 3, 5]);
+          const inside = a * b;
           return {
-            topic: "[제곱근 보스] 무리수의 정수 부분",
-            question: `$\\sqrt{${n * n + add}}$ 의 정수 부분을 구하시오. (단답형 정수 입력)`,
-            answer: n,
-            solution: `$${n}^2 = ${n * n} < ${n * n + add} < ${(n + 1) * (n + 1)}$ 이므로 정수 부분은 $${n}$ 입니다.`
+            topic: "[제곱근] 7. 근호의 곱셈",
+            question: `$\\sqrt{${a}} \\times \\sqrt{${b}}$ 의 값은 $\\sqrt{k}$ 입니다. $k$의 값은?`,
+            answer: inside,
+            solution: `$\\sqrt{${a}} \\times \\sqrt{${b}} = \\sqrt{${a} \\times ${b}} = \\sqrt{${inside}}$ 이므로 $k = ${inside}$ 입니다.`
           };
         }
       },
 
       genUnit2(tier) {
-        const r1 = this.getRandomInt(1, 5);
-        const r2 = this.getRandomInt(2, 6);
-        const b = -(r1 + r2);
-        const c = r1 * r2;
-        const bSign = b < 0 ? `${b}x` : `+${b}x`;
-        const cSign = c < 0 ? `${c}` : `+${c}`;
-
-        if (tier === 1) {
+        const type = this.getRandomInt(1, 7);
+        if (type === 1) {
+          const r1 = this.getRandomInt(1, 4);
+          const r2 = this.getRandomInt(r1 + 1, 6);
+          const b = -(r1 + r2);
+          const c = r1 * r2;
+          const bSign = b < 0 ? `${b}x` : `+${b}x`;
+          const cSign = c < 0 ? `${c}` : `+${c}`;
           return {
-            topic: "[이차방정식] 인수분해와 해 구하기",
-            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 양수인 두 근 중 더 큰 근은?`,
-            answer: Math.max(r1, r2),
-            solution: `$(x - ${r1})(x - ${r2}) = 0$ 이므로 두 근은 $x = ${r1}, ${r2}$ 입니다. 더 큰 근은 $${Math.max(r1, r2)}$ 입니다.`
+            topic: "[이차방정식] 1. 인수분해를 이용한 해 구하기",
+            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근 중 더 큰 근은?`,
+            answer: r2,
+            solution: `$(x - ${r1})(x - ${r2}) = 0$ 이므로 두 근은 $x = ${r1}, ${r2}$ 입니다. 따라서 더 큰 근은 $${r2}$ 입니다.`
           };
-        } else if (tier === 2) {
+        } else if (type === 2) {
+          const p = this.getRandomInt(2, 7);
+          const doubleP = 2 * p;
+          const pSq = p * p;
           return {
-            topic: "[이차방정식] 두 근의 합",
-            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 합은?`,
-            answer: r1 + r2,
-            solution: `두 근이 $${r1}$, $${r2}$ 이므로 두 근의 합은 $${r1 + r2}$ 입니다.`
+            topic: "[이차방정식] 2. 완전제곱식과 중근",
+            question: `이차방정식 $x^2 - ${doubleP}x + ${pSq} = 0$ 의 중근 $x$의 값은?`,
+            answer: p,
+            solution: `좌변이 완전제곱식 $(x - ${p})^2 = 0$ 으로 인수분해되므로 중근은 $x = ${p}$ 입니다.`
+          };
+        } else if (type === 3) {
+          const r1 = this.getRandomInt(1, 5);
+          const r2 = this.getRandomInt(2, 6);
+          const sum = r1 + r2;
+          const b = -sum;
+          const c = r1 * r2;
+          return {
+            topic: "[이차방정식] 3. 두 근의 합",
+            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x + ${c} = 0$ 의 두 근의 합은?`,
+            answer: sum,
+            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 합은 $${r1} + ${r2} = ${sum}$ 입니다.`
+          };
+        } else if (type === 4) {
+          const a = 1;
+          const b = this.getRandomChoice([4, 6, 8]);
+          const c = this.getRandomInt(1, 5);
+          const d = b * b - 4 * a * c;
+          return {
+            topic: "[이차방정식] 4. 판별식(D) 값 계산",
+            question: `이차방정식 $x^2 + ${b}x + ${c} = 0$ 의 판별식 $D = b^2 - 4ac$ 의 값은?`,
+            answer: d,
+            solution: `판별식 $D = ${b}^2 - 4 \\times 1 \\times ${c} = ${b * b} - ${4 * c} = ${d}$ 입니다.`
+          };
+        } else if (type === 5) {
+          const r1 = this.getRandomInt(1, 5);
+          const r2 = this.getRandomInt(2, 6);
+          const prod = r1 * r2;
+          const b = -(r1 + r2);
+          return {
+            topic: "[이차방정식] 5. 두 근의 곱",
+            question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x + ${prod} = 0$ 의 두 근의 곱은?`,
+            answer: prod,
+            solution: `두 근이 $${r1}, ${r2}$ 이므로 두 근의 곱은 $${r1} \\times ${r2} = ${prod}$ 입니다.`
+          };
+        } else if (type === 6) {
+          const r = this.getRandomInt(2, 5);
+          const k = this.getRandomInt(1, 4);
+          const c = r * (r + k);
+          return {
+            topic: "[이차방정식] 6. 한 근이 주어질 때 미지수 구하기",
+            question: `이차방정식 $x^2 - ${2 * r + k}x + c = 0$ 의 한 근이 $x = ${r}$ 일 때, 상수 $c$의 값은?`,
+            answer: c,
+            solution: `$x = ${r}$ 을 대입하면 $${r}^2 - ${2 * r + k}(${r}) + c = 0 \\implies c = ${c}$ 입니다.`
           };
         } else {
+          const q = this.getRandomChoice([4, 9, 16, 25]);
+          const sqrtQ = Math.round(Math.sqrt(q));
           return {
-            topic: "[이차방정식 보스] 두 근의 곱",
-            question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근의 곱을 구하시오. (단답형 정수 입력)`,
-            answer: c,
-            solution: `두 근의 곱은 $${r1} \\times ${r2} = ${c}$ 입니다.`
+            topic: "[이차방정식] 7. 제곱근을 이용한 풀이",
+            question: `이차방정식 $x^2 = ${q}$ 의 양수인 해는?`,
+            answer: sqrtQ,
+            solution: `$x = \\pm \\sqrt{${q}} = \\pm ${sqrtQ}$ 이므로 양수인 해는 $${sqrtQ}$ 입니다.`
           };
         }
       },
 
       genUnit3(tier) {
-        const p = this.getRandomInt(1, 5);
-        const q = this.getRandomInt(2, 8);
-        if (tier === 1) {
+        const type = this.getRandomInt(1, 7);
+        if (type === 1) {
+          const p = this.getRandomInt(1, 5);
+          const q = this.getRandomInt(2, 9);
           return {
-            topic: "[이차함수] 꼭짓점의 y좌표",
+            topic: "[이차함수] 1. 꼭짓점의 y좌표",
             question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 꼭짓점의 $y$좌표는?`,
             answer: q,
-            solution: `표준형에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
+            solution: `표준형 $y = a(x - p)^2 + q$ 에서 꼭짓점은 $(${p}, ${q})$ 이므로 $y$좌표는 $${q}$ 입니다.`
           };
-        } else if (tier === 2) {
+        } else if (type === 2) {
+          const p = this.getRandomInt(1, 6);
+          const q = this.getRandomInt(1, 8);
           return {
-            topic: "[이차함수] 대칭축의 방정식",
-            question: `이차함수 $y = -(x + ${p})^2 + ${q}$ 의 대칭축의 방정식 $x = k$ 에서 $k$는?`,
-            answer: -p,
-            solution: `대칭축은 $x + ${p} = 0 \\implies x = -${p}$ 입니다.`
+            topic: "[이차함수] 2. 대칭축의 방정식",
+            question: `이차함수 $y = -(x - ${p})^2 + ${q}$ 의 축의 방정식 $x = k$ 에서 $k$의 값은?`,
+            answer: p,
+            solution: `대칭축의 방정식은 $x - ${p} = 0 \\implies x = ${p}$ 이므로 $k = ${p}$ 입니다.`
+          };
+        } else if (type === 3) {
+          const q = this.getRandomInt(2, 7);
+          return {
+            topic: "[이차함수] 3. y축 방향 평행이동",
+            question: `이차함수 $y = x^2$ 의 그래프를 $y$축 방향으로 $${q}$만큼 평행이동한 식의 $y$절편은?`,
+            answer: q,
+            solution: `평행이동한 식은 $y = x^2 + ${q}$ 이며, $x = 0$ 일 때 $y = ${q}$ 입니다.`
+          };
+        } else if (type === 4) {
+          const p = this.getRandomInt(1, 4);
+          const q = this.getRandomInt(1, 5);
+          const yInt = p * p + q;
+          return {
+            topic: "[이차함수] 4. y절편 구하기",
+            question: `이차함수 $y = (x - ${p})^2 + ${q}$ 의 그래프와 $y$축이 만나는 점의 $y$좌표는?`,
+            answer: yInt,
+            solution: `$x = 0$ 을 대입하면 $y = (0 - ${p})^2 + ${q} = ${p * p} + ${q} = ${yInt}$ 입니다.`
+          };
+        } else if (type === 5) {
+          const a = this.getRandomInt(1, 3);
+          const xVal = this.getRandomInt(2, 4);
+          const yVal = a * xVal * xVal;
+          return {
+            topic: "[이차함수] 5. 특정 함숫값 계산",
+            question: `이차함수 $f(x) = ${a > 1 ? a : ''}x^2$ 에 대하여 $f(${xVal})$ 의 값은?`,
+            answer: yVal,
+            solution: `$f(${xVal}) = ${a} \\times (${xVal})^2 = ${a} \\times ${xVal * xVal} = ${yVal}$ 입니다.`
+          };
+        } else if (type === 6) {
+          const p = this.getRandomInt(2, 6);
+          return {
+            topic: "[이차함수] 6. x축 방향 평행이동",
+            question: `이차함수 $y = x^2$ 의 그래프를 $x$축의 양의 방향으로 $${p}$만큼 평행이동한 꼭짓점의 $x$좌표는?`,
+            answer: p,
+            solution: `평행이동한 식은 $y = (x - ${p})^2$ 이므로 꼭짓점의 $x$좌표는 $${p}$ 입니다.`
           };
         } else {
+          const a = this.getRandomInt(2, 5);
           return {
-            topic: "[이차함수 보스] 함수의 최댓값",
-            question: `이차함수 $y = -(x - ${p})^2 + ${q}$ 의 최댓값을 구하시오. (단답형 정수 입력)`,
-            answer: q,
-            solution: `위로 볼록한 포물선이므로 꼭짓점 $x = ${p}$ 에서 최댓값 $${q}$ 를 갖습니다.`
+            topic: "[이차함수] 7. 기본형의 꼭짓점",
+            question: `이차함수 $y = ${a}x^2$ 의 꼭짓점의 $x$좌표는?`,
+            answer: 0,
+            solution: `기본형 $y = ax^2$ 의 꼭짓점은 원점 $(0, 0)$ 이므로 꼭짓점의 $x$좌표는 $0$ 입니다.`
           };
         }
       },
 
       genUnit4(tier) {
-        if (tier === 1) {
+        const type = this.getRandomInt(1, 7);
+        if (type === 1) {
           return {
-            topic: "[삼각비] 특수각의 삼각비 연산",
+            topic: "[삼각비] 1. 특수각 삼각비 기본 연산",
             question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
             answer: 1,
-            solution: `$\\sin 30^\\circ = \\frac{1}{2}, \\cos 60^\\circ = \\frac{1}{2}$ 이므로 합은 $1$ 입니다.`
+            solution: `$\\sin 30^\\circ = \\frac{1}{2}, \\cos 60^\\circ = \\frac{1}{2}$ 이므로 합은 $\\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
           };
-        } else if (tier === 2) {
-          const k = this.getRandomInt(2, 6);
+        } else if (type === 2) {
+          const k = this.getRandomInt(2, 5);
           return {
-            topic: "[삼각비] 특수각 혼합 사칙연산",
+            topic: "[삼각비] 2. 탄젠트와 사인의 혼합 연산",
             question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
             answer: k - 1,
-            solution: `$\\tan 45^\\circ = 1, \\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k} - 1 = ${k - 1}$ 입니다.`
+            solution: `$\\tan 45^\\circ = 1, \\sin 30^\\circ = \\frac{1}{2}$ 이므로 $${k}(1) - 2(\\frac{1}{2}) = ${k} - 1 = ${k - 1}$ 입니다.`
+          };
+        } else if (type === 3) {
+          const base = this.getRandomChoice([3, 4, 5, 6]);
+          const hyp = base * 2;
+          return {
+            topic: "[삼각비] 3. 코사인과 빗변의 길이",
+            question: `직각삼각형에서 예각이 $60^\\circ$ 이고 밑변이 $${base}$ 일 때, 빗변의 길이는?`,
+            answer: hyp,
+            solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2} \\implies \\text{빗변} = 2 \\times ${base} = ${hyp}$ 입니다.`
+          };
+        } else if (type === 4) {
+          return {
+            topic: "[삼각비] 4. 특수각 제곱의 합",
+            question: `$(\\sin 45^\\circ)^2 + (\\cos 45^\\circ)^2$ 의 값은?`,
+            answer: 1,
+            solution: `$(\\frac{\\sqrt{2}}{2})^2 + (\\frac{\\sqrt{2}}{2})^2 = \\frac{1}{2} + \\frac{1}{2} = 1$ 입니다.`
+          };
+        } else if (type === 5) {
+          const base = this.getRandomInt(4, 9);
+          return {
+            topic: "[삼각비] 5. 탄젠트를 이용한 높이 구하기",
+            question: `밑변의 길이가 $${base}$ 이고 밑각이 $45^\\circ$ 인 직각삼각형의 높이는?`,
+            answer: base,
+            solution: `$\\tan 45^\\circ = \\frac{\\text{높이}}{\\text{밑변}} = 1 \\implies \\text{높이} = ${base}$ 입니다.`
+          };
+        } else if (type === 6) {
+          return {
+            topic: "[삼각비] 6. 0도와 90도의 삼각비",
+            question: `$\\sin 90^\\circ + \\cos 0^\\circ + \\tan 0^\\circ$ 의 값은?`,
+            answer: 2,
+            solution: `$\\sin 90^\\circ = 1, \\cos 0^\\circ = 1, \\tan 0^\\circ = 0$ 이므로 합은 $1 + 1 + 0 = 2$ 입니다.`
           };
         } else {
-          const base = this.getRandomChoice([4, 6, 8, 10]);
           return {
-            topic: "[삼각비 보스] 직각삼각형 빗변 계산",
-            question: `밑변이 $${base}$ 이고 각도가 $60^\\circ$ 인 직각삼각형에서 빗변의 길이를 구하시오. (단답형 정수 입력)`,
-            answer: base * 2,
-            solution: `$\\cos 60^\\circ = \\frac{\\text{밑변}}{\\text{빗변}} = \\frac{1}{2} \\implies$ 빗변 $= ${base * 2}$ 입니다.`
+            topic: "[삼각비] 7. 특수각 삼각비의 곱셈",
+            question: `$2 \\times \\sin 30^\\circ \\times \\tan 45^\\circ$ 의 값은?`,
+            answer: 1,
+            solution: `$2 \\times \\frac{1}{2} \\times 1 = 1$ 입니다.`
           };
         }
       },
 
       genUnit5(tier) {
-        if (tier === 1) {
-          const centerAngle = this.getRandomChoice([50, 60, 70, 80, 100, 120, 140]);
+        const type = this.getRandomInt(1, 7);
+        if (type === 1) {
+          const cAngle = this.getRandomChoice([60, 70, 80, 100, 120, 140]);
           return {
-            topic: "[원의 성질] 중심각과 원주각",
-            question: `한 호에 대한 중심각의 크기가 $${centerAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
-            answer: centerAngle / 2,
-            solution: `원주각은 중심각의 절반이므로 $\\frac{${centerAngle}^\\circ}{2} = ${centerAngle / 2}^\\circ$ 입니다.`
+            topic: "[원의 성질] 1. 중심각과 원주각",
+            question: `한 호에 대한 중심각의 크기가 $${cAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: cAngle / 2,
+            solution: `원주각의 크기는 중심각의 절반이므로 $${cAngle}^\\circ \\div 2 = ${cAngle / 2}^\\circ$ 입니다.`
           };
-        } else if (tier === 2) {
-          const angleA = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
+        } else if (type === 2) {
+          const a = this.getRandomChoice([65, 75, 80, 85, 95, 105]);
           return {
-            topic: "[원의 성질] 원에 내접하는 사각형",
-            question: `원에 내접하는 사각형의 한 각이 $${angleA}^\\circ$ 일 때 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
-            answer: 180 - angleA,
-            solution: `마주 보는 두 대각의 합은 $180^\\circ$ 이므로 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
+            topic: "[원의 성질] 2. 원에 내접하는 사각형의 대각",
+            question: `원에 내접하는 사각형에서 한 내각이 $${a}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: 180 - a,
+            solution: `마주 보는 두 대각의 크기의 합은 $180^\\circ$ 이므로 $180^\\circ - ${a}^\\circ = ${180 - a}^\\circ$ 입니다.`
+          };
+        } else if (type === 3) {
+          return {
+            topic: "[원의 성질] 3. 반원에 대한 원주각",
+            question: `원의 지름을 한 변으로 하는 내접삼각형에서 지름에 대한 원주각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: 90,
+            solution: `반원에 대한 원주각의 크기는 항상 직각인 $90^\\circ$ 입니다.`
+          };
+        } else if (type === 4) {
+          const inAngle = this.getRandomChoice([25, 30, 35, 40, 45, 50]);
+          return {
+            topic: "[원의 성질] 4. 원주각으로 중심각 구하기",
+            question: `한 호에 대한 원주각의 크기가 $${inAngle}^\\circ$ 일 때, 중심각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: inAngle * 2,
+            solution: `중심각의 크기는 원주각의 $2$배이므로 $${inAngle}^\\circ \\times 2 = ${inAngle * 2}^\\circ$ 입니다.`
+          };
+        } else if (type === 5) {
+          return {
+            topic: "[원의 성질] 5. 원의 접선과 반지름",
+            question: `원의 접선과 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
+            answer: 90,
+            solution: `원의 접선은 접점을 지나는 반지름에 수직이므로 이루는 각은 $90^\\circ$ 입니다.`
+          };
+        } else if (type === 6) {
+          const angle = this.getRandomChoice([32, 44, 52, 63]);
+          return {
+            topic: "[원의 성질] 6. 같은 호에 대한 원주각",
+            question: `원 $O$에서 한 호 $AB$에 대한 원주각 $\\angle APB = ${angle}^\\circ$ 일 때, 같은 호에 대한 다른 원주각 $\\angle AQB$의 크기는 몇 도($^\\circ$)인가?`,
+            answer: angle,
+            solution: `같은 호에 대한 원주각의 크기는 서로 같으므로 $\\angle AQB = ${angle}^\\circ$ 입니다.`
           };
         } else {
-          const angleA = this.getRandomChoice([60, 70, 75, 80, 85, 110, 115]);
+          const half = this.getRandomInt(3, 8);
           return {
-            topic: "[원의 성질 보스] 원에 내접하는 사각형의 대각",
-            question: `원에 내접하는 사각형의 한 각이 $${angleA}^\\circ$ 일 때 마주 보는 대각의 크기를 구하시오. (단답형 정수 입력)`,
-            answer: 180 - angleA,
-            solution: `대각의 크기는 $180^\\circ - ${angleA}^\\circ = ${180 - angleA}^\\circ$ 입니다.`
+            topic: "[원의 성질] 7. 현의 수직이등분선",
+            question: `원의 중심에서 현에 내린 수선에 의해 나누어진 한쪽 선분의 길이가 $${half}$ 일 때, 현 전체의 길이는?`,
+            answer: half * 2,
+            solution: `원의 중심에서 현에 내린 수선은 그 현을 수직이등분하므로 현의 전체 길이는 $${half} \\times 2 = ${half * 2}$ 입니다.`
           };
         }
       }
@@ -1743,7 +1939,9 @@
             try { window.katex.render(part, span, { throwOnError: false }); } catch (e) { span.textContent = part; }
             el.appendChild(span);
           } else {
-            el.appendChild(document.createTextNode(part));
+            const span = document.createElement("span");
+            span.innerHTML = part.replace(/\n/g, "<br>");
+            el.appendChild(span);
           }
         });
       },
@@ -1781,7 +1979,7 @@
 
           if (this.selectedTier === 2) {
             recText = "권장: +5~+9강 (티탄 중갑)";
-            if (avgGear < 5) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold">⚠️ 방어구 제련 필요</span>`;
+            if (avgGear < 5) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold">⚠️️ 방어구 제련 필요</span>`;
           } else if (this.selectedTier === 3) {
             recText = "권장: +10~+15강 (종결 슈트)";
             if (avgGear < 9) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold animate-pulse">☠️ 즉사 주의!</span>`;
@@ -1854,9 +2052,9 @@
         document.getElementById("battle-tier-badge").textContent = tier === 1 ? "T1 하급 마물림" : (tier === 2 ? "T2 정예 유적" : "T3 보스 성소");
         document.getElementById("battle-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
 
-        const wDef = WEAPON_CATALOG[this.state.equippedWeapon] || WEAPON_CATALOG.staff;
-        const sDef = SUIT_CATALOG[this.state.equippedSuit] || SUIT_CATALOG.robe;
-        document.getElementById("arena-gear-tag").textContent = `${wDef.name.split(" ")[1] || "무기"} & ${sDef.name.split(" ")[1] || "슈트"}`;
+        const wNames = { staff: "지팡이", greatsword: "대검", rapier: "레이피어" };
+        const sNames = { robe: "로브", titan: "중갑", mirage: "망토" };
+        document.getElementById("arena-gear-tag").textContent = `${wNames[this.state.equippedWeapon] || "무기"} & ${sNames[this.state.equippedSuit] || "슈트"}`;
 
         document.getElementById("arena-player-atk").textContent = Math.round(this.state.atk);
         document.getElementById("arena-player-def").textContent = Math.round(this.state.def);
@@ -2053,6 +2251,7 @@
       showSolutionModal() {
         const b = this.currentBattle;
         const modal = document.getElementById("modal-solution");
+        document.getElementById("solution-modal-header").textContent = "마도 주문 영창 실패! (오답 풀이 비법)";
         const pEl = document.getElementById("solution-problem-text");
         const aEl = document.getElementById("solution-correct-answer");
         const dEl = document.getElementById("solution-detail-text");
@@ -2060,6 +2259,11 @@
         this.renderFormulaInto(pEl, b.currentProblem.question);
         this.renderFormulaInto(aEl, String(b.currentProblem.answer));
         this.renderFormulaInto(dEl, b.currentProblem.solution);
+
+        const actBtn = document.getElementById("btn-solution-action");
+        actBtn.classList.remove("hidden");
+        actBtn.onclick = () => this.closeSolutionModalAndDefense();
+
         modal.classList.remove("hidden");
       },
 
@@ -2365,7 +2569,23 @@
       viewGrimoireSolution(itemId) {
         const item = (this.state.grimoire || []).find(g => g.id === itemId);
         if (!item) return;
-        this.showModal(`[풀이 복습] ${item.topic}`, `정답: ${item.answer}\n\n[상세 해설]\n${item.solution.replace(/<br>/g, '\n')}`, "fa-solid fa-book-open text-amber-400");
+
+        const modal = document.getElementById("modal-solution");
+        document.getElementById("solution-modal-header").textContent = `[풀이 복습] ${item.topic}`;
+        const pEl = document.getElementById("solution-problem-text");
+        const aEl = document.getElementById("solution-correct-answer");
+        const dEl = document.getElementById("solution-detail-text");
+
+        this.renderFormulaInto(pEl, item.question);
+        this.renderFormulaInto(aEl, String(item.answer));
+        this.renderFormulaInto(dEl, item.solution);
+
+        const actBtn = document.getElementById("btn-solution-action");
+        actBtn.classList.remove("hidden");
+        actBtn.onclick = () => { document.getElementById("modal-solution").classList.add("hidden"); };
+        actBtn.innerHTML = `<i class="fa-solid fa-check"></i> <span>확인 완료</span>`;
+
+        modal.classList.remove("hidden");
       },
 
       startGrimoireChallenge(itemId) {
@@ -3197,7 +3417,8 @@
         if (this.state.pin) {
           if (statusBox) {
             statusBox.classList.remove("hidden");
-            document.getElementById("pin-current-text").textContent = "•".repeat(this.state.pin.length);
+            const nickText = this.state.nickname ? `[${this.state.nickname}] ` : "";
+            document.getElementById("pin-current-text").textContent = `${nickText}${"•".repeat(this.state.pin.length)}`;
           }
           if (logoutBtn) logoutBtn.classList.remove("hidden");
         } else {
@@ -3208,11 +3429,111 @@
         document.getElementById("modal-pin").classList.remove("hidden");
       },
 
+      togglePinVisibility() {
+        const inputEl = document.getElementById("input-pin-code");
+        const eyeIcon = document.getElementById("pin-eye-icon");
+        if (!inputEl) return;
+        if (inputEl.type === "password") {
+          inputEl.type = "text";
+          if (eyeIcon) eyeIcon.className = "fa-solid fa-eye-slash text-amber-400";
+        } else {
+          inputEl.type = "password";
+          if (eyeIcon) eyeIcon.className = "fa-solid fa-eye";
+        }
+      },
+
+      async connectCloudPin() {
+        const pinInput = (document.getElementById("input-pin-code")?.value || "").trim().replace(/\D/g, '');
+        if (!pinInput || pinInput.length < 4 || pinInput.length > 8) {
+          this.showToast("PIN 번호는 4~8자리 숫자여야 합니다.", "error");
+          return;
+        }
+
+        const nickVal = (document.getElementById("input-pin-nickname")?.value || "").trim().slice(0, 8);
+        if (!nickVal) {
+          this.showToast("캐릭터 닉네임을 입력해주세요!", "error");
+          document.getElementById("input-pin-nickname")?.focus();
+          return;
+        }
+
+        const classVal = (document.getElementById("select-pin-class")?.value || "").trim();
+        if (!classVal) {
+          this.showToast("소속 반을 선택해주세요!", "error");
+          return;
+        }
+
+        this.showToast("계정 및 PIN 인증 중...", "info");
+        try {
+          const res = await fetch(this.backendUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ action: "load", pin: pinInput, nickname: nickVal, classNo: classVal })
+          });
+          const result = await res.json();
+
+          if (result.status === "error" || result.status === "fail") {
+            const errorMsg = result.message || "등록된 닉네임과 일치하지 않는 PIN 번호입니다.";
+            this.showToast(errorMsg, "error");
+            this.showModal("접속 실패 (PIN 불일치)", `${errorMsg}\n\n등록하신 닉네임과 PIN 번호가 맞는지 확인해 주세요.`, "fa-solid fa-triangle-exclamation text-rose-500");
+            return;
+          }
+
+          if (result.status === "success") {
+            this.state.pin = pinInput;
+            this.state.nickname = nickVal;
+            this.state.classNo = classVal;
+
+            if (result.exists && result.userData) {
+              const u = result.userData;
+              this.state.nickname = u.nickname || nickVal;
+              this.state.classNo = u.classNo || classVal;
+              this.state.level = u.level || 1;
+              this.state.exp = u.exp || 0;
+              this.state.gold = u.gold || 0;
+              this.state.weapon = u.weapon || 0;
+              this.state.armor = u.armor || 0;
+              this.state.materials = u.materials || this.state.materials;
+              this.state.progress = u.progress || this.state.progress;
+              this.state.stats = u.stats || this.state.stats;
+              if (Array.isArray(u.grimoire)) this.state.grimoire = u.grimoire;
+
+              if (u.inventory) {
+                this.state.maxPotionCapacity = u.inventory.maxPotionCapacity || 5;
+                if (u.inventory.potions) this.state.potions = u.inventory.potions;
+                this.state.equippedWeapon = u.inventory.equippedWeapon || "staff";
+                this.state.equippedSuit = u.inventory.equippedSuit || "robe";
+                this.state.ownedWeapons = u.inventory.ownedWeapons || ["staff"];
+                this.state.ownedSuits = u.inventory.ownedSuits || ["robe"];
+                this.state.activePet = u.inventory.activePet || null;
+                this.state.activeAura = u.inventory.activeAura || null;
+                this.state.ownedPets = u.inventory.ownedPets || [];
+                this.state.ownedAuras = u.inventory.ownedAuras || [];
+              }
+
+              this.calculateStats();
+              this.showToast(`[${this.state.nickname}] 마도사님 접속 완료!`, "success");
+            } else {
+              this.showToast(`새로운 닉네임 [${nickVal}] 계정이 생성되었습니다!`, "success");
+            }
+
+            this.saveToLocalStorage();
+            await this.triggerCloudSave(true);
+            this.closeModal("modal-pin");
+            this.updateHeaderUI();
+            this.renderLobbyDungeons();
+          } else {
+            this.showToast("인증에 실패했습니다. 다시 시도해 주세요.", "error");
+          }
+        } catch (e) {
+          this.showToast("네트워크 통신 오류가 발생했습니다.", "error");
+        }
+      },
+
       async logoutCloudPin() {
         if (!this.state.pin) return;
         await this.triggerCloudSave(false);
 
-        const oldPin = this.state.pin;
+        const oldNick = this.state.nickname;
         this.state.pin = "";
 
         this.state = {
@@ -3250,99 +3571,7 @@
         this.renderLobbyDungeons();
         this.closeModal("modal-pin");
 
-        this.showToast(`[PIN ${oldPin}] 데이터가 안전하게 저장된 후 로그아웃되었습니다.`, "success");
-      },
-
-      togglePinVisibility() {
-        const inputEl = document.getElementById("input-pin-code");
-        const eyeIcon = document.getElementById("pin-eye-icon");
-        if (!inputEl) return;
-        if (inputEl.type === "password") {
-          inputEl.type = "text";
-          if (eyeIcon) eyeIcon.className = "fa-solid fa-eye-slash text-amber-400";
-        } else {
-          inputEl.type = "password";
-          if (eyeIcon) eyeIcon.className = "fa-solid fa-eye";
-        }
-      },
-
-      async connectCloudPin() {
-        const pinInput = (document.getElementById("input-pin-code")?.value || "").trim().replace(/\D/g, '');
-        if (!pinInput || pinInput.length < 4 || pinInput.length > 8) {
-          this.showToast("PIN 번호는 4~8자리 숫자여야 합니다.", "error");
-          return;
-        }
-
-        const nickVal = (document.getElementById("input-pin-nickname")?.value || "").trim().slice(0, 8);
-        if (!nickVal) {
-          this.showToast("캐릭터 닉네임을 입력해주세요!", "error");
-          document.getElementById("input-pin-nickname")?.focus();
-          return;
-        }
-
-        const classVal = (document.getElementById("select-pin-class")?.value || "").trim();
-        if (!classVal) {
-          this.showToast("소속 반을 선택해주세요!", "error");
-          return;
-        }
-
-        this.showToast("계정 및 핀번호 인증 중...", "info");
-        try {
-          const res = await fetch(this.backendUrl, {
-            method: "POST",
-            headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "load", pin: pinInput, nickname: nickVal, classNo: classVal })
-          });
-          const result = await res.json();
-
-          if (result.status === "success") {
-            this.state.pin = pinInput;
-            this.state.nickname = nickVal;
-            this.state.classNo = classVal;
-
-            if (result.exists && result.userData) {
-              const u = result.userData;
-              this.state.level = u.level || 1;
-              this.state.exp = u.exp || 0;
-              this.state.gold = u.gold || 0;
-              this.state.weapon = u.weapon || 0;
-              this.state.armor = u.armor || 0;
-              this.state.materials = u.materials || this.state.materials;
-              this.state.progress = u.progress || this.state.progress;
-              this.state.stats = u.stats || this.state.stats;
-              if (Array.isArray(u.grimoire)) this.state.grimoire = u.grimoire;
-
-              if (u.inventory) {
-                this.state.maxPotionCapacity = u.inventory.maxPotionCapacity || 5;
-                if (u.inventory.potions) this.state.potions = u.inventory.potions;
-                this.state.equippedWeapon = u.inventory.equippedWeapon || "staff";
-                this.state.equippedSuit = u.inventory.equippedSuit || "robe";
-                this.state.ownedWeapons = u.inventory.ownedWeapons || ["staff"];
-                this.state.ownedSuits = u.inventory.ownedSuits || ["robe"];
-                this.state.activePet = u.inventory.activePet || null;
-                this.state.activeAura = u.inventory.activeAura || null;
-                this.state.ownedPets = u.inventory.ownedPets || [];
-                this.state.ownedAuras = u.inventory.ownedAuras || [];
-              }
-
-              this.calculateStats();
-              this.showToast(`[${nickVal}] 마도사님, 접속을 환영합니다!`, "success");
-            } else {
-              this.showToast(`새로운 닉네임 [${nickVal}] 계정이 생성되었습니다!`, "success");
-            }
-
-            this.triggerCloudSave(true);
-            this.closeModal("modal-pin");
-            this.updateHeaderUI();
-            this.renderLobbyDungeons();
-            this.saveToLocalStorage();
-          } else {
-            this.showToast(result.message || "핀번호가 다릅니다.", "error");
-            this.showModal("접속 실패", result.message || "핀번호가 다릅니다.\n등록된 닉네임과 일치하는 핀번호를 입력하세요.", "fa-solid fa-triangle-exclamation text-rose-500");
-          }
-        } catch (e) {
-          this.showToast("네트워크 오류로 접속할 수 없습니다. 인터넷 연결을 확인하세요.", "error");
-        }
+        this.showToast(`[${oldNick || '모험가'}] 계정이 안전하게 저장된 후 로그아웃되었습니다.`, "success");
       },
 
       async triggerCloudSave(showToastNotice = false) {
@@ -3371,7 +3600,11 @@
             body: JSON.stringify({
               action: "save",
               pin: this.state.pin,
+              nickname: this.state.nickname,
+              classNo: this.state.classNo,
               data: {
+                nickname: this.state.nickname,
+                classNo: this.state.classNo,
                 level: this.state.level,
                 exp: this.state.exp,
                 gold: this.state.gold,
