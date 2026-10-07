@@ -3639,14 +3639,20 @@
           const res = await fetch(this.backendUrl, {
             method: "POST",
             headers: { "Content-Type": "text/plain;charset=utf-8" },
-            body: JSON.stringify({ action: "load", pin: pinInput, nickname: nickVal, classNo: classVal })
+            body: JSON.stringify({
+              action: "load",
+              token: "ARCANIS_MATH_SECURE_2026_TOKEN_KEY", // 보안 토큰 추가
+              pin: pinInput,
+              nickname: nickVal,
+              classNo: classVal
+            })
           });
           const result = await res.json();
 
           if (result.status === "error" || result.status === "fail") {
             const errorMsg = result.message || "등록된 닉네임과 일치하지 않는 PIN 번호입니다.";
             this.showToast(errorMsg, "error");
-            this.showModal("접속 실패 (PIN 불일치)", `${errorMsg}\n\n등록하신 닉네임과 PIN 번호가 맞는지 확인해 주세요.`, "fa-solid fa-triangle-exclamation text-rose-500");
+            this.showModal("접속 실패", `${errorMsg}\n\n등록하신 닉네임과 PIN 번호가 맞는지 확인해 주세요.`, "fa-solid fa-triangle-exclamation text-rose-500");
             return;
           }
 
@@ -3746,7 +3752,7 @@
         this.showToast(`[${oldNick || '모험가'}] 계정이 안전하게 저장된 후 로그아웃되었습니다.`, "success");
       },
 
-      async triggerCloudSave(showToastNotice = false) {
+    async triggerCloudSave(showToastNotice = false) {
         this.saveToLocalStorage();
         if (!this.state.pin) return;
 
@@ -3771,6 +3777,7 @@
             headers: { "Content-Type": "text/plain;charset=utf-8" },
             body: JSON.stringify({
               action: "save",
+              token: "ARCANIS_MATH_SECURE_2026_TOKEN_KEY", // 보안 토큰 추가
               pin: this.state.pin,
               nickname: this.state.nickname,
               classNo: this.state.classNo,
@@ -3915,6 +3922,25 @@
     window.addEventListener("DOMContentLoaded", () => {
       App.init();
     });
+
+// --- 학생들의 단순 조작 방지 (F12 및 마우스 우클릭 차단) ---
+    window.addEventListener('keydown', (e) => {
+      // F12 키, Ctrl+Shift+I (검사창), Ctrl+Shift+J (콘솔창), Ctrl+U (소스보기) 차단
+      if (
+        e.key === 'F12' || 
+        (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+        (e.ctrlKey && (e.key === 'u' || e.key === 'U'))
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    // 마우스 오른쪽 버튼(우클릭 ➔ 검사 메뉴) 차단
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
   </script>
 </body>
 </html>
