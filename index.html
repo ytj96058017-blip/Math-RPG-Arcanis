@@ -1967,6 +1967,7 @@
         progress: { tier1: {}, tier2: {}, tier3: {} },
         stats: { solved: 0, correct: 0 },
         grimoire: [],
+        grimoireLockUntil: 0,
         equippedWeapon: "staff",
         equippedSuit: "robe",
         ownedWeapons: ["staff"],
@@ -2667,8 +2668,8 @@
 
           const isUnsolved = !item.solved;
           
-          // 남은 쿨타임(초) 계산
-          const remainingSec = Math.max(0, Math.ceil(((item.lockUntil || 0) - Date.now()) / 1000));
+          // 비전서 전체 남은 쿨타임(초) 계산
+          const remainingSec = Math.max(0, Math.ceil(((this.state.grimoireLockUntil || 0) - Date.now()) / 1000));
           const isLocked = remainingSec > 0;
 
           card.innerHTML = `
@@ -2745,10 +2746,10 @@
         const item = (this.state.grimoire || []).find(g => g.id === itemId);
         if (!item) return;
 
-        // --- 쿨타임 검사 추가 ---
-        const remainingSec = Math.max(0, Math.ceil(((item.lockUntil || 0) - Date.now()) / 1000));
+        // --- 비전서 전체 쿨타임 검사 ---
+        const remainingSec = Math.max(0, Math.ceil(((this.state.grimoireLockUntil || 0) - Date.now()) / 1000));
         if (remainingSec > 0) {
-          this.showToast(`아직 주문 연마 중입니다! ${remainingSec}초 후에 다시 도전할 수 있습니다.`, "error");
+          this.showToast(`비전서 전체가 마도 연마 중입니다! ${remainingSec}초 후에 도전할 수 있습니다.`, "error");
           return;
         }
         // ------------------------
@@ -2845,9 +2846,9 @@
           );
         } else {
           SoundManager.playDefeat();
-          // 틀린 횟수 1 증가 & 30초 쿨타임 설정
+          // 틀린 횟수 1 증가 & 비전서 전체 30초 쿨타임 설정
           item.challengeAttempts = (item.challengeAttempts || 0) + 1;
-          item.lockUntil = Date.now() + 30000; // 30초 뒤 풀림
+          this.state.grimoireLockUntil = Date.now() + 30000; // 비전서 전체 30초 잠금
 
           this.saveToLocalStorage();
           this.triggerCloudSave(false);
