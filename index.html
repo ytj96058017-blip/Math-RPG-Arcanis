@@ -2343,6 +2343,8 @@
         if (existingIdx >= 0) {
           this.state.grimoire[existingIdx].solved = false;
           this.state.grimoire[existingIdx].failCount = (this.state.grimoire[existingIdx].failCount || 1) + 1;
+          this.state.grimoire[existingIdx].challengeAttempts = this.state.grimoire[existingIdx].challengeAttempts || 0;
+          this.state.grimoire[existingIdx].lockUntil = this.state.grimoire[existingIdx].lockUntil || 0;
           this.state.grimoire[existingIdx].updatedAt = Date.now();
         } else {
           this.state.grimoire.unshift({
@@ -2357,6 +2359,8 @@
             solution: prob.solution,
             solved: false,
             failCount: 1,
+            challengeAttempts: 0,
+            lockUntil: 0,
             createdAt: Date.now(),
             updatedAt: Date.now()
           });
@@ -2588,6 +2592,22 @@
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
         this.switchGrimoireTab(this.currentGrimoireTab || "unsolved");
         document.getElementById("modal-grimoire").classList.remove("hidden");
+
+        // 쿨타임 실시간 카운트다운 타이머 (1초마다 목록 시간 갱신)
+        if (this.grimoireTimer) clearInterval(this.grimoireTimer);
+        this.grimoireTimer = setInterval(() => {
+          const modal = document.getElementById("modal-grimoire");
+          // 모달이 닫혀 있으면 타이머 정지
+          if (!modal || modal.classList.contains("hidden")) {
+            clearInterval(this.grimoireTimer);
+            this.grimoireTimer = null;
+            return;
+          }
+          // 미극복 탭일 때만 초단위 갱신
+          if (this.currentGrimoireTab === "unsolved") {
+            this.renderGrimoireList();
+          }
+        }, 1000);
       },
 
       switchGrimoireTab(tab) {
@@ -2646,6 +2666,11 @@
           card.className = "bg-slate-950 border border-slate-800 hover:border-rose-500/50 rounded-xl p-3.5 space-y-2 transition shadow";
 
           const isUnsolved = !item.solved;
+          
+          // 남은 쿨타임(초) 계산
+          const remainingSec = Math.max(0, Math.ceil(((item.lockUntil || 0) - Date.now()) / 1000));
+          const isLocked = remainingSec > 0;
+
           card.innerHTML = `
             <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
               <div class="flex items-center gap-2">
@@ -2661,15 +2686,25 @@
 
             <div class="flex items-center justify-between pt-1">
               <div class="text-[10px] text-slate-400">
-                ${isUnsolved ? `<span class="text-rose-400 font-bold font-mono">오답 횟수: ${item.failCount || 1}회</span>` : '<span class="text-emerald-400 font-bold">오답 극복 보너스 수령 완료</span>'}
+                ${isUnsolved ? `<span class="text-rose-400 font-bold font-mono">오답 횟수: ${item.failCount || 1}회 (재도전 실패: ${item.challengeAttempts || 0}회)</span>` : '<span class="text-emerald-400 font-bold">오답 극복 보너스 수령 완료</span>'}
               </div>
               <div class="flex gap-2">
-                ${isUnsolved ? `
-                  <button onclick="App.startGrimoireChallenge('${item.id}')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black px-3.5 py-1.5 rounded-lg text-xs transition shadow flex items-center gap-1.5">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                    <span>오답 극복 도전!</span>
-                  </button>
-                ` : `
+                ${isUnsolved ? (
+                  isLocked ? `
+                    <button disabled class="bg-slate-800 border border-slate-700 text-slate-400 font-bold px-3.5 py-1.5 rounded-lg text-xs cursor-not-allowed flex items-center gap-1.5">
+                      <i class="fa-solid fa-hourglass-half text-amber-400 fa-spin"></i>
+                      <span>주문 연마 중 (${remainingSec}초)</span>
+                    </button>
+                    <button onclick="App.viewGrimoireSolution('${item.id}')" class="bg-indigo-950/70 hover:bg-indigo-900 border border-indigo-500/50 text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                      비법서 정독
+                    </button>
+                  ` : `
+                    <button onclick="App.startGrimoireChallenge('${item.id}')" class="bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black px-3.5 py-1.5 rounded-lg text-xs transition shadow flex items-center gap-1.5">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      <span>오답 극복 도전!</span>
+                    </button>
+                  `
+                ) : `
                   <button onclick="App.viewGrimoireSolution('${item.id}')" class="bg-slate-800 hover:bg-slate-700 text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-700 transition">
                     풀이 다시 보기
                   </button>
@@ -2709,6 +2744,14 @@
       startGrimoireChallenge(itemId) {
         const item = (this.state.grimoire || []).find(g => g.id === itemId);
         if (!item) return;
+
+        // --- 쿨타임 검사 추가 ---
+        const remainingSec = Math.max(0, Math.ceil(((item.lockUntil || 0) - Date.now()) / 1000));
+        if (remainingSec > 0) {
+          this.showToast(`아직 주문 연마 중입니다! ${remainingSec}초 후에 다시 도전할 수 있습니다.`, "error");
+          return;
+        }
+        // ------------------------
 
         this.activeGrimoireItem = item;
         document.getElementById("g-challenge-topic").textContent = `${item.topic} (극복 도전)`;
@@ -2768,8 +2811,19 @@
           item.solved = true;
           item.solvedAt = Date.now();
 
-          const bonusGold = 100;
-          const bonusExp = 50;
+         // 찍기 방지: 틀린 적 없으면 100G/50EXP, 1번 틀렸으면 50G/25EXP, 2번 이상 틀렸으면 20G/10EXP
+          const attempts = item.challengeAttempts || 0;
+          let bonusGold = 100;
+          let bonusExp = 50;
+
+          if (attempts === 1) {
+            bonusGold = 50;
+            bonusExp = 25;
+          } else if (attempts >= 2) {
+            bonusGold = 20;
+            bonusExp = 10;
+          }
+
           this.state.gold += bonusGold;
           this.state.exp += bonusExp;
 
@@ -2791,7 +2845,21 @@
           );
         } else {
           SoundManager.playDefeat();
-          this.showToast("아쉽습니다! 정답이 아닙니다. 차근차근 다시 풀어보세요.", "error");
+          // 틀린 횟수 1 증가 & 30초 쿨타임 설정
+          item.challengeAttempts = (item.challengeAttempts || 0) + 1;
+          item.lockUntil = Date.now() + 30000; // 30초 뒤 풀림
+
+          this.saveToLocalStorage();
+          this.triggerCloudSave(false);
+
+          // 도전 창 닫고 목록 새로고침
+          document.getElementById("modal-grimoire-challenge").classList.add("hidden");
+          this.renderGrimoireList();
+
+          this.showToast("틀렸습니다! 30초 동안 비전서 주문이 잠깁니다. 풀이를 먼저 확인하세요!", "error");
+
+          // 자동으로 풀이 비법 모달창 열어주기 (공부 유도)
+          this.viewGrimoireSolution(item.id);
         }
       },
 
