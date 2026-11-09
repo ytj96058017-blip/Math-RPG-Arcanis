@@ -630,7 +630,7 @@
         </div>
       </div>
 
-      <div class="flex border-b border-slate-800 mb-3 gap-1 overflow-x-auto pb-1 text-xs">
+      <div class="flex shrink-0 flex-wrap border-b border-slate-800 mb-3 gap-1.5 pb-2.5 text-xs">
         <button id="rank-tab-btn-power" onclick="App.switchRankTab('power')" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950">
           <i class="fa-solid fa-crown mr-1"></i>절대 패왕 (종합 스펙)
         </button>
@@ -3263,8 +3263,46 @@
         container.innerHTML = "";
         const tab = this.currentRankTab || "power";
 
+        // 동일 아이디(닉네임+학급) 중복 제거 후 최고 점수 1개만 남기는 헬퍼 함수
+        const deduplicateUsers = (rawList, scoreKey) => {
+          const userMap = new Map();
+          rawList.forEach(u => {
+            const uniqueKey = `${(u.name || "").trim()}_${(u.classNo || "").trim()}`;
+            const currentScore = Number(u[scoreKey]) || 0;
+            if (!userMap.has(uniqueKey)) {
+              userMap.set(uniqueKey, u);
+            } else {
+              const existing = userMap.get(uniqueKey);
+              const existingScore = Number(existing[scoreKey]) || 0;
+              if (currentScore > existingScore) {
+                userMap.set(uniqueKey, u);
+              }
+            }
+          });
+          return Array.from(userMap.values()).sort((a, b) => (Number(b[scoreKey]) || 0) - (Number(a[scoreKey]) || 0));
+        };
+
         if (tab === "class") {
-          const classList = this.cachedRankings.classBattle || [];
+          // 정답수 목록에서 중복 학생을 먼저 제거한 뒤 학급별 합산 재계산
+          const uniqueCorrectUsers = deduplicateUsers(this.cachedRankings.rankings.correct || [], "correctCount");
+          let classList = [];
+
+          if (uniqueCorrectUsers.length > 0) {
+            const classMap = new Map();
+            uniqueCorrectUsers.forEach(u => {
+              if (!u.classNo) return;
+              if (!classMap.has(u.classNo)) {
+                classMap.set(u.classNo, { classNo: u.classNo, participants: 0, totalCorrect: 0 });
+              }
+              const cData = classMap.get(u.classNo);
+              cData.participants += 1;
+              cData.totalCorrect += (Number(u.correctCount) || 0);
+            });
+            classList = Array.from(classMap.values()).sort((a, b) => b.totalCorrect - a.totalCorrect);
+          } else {
+            classList = this.cachedRankings.classBattle || [];
+          }
+
           if (classList.length === 0) {
             container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>아직 학급 대항전에 등록된 학급이 없습니다.</p></div>`;
             return;
@@ -3292,7 +3330,14 @@
           return;
         }
 
-        const list = (this.cachedRankings.rankings[tab] || []);
+        const scoreKeyMap = {
+          power: "powerScore",
+          correct: "correctCount",
+          gold: "gold"
+        };
+        const rawList = this.cachedRankings.rankings[tab] || [];
+        const list = deduplicateUsers(rawList, scoreKeyMap[tab]);
+
         if (list.length === 0) {
           container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>해당 부문에 기록된 학생이 없습니다.</p></div>`;
           return;
