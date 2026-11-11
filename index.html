@@ -1522,16 +1522,16 @@
       getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
       getRandomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
 
-      generateProblem(unitId, tier) {
+      generateProblem(unitId, tier, targetType = null) {
         let prob = null;
         let attempts = 0;
         do {
           attempts++;
-          if (unitId === 1) prob = this.genUnit1(tier);
-          else if (unitId === 2) prob = this.genUnit2(tier);
-          else if (unitId === 3) prob = this.genUnit3(tier);
-          else if (unitId === 4) prob = this.genUnit4(tier);
-          else prob = this.genUnit5(tier);
+          if (unitId === 1) prob = this.genUnit1(tier, targetType);
+          else if (unitId === 2) prob = this.genUnit2(tier, targetType);
+          else if (unitId === 3) prob = this.genUnit3(tier, targetType);
+          else if (unitId === 4) prob = this.genUnit4(tier, targetType);
+          else prob = this.genUnit5(tier, targetType);
         } while (this.recentKeys.includes(prob.question) && attempts < 10);
 
         this.recentKeys.push(prob.question);
@@ -1551,16 +1551,23 @@
         }
 
         const choices = Array.from(set).sort(() => Math.random() - 0.5);
-        return { topic: prob.topic, question: prob.question, answer: prob.answer, choices: choices, solution: prob.solution };
+        return { 
+          type: prob.type || targetType || 1, 
+          topic: prob.topic, 
+          question: prob.question, 
+          answer: prob.answer, 
+          choices: choices, 
+          solution: prob.solution 
+        };
       },
-
-      genUnit1(tier) {
-        const type = this.getRandomInt(1, 7);
+genUnit1(tier, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 7);
         if (type === 1) {
           const a = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 7) : this.getRandomInt(7, 12));
           const b = this.getRandomChoice(tier === 1 ? [2, 3] : [2, 3, 5]);
           const inside = a * a * b;
           return {
+            type: 1,
             topic: `[제곱근] 1. 근호 밖으로 꺼내기 (T${tier})`,
             question: `$\\sqrt{${inside}}$ 를 $a\\sqrt{${b}}$ 꼴로 나타낼 때, $a$의 값은?`,
             answer: a,
@@ -1571,6 +1578,7 @@
           const mul = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 8) : this.getRandomInt(8, 14));
           const top = a * mul;
           return {
+            type: 2,
             topic: `[제곱근] 2. 분모의 유리화 (T${tier})`,
             question: `$\\frac{${top}}{\\sqrt{${a}}}$ 를 유리화하여 $k\\sqrt{${a}}$ 로 나타낼 때, 유리수 $k$의 값은?`,
             answer: mul,
@@ -1581,6 +1589,7 @@
           const add = this.getRandomInt(1, tier === 1 ? 3 : 5);
           const inside = n * n + add;
           return {
+            type: 3,
             topic: `[제곱근] 3. 무리수의 정수 부분 (T${tier})`,
             question: `$\\sqrt{${inside}}$ 의 정수 부분을 구하시오.`,
             answer: n,
@@ -1589,6 +1598,7 @@
         } else if (type === 4) {
           const val = tier === 1 ? this.getRandomInt(3, 6) : (tier === 2 ? this.getRandomInt(7, 12) : this.getRandomInt(13, 20));
           return {
+            type: 4,
             topic: `[제곱근] 4. 제곱근의 기본 성질 (T${tier})`,
             question: `$\\sqrt{(-${val})^2} + \\sqrt{${val}^2}$ 의 값은?`,
             answer: val * 2,
@@ -1600,6 +1610,7 @@
           const diff = this.getRandomInt(1, tier === 1 ? 2 : 4);
           const c = aSq - diff;
           return {
+            type: 5,
             topic: `[제곱근] 5. 제곱근과 수의 대소 비교 (T${tier})`,
             question: `$${a}$ 와 $\\sqrt{${c}}$ 중 더 큰 수의 제곱값은?`,
             answer: aSq,
@@ -1610,6 +1621,7 @@
           const k1 = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 9) : this.getRandomInt(10, 18));
           const k2 = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(4, 8) : this.getRandomInt(8, 15));
           return {
+            type: 6,
             topic: `[제곱근] 6. 동류근의 덧셈 (T${tier})`,
             question: `$${k1}\\sqrt{${c}} + ${k2}\\sqrt{${c}} = k\\sqrt{${c}}$ 일 때, 유리수 $k$의 값은?`,
             answer: k1 + k2,
@@ -1620,6 +1632,7 @@
           const b = this.getRandomChoice(tier === 1 ? [2, 5] : [3, 7]);
           const inside = a * b;
           return {
+            type: 7,
             topic: `[제곱근] 7. 근호의 곱셈 (T${tier})`,
             question: `$\\sqrt{${a}} \\times \\sqrt{${b}}$ 의 값은 $\\sqrt{k}$ 입니다. $k$의 값은?`,
             answer: inside,
@@ -1628,8 +1641,8 @@
         }
       },
 
-      genUnit2(tier) {
-        const type = this.getRandomInt(1, 7);
+      genUnit2(tier, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 7);
         if (type === 1) {
           let r1, r2;
           if (tier === 1) {
@@ -1648,6 +1661,7 @@
           const cSign = c < 0 ? `${c}` : `+${c}`;
           const maxRoot = Math.max(r1, r2);
           return {
+            type: 1,
             topic: `[이차방정식] 1. 인수분해를 이용한 해 구하기 (T${tier})`,
             question: `이차방정식 $x^2 ${bSign} ${cSign} = 0$ 의 두 근 중 더 큰 근은?`,
             answer: maxRoot,
@@ -1658,6 +1672,7 @@
           const doubleP = 2 * p;
           const pSq = p * p;
           return {
+            type: 2,
             topic: `[이차방정식] 2. 완전제곱식과 중근 (T${tier})`,
             question: `이차방정식 $x^2 - ${doubleP}x + ${pSq} = 0$ 의 중근 $x$의 값은?`,
             answer: p,
@@ -1670,6 +1685,7 @@
           const b = -sum;
           const c = r1 * r2;
           return {
+            type: 3,
             topic: `[이차방정식] 3. 두 근의 합 (T${tier})`,
             question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x ${c < 0 ? c : '+' + c} = 0$ 의 두 근의 합은?`,
             answer: sum,
@@ -1681,6 +1697,7 @@
           const c = tier === 1 ? this.getRandomInt(1, 3) : (tier === 2 ? this.getRandomInt(2, 6) : this.getRandomInt(4, 9));
           const d = b * b - 4 * a * c;
           return {
+            type: 4,
             topic: `[이차방정식] 4. 판별식(D) 값 계산 (T${tier})`,
             question: `이차방정식 $x^2 + ${b}x + ${c} = 0$ 의 판별식 $D = b^2 - 4ac$ 의 값은?`,
             answer: d,
@@ -1692,6 +1709,7 @@
           const prod = r1 * r2;
           const b = -(r1 + r2);
           return {
+            type: 5,
             topic: `[이차방정식] 5. 두 근의 곱 (T${tier})`,
             question: `이차방정식 $x^2 ${b < 0 ? b : '+' + b}x ${prod < 0 ? prod : '+' + prod} = 0$ 의 두 근의 곱은?`,
             answer: prod,
@@ -1702,6 +1720,7 @@
           const k = this.getRandomInt(1, 4);
           const c = r * (r + k);
           return {
+            type: 6,
             topic: `[이차방정식] 6. 한 근이 주어질 때 미지수 구하기 (T${tier})`,
             question: `이차방정식 $x^2 - ${2 * r + k}x + c = 0$ 의 한 근이 $x = ${r}$ 일 때, 상수 $c$의 값은?`,
             answer: c,
@@ -1712,6 +1731,7 @@
           const q = this.getRandomChoice(cand);
           const sqrtQ = Math.round(Math.sqrt(q));
           return {
+            type: 7,
             topic: `[이차방정식] 7. 제곱근을 이용한 풀이 (T${tier})`,
             question: `이차방정식 $x^2 = ${q}$ 의 양수인 해는?`,
             answer: sqrtQ,
@@ -1720,14 +1740,15 @@
         }
       },
 
-      genUnit3(tier) {
-        const type = this.getRandomInt(1, 7);
+      genUnit3(tier, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 7);
         if (type === 1) {
           const p = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-6, 6);
           const q = tier === 1 ? this.getRandomInt(2, 6) : (tier === 2 ? this.getRandomInt(-8, 8) : this.getRandomInt(-15, 15));
           const pTerm = p === 0 ? "x" : (p > 0 ? `(x - ${p})` : `(x + ${-p})`);
           const qTerm = q >= 0 ? `+ ${q}` : `- ${-q}`;
           return {
+            type: 1,
             topic: `[이차함수] 1. 꼭짓점의 y좌표 (T${tier})`,
             question: `이차함수 $y = ${pTerm}^2 ${qTerm}$ 의 꼭짓점의 $y$좌표는?`,
             answer: q,
@@ -1738,6 +1759,7 @@
           const q = this.getRandomInt(1, 8);
           const pTerm = p >= 0 ? `(x - ${p})` : `(x + ${-p})`;
           return {
+            type: 2,
             topic: `[이차함수] 2. 대칭축의 방정식 (T${tier})`,
             question: `이차함수 $y = -${pTerm}^2 + ${q}$ 의 축의 방정식 $x = k$ 에서 $k$의 값은?`,
             answer: p,
@@ -1746,6 +1768,7 @@
         } else if (type === 3) {
           const q = tier === 1 ? this.getRandomInt(2, 5) : (tier === 2 ? this.getRandomInt(6, 12) : this.getRandomInt(13, 22));
           return {
+            type: 3,
             topic: `[이차함수] 3. y축 방향 평행이동 (T${tier})`,
             question: `이차함수 $y = x^2$ 의 그래프를 $y$축 방향으로 $${q}$만큼 평행이동한 식의 $y$절편은?`,
             answer: q,
@@ -1756,6 +1779,7 @@
           const q = tier === 1 ? this.getRandomInt(1, 4) : this.getRandomInt(-4, 6);
           const yInt = p * p + q;
           return {
+            type: 4,
             topic: `[이차함수] 4. y절편 구하기 (T${tier})`,
             question: `이차함수 $y = (x - ${p})^2 ${q >= 0 ? '+' + q : q}$ 의 그래프와 $y$축이 만나는 점의 $y$좌표는?`,
             answer: yInt,
@@ -1766,6 +1790,7 @@
           const xVal = tier === 1 ? this.getRandomInt(2, 3) : (tier === 2 ? this.getRandomInt(3, 4) : this.getRandomInt(4, 6));
           const yVal = a * xVal * xVal;
           return {
+            type: 5,
             topic: `[이차함수] 5. 특정 함숫값 계산 (T${tier})`,
             question: `이차함수 $f(x) = ${a > 1 ? a : ''}x^2$ 에 대하여 $f(${xVal})$ 의 값은?`,
             answer: yVal,
@@ -1774,6 +1799,7 @@
         } else if (type === 6) {
           const p = tier === 1 ? this.getRandomInt(2, 5) : (tier === 2 ? this.getRandomInt(6, 10) : this.getRandomInt(11, 18));
           return {
+            type: 6,
             topic: `[이차함수] 6. x축 방향 평행이동 (T${tier})`,
             question: `이차함수 $y = x^2$ 의 그래프를 $x$축의 양의 방향으로 $${p}$만큼 평행이동한 꼭짓점의 $x$좌표는?`,
             answer: p,
@@ -1782,6 +1808,7 @@
         } else {
           const a = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 8) : this.getRandomInt(9, 15));
           return {
+            type: 7,
             topic: `[이차함수] 7. 기본형의 꼭짓점 (T${tier})`,
             question: `이차함수 $y = ${a}x^2$ 의 꼭짓점의 $x$좌표는?`,
             answer: 0,
@@ -1790,11 +1817,12 @@
         }
       },
 
-      genUnit4(tier) {
-        const type = this.getRandomInt(1, 7);
+      genUnit4(tier, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 7);
         if (type === 1) {
           if (tier === 1) {
             return {
+              type: 1,
               topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T1)`,
               question: `$\\sin 30^\\circ + \\cos 60^\\circ$ 의 값을 계산하면?`,
               answer: 1,
@@ -1802,6 +1830,7 @@
             };
           } else if (tier === 2) {
             return {
+              type: 1,
               topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T2)`,
               question: `$\\tan 45^\\circ + \\sin 90^\\circ - \\cos 0^\\circ$ 의 값은?`,
               answer: 1,
@@ -1809,6 +1838,7 @@
             };
           } else {
             return {
+              type: 1,
               topic: `[삼각비] 1. 특수각 삼각비 기본 연산 (T3)`,
               question: `$2\\sin 30^\\circ + 3\\tan 45^\\circ - 4\\cos 60^\\circ$ 의 값은?`,
               answer: 2,
@@ -1818,6 +1848,7 @@
         } else if (type === 2) {
           const k = tier === 1 ? this.getRandomInt(2, 4) : (tier === 2 ? this.getRandomInt(5, 8) : this.getRandomInt(9, 14));
           return {
+            type: 2,
             topic: `[삼각비] 2. 탄젠트와 사인의 혼합 연산 (T${tier})`,
             question: `$${k} \\times \\tan 45^\\circ - 2 \\times \\sin 30^\\circ$ 의 값은?`,
             answer: k - 1,
@@ -1827,6 +1858,7 @@
           const base = tier === 1 ? this.getRandomChoice([3, 4, 5]) : (tier === 2 ? this.getRandomChoice([6, 8, 10]) : this.getRandomChoice([12, 15, 20]));
           const hyp = base * 2;
           return {
+            type: 3,
             topic: `[삼각비] 3. 코사인과 빗변의 길이 (T${tier})`,
             question: `직각삼각형에서 예각이 $60^\\circ$ 이고 밑변이 $${base}$ 일 때, 빗변의 길이는?`,
             answer: hyp,
@@ -1835,6 +1867,7 @@
         } else if (type === 4) {
           const mul = tier === 1 ? 1 : (tier === 2 ? 2 : 4);
           return {
+            type: 4,
             topic: `[삼각비] 4. 특수각 제곱의 합 (T${tier})`,
             question: `$${mul > 1 ? mul : ''}(\\sin 45^\\circ)^2 + ${mul > 1 ? mul : ''}(\\cos 45^\\circ)^2$ 의 값은?`,
             answer: mul,
@@ -1843,6 +1876,7 @@
         } else if (type === 5) {
           const base = tier === 1 ? this.getRandomInt(4, 7) : (tier === 2 ? this.getRandomInt(8, 14) : this.getRandomInt(15, 25));
           return {
+            type: 5,
             topic: `[삼각비] 5. 탄젠트를 이용한 높이 구하기 (T${tier})`,
             question: `밑변의 길이가 $${base}$ 이고 밑각이 $45^\\circ$ 인 직각삼각형의 높이는?`,
             answer: base,
@@ -1851,6 +1885,7 @@
         } else if (type === 6) {
           const c = tier === 1 ? 1 : (tier === 2 ? 3 : 5);
           return {
+            type: 6,
             topic: `[삼각비] 6. 0도와 90도의 삼각비 (T${tier})`,
             question: `$${c}\\sin 90^\\circ + \\cos 0^\\circ + \\tan 0^\\circ$ 의 값은?`,
             answer: c + 1,
@@ -1859,6 +1894,7 @@
         } else {
           const mul = tier === 1 ? 2 : (tier === 2 ? 4 : 6);
           return {
+            type: 7,
             topic: `[삼각비] 7. 특수각 삼각비의 곱셈 (T${tier})`,
             question: `$${mul} \\times \\sin 30^\\circ \\times \\tan 45^\\circ$ 의 값은?`,
             answer: mul / 2,
@@ -1867,11 +1903,12 @@
         }
       },
 
-      genUnit5(tier) {
-        const type = this.getRandomInt(1, 7);
+      genUnit5(tier, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 7);
         if (type === 1) {
           const cAngle = tier === 1 ? this.getRandomChoice([60, 80, 100]) : (tier === 2 ? this.getRandomChoice([110, 130, 150]) : this.getRandomChoice([144, 168, 192]));
           return {
+            type: 1,
             topic: `[원의 성질] 1. 중심각과 원주각 (T${tier})`,
             question: `한 호에 대한 중심각의 크기가 $${cAngle}^\\circ$ 일 때, 원주각의 크기는 몇 도($^\\circ$)인가?`,
             answer: cAngle / 2,
@@ -1880,6 +1917,7 @@
         } else if (type === 2) {
           const a = tier === 1 ? this.getRandomChoice([60, 70, 80]) : (tier === 2 ? this.getRandomChoice([65, 75, 85, 95]) : this.getRandomChoice([57, 68, 73, 112]));
           return {
+            type: 2,
             topic: `[원의 성질] 2. 원에 내접하는 사각형의 대각 (T${tier})`,
             question: `원에 내접하는 사각형에서 한 내각이 $${a}^\\circ$ 일 때, 마주 보는 대각의 크기는 몇 도($^\\circ$)인가?`,
             answer: 180 - a,
@@ -1888,6 +1926,7 @@
         } else if (type === 3) {
           if (tier === 1) {
             return {
+              type: 3,
               topic: `[원의 성질] 3. 반원에 대한 원주각 (T1)`,
               question: `원의 지름을 한 변으로 하는 내접삼각형에서 지름에 대한 원주각의 크기는 몇 도($^\\circ$)인가?`,
               answer: 90,
@@ -1896,6 +1935,7 @@
           } else {
             const acute = tier === 2 ? this.getRandomChoice([30, 40, 50]) : this.getRandomChoice([28, 37, 43, 56]);
             return {
+              type: 3,
               topic: `[원의 성질] 3. 반원 내접 직각삼각형의 예각 (T${tier})`,
               question: `원의 지름을 빗변으로 하는 내접 직각삼각형에서 한 예각이 $${acute}^\\circ$ 일 때, 다른 한 예각의 크기는 몇 도($^\\circ$)인가?`,
               answer: 90 - acute,
@@ -1905,6 +1945,7 @@
         } else if (type === 4) {
           const inAngle = tier === 1 ? this.getRandomChoice([25, 30, 40]) : (tier === 2 ? this.getRandomChoice([45, 55, 65]) : this.getRandomChoice([68, 74, 82]));
           return {
+            type: 4,
             topic: `[원의 성질] 4. 원주각으로 중심각 구하기 (T${tier})`,
             question: `한 호에 대한 원주각의 크기가 $${inAngle}^\\circ$ 일 때, 중심각의 크기는 몇 도($^\\circ$)인가?`,
             answer: inAngle * 2,
@@ -1913,6 +1954,7 @@
         } else if (type === 5) {
           if (tier === 1) {
             return {
+              type: 5,
               topic: `[원의 성질] 5. 원의 접선과 반지름 (T1)`,
               question: `원의 접선과 접점을 지나는 반지름이 이루는 각의 크기는 몇 도($^\\circ$)인가?`,
               answer: 90,
@@ -1921,6 +1963,7 @@
           } else {
             const central = tier === 2 ? this.getRandomChoice([50, 60, 70]) : this.getRandomChoice([42, 54, 66]);
             return {
+              type: 5,
               topic: `[원의 성질] 5. 접선과 중심각 삼각형의 예각 (T${tier})`,
               question: `원 밖의 점에서 그은 접선과 중심을 이은 직각삼각형에서 중심각이 $${central}^\\circ$ 일 때, 다른 한 예각의 크기는 몇 도($^\\circ$)인가?`,
               answer: 90 - central,
@@ -1930,6 +1973,7 @@
         } else if (type === 6) {
           const angle = tier === 1 ? this.getRandomChoice([30, 40, 50]) : (tier === 2 ? this.getRandomChoice([37, 46, 58]) : this.getRandomChoice([63, 71, 84]));
           return {
+            type: 6,
             topic: `[원의 성질] 6. 같은 호에 대한 원주각 (T${tier})`,
             question: `원 $O$에서 한 호 $AB$에 대한 원주각 $\\angle APB = ${angle}^\\circ$ 일 때, 같은 호에 대한 다른 원주각 $\\angle AQB$의 크기는 몇 도($^\\circ$)인가?`,
             answer: angle,
@@ -1938,6 +1982,7 @@
         } else {
           const half = tier === 1 ? this.getRandomInt(3, 5) : (tier === 2 ? this.getRandomInt(6, 10) : this.getRandomInt(11, 16));
           return {
+            type: 7,
             topic: `[원의 성질] 7. 현의 수직이등분선 (T${tier})`,
             question: `원의 중심에서 현에 내린 수선에 의해 나누어진 한쪽 선분의 길이가 $${half}$ 일 때, 현 전체의 길이는?`,
             answer: half * 2,
@@ -1945,6 +1990,7 @@
           };
         }
       }
+     
     };
 
     const App = {
@@ -2335,7 +2381,7 @@
         }
       },
 
-      recordWrongAnswer(battle) {
+ recordWrongAnswer(battle) {
         if (!battle || !battle.currentProblem) return;
         const prob = battle.currentProblem;
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
@@ -2346,6 +2392,7 @@
           this.state.grimoire[existingIdx].failCount = (this.state.grimoire[existingIdx].failCount || 1) + 1;
           this.state.grimoire[existingIdx].challengeAttempts = this.state.grimoire[existingIdx].challengeAttempts || 0;
           this.state.grimoire[existingIdx].lockUntil = this.state.grimoire[existingIdx].lockUntil || 0;
+          this.state.grimoire[existingIdx].problemType = prob.type || this.state.grimoire[existingIdx].problemType || 1;
           this.state.grimoire[existingIdx].updatedAt = Date.now();
         } else {
           this.state.grimoire.unshift({
@@ -2353,6 +2400,7 @@
             dungeonId: battle.dungeon.id,
             dungeonName: battle.dungeon.name,
             tier: battle.tier,
+            problemType: prob.type || 1,
             topic: prob.topic,
             question: prob.question,
             answer: prob.answer,
@@ -2755,14 +2803,19 @@
         // ------------------------
 
         this.activeGrimoireItem = item;
-        document.getElementById("g-challenge-topic").textContent = `${item.topic} (극복 도전)`;
+
+        // [핵심] 기존에 저장된 problemType을 기반으로 새로운 쌍둥이 문제 생성!
+        const twinProblem = MathEngine.generateProblem(item.dungeonId, item.tier, item.problemType || null);
+        this.currentGrimoireProblem = twinProblem; // 채점에 사용할 활성 쌍둥이 문제 보관
+
+        document.getElementById("g-challenge-topic").textContent = `${twinProblem.topic} [쌍둥이 극복 문제]`;
         const qEl = document.getElementById("g-challenge-question");
-        this.renderFormulaInto(qEl, item.question);
+        this.renderFormulaInto(qEl, twinProblem.question);
 
         const choiceArea = document.getElementById("g-challenge-choices");
         const keypadArea = document.getElementById("g-challenge-keypad");
 
-        if (item.tier === 3 || !item.choices || item.choices.length === 0) {
+        if (item.tier === 3 || !twinProblem.choices || twinProblem.choices.length === 0) {
           choiceArea.classList.add("hidden");
           keypadArea.classList.remove("hidden");
           const inputEl = document.getElementById("g-challenge-input");
@@ -2773,7 +2826,7 @@
           keypadArea.classList.add("hidden");
           choiceArea.innerHTML = "";
 
-          const shuffled = [...item.choices].sort(() => Math.random() - 0.5);
+          const shuffled = [...twinProblem.choices].sort(() => Math.random() - 0.5);
           shuffled.forEach(val => {
             const btn = document.createElement("button");
             btn.className = "bg-slate-800 hover:bg-indigo-900 border border-slate-700 hover:border-indigo-400 p-3 rounded-xl font-bold text-slate-100 flex items-center justify-between transition shadow group";
@@ -2805,14 +2858,17 @@
       handleGrimoireAnswer(selectedVal) {
         if (!this.activeGrimoireItem) return;
         const item = this.activeGrimoireItem;
-        const isCorrect = String(selectedVal).trim() === String(item.answer).trim();
+        
+        // [핵심] 쌍둥이 문제 정답과 비교 (없을 시 원본 정답 비교)
+        const targetAns = this.currentGrimoireProblem ? this.currentGrimoireProblem.answer : item.answer;
+        const isCorrect = String(selectedVal).trim() === String(targetAns).trim();
 
         if (isCorrect) {
           SoundManager.playVictory();
           item.solved = true;
           item.solvedAt = Date.now();
 
-         // 찍기 방지: 틀린 적 없으면 100G/50EXP, 1번 틀렸으면 50G/25EXP, 2번 이상 틀렸으면 20G/10EXP
+          // 찍기 방지: 틀린 적 없으면 100G/50EXP, 1번 틀렸으면 50G/25EXP, 2번 이상 틀렸으면 20G/10EXP
           const attempts = item.challengeAttempts || 0;
           let bonusGold = 100;
           let bonusExp = 50;
@@ -2838,7 +2894,7 @@
 
           this.showModal(
             "🎉 오답 완전 극복 성공! 🎉",
-            `취약했던 [${item.topic}] 주문을 완벽하게 재시전하여 극복했습니다!\n\n` +
+            `취약했던 [${item.topic}] 주문의 쌍둥이 문제를 완벽하게 풀어냈습니다!\n\n` +
             `• 오답 극복 보너스 골드: +${bonusGold} G\n` +
             `• 오답 극복 보너스 경험치: +${bonusExp} EXP\n\n` +
             `마도 비전서에 '완전 정복' 훈장이 날인되었습니다.`,
