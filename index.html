@@ -124,12 +124,14 @@
           <span>명예의 전당</span>
         </button>
 
-        <!-- 레벨 & 경험치 -->
+      <!-- 레벨 & 경험치 -->
         <div class="flex flex-col items-end">
           <div class="flex items-center gap-1.5 text-xs font-bold">
             <span class="text-amber-400">Lv.<span id="header-level" class="text-white">1</span></span>
-            <span id="header-level-badge" class="text-[9px] px-1 bg-amber-500/20 text-amber-300 rounded font-mono">MAX 30</span>
+            <span id="header-level-badge" class="text-[9px] px-1 bg-amber-500/20 text-amber-300 rounded font-mono">MAX 100</span>
           </div>
+
+
           <div class="w-20 sm:w-28 bg-slate-800 h-1.5 rounded-full overflow-hidden mt-0.5 border border-slate-700/60">
             <div id="header-exp-bar" class="bg-gradient-to-r from-indigo-500 to-sky-400 h-full transition-all duration-300" style="width: 0%"></div>
           </div>
@@ -176,8 +178,9 @@
               <i class="fa-solid fa-user-pen mr-1"></i><span id="lobby-user-label">마도사 #미연동</span>
             </span>
           </div>
-          <p class="text-xs text-slate-300 max-w-md">
-            5대 수학 차원의 균열을 정복하여 수학의 지배자(Lv.30)로 거듭나세요! 획득한 골드로 특화 무기와 아르카나 슈트를 장만하세요.
+          
+<p class="text-xs text-slate-300 max-w-md">
+            5대 수학 차원의 균열을 정복하여 아르카니스 초월신(Lv.100)으로 거듭나세요! 골드와 특산물로 특화 무기·슈트와 필살기 스킬을 연마하세요.
           </p>
         </div>
 
@@ -188,8 +191,9 @@
             <span id="lobby-grimoire-badge" class="bg-rose-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">0</span>
           </button>
           <button onclick="App.openArmoryModal()" class="flex items-center gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-purple-400/40">
-            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> 무기 & 슈트 성소
+            <i class="fa-solid fa-wand-magic-sparkles text-amber-300"></i> 장비 & 스킬 성소
           </button>
+
           <button onclick="App.openBlacksmithModal()" class="flex items-center gap-1.5 bg-amber-600/90 hover:bg-amber-500 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg">
             <i class="fa-solid fa-hammer"></i> 마도 대장간
           </button>
@@ -215,10 +219,14 @@
           <button id="tab-tier-2" onclick="App.switchTier(2)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
             <i class="fa-solid fa-skull mr-1"></i>Tier 2. 정예 유적
           </button>
-          <button id="tab-tier-3" onclick="App.switchTier(3)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+         <button id="tab-tier-3" onclick="App.switchTier(3)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
             <i class="fa-solid fa-crown mr-1"></i>Tier 3. 보스 성소
           </button>
-        </div>
+          <button id="tab-tier-4" onclick="App.switchTier(4)" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-rose-300 border border-rose-500/40 hover:bg-rose-950/60 transition">
+            <i class="fa-solid fa-skull-crossbones mr-1 text-rose-400"></i>Tier 4. 심연의 신역
+          </button>
+        </div> 
+
         <div class="text-xs text-slate-400 font-mono">
           <i class="fa-solid fa-shield-halved text-indigo-400 mr-1"></i>각 던전 3구역(3 Waves) 연속 원정
         </div>
@@ -297,10 +305,13 @@
           <span class="text-[10px] font-mono tracking-widest uppercase">Arcane Clash</span>
         </div>
 
-        <!-- 우측: 몬스터 영역 -->
+<!-- 우측: 몬스터 영역 -->
         <div class="relative z-10 flex flex-col items-center">
           <div class="text-center mb-1">
-            <span id="battle-monster-name" class="text-xs font-bold text-rose-300">몬스터</span>
+            <div class="flex items-center justify-center gap-1 mb-0.5">
+              <span id="battle-monster-name" class="text-xs font-bold text-rose-300">몬스터</span>
+              <span id="monster-shield-badge" class="hidden text-[9px] px-1.5 py-0.2 rounded bg-purple-950 border border-purple-400/60 text-purple-200 font-bold animate-pulse">🛡️ 마력보호막</span>
+            </div>
             <div class="flex items-center gap-1.5 justify-center">
               <div class="w-24 sm:w-28 bg-slate-900 border border-slate-700 h-2 rounded-full overflow-hidden">
                 <div id="battle-monster-hp-bar" class="bg-gradient-to-r from-rose-500 to-amber-500 h-full transition-all duration-300" style="width: 100%"></div>
@@ -319,6 +330,26 @@
         </div>
       </div>
 
+      <!-- 필살기 마력 게이지 & 스킬 발동 컨트롤 바 -->
+      <div class="bg-slate-900/95 border border-amber-500/40 rounded-xl px-3.5 py-2.5 flex flex-col sm:flex-row items-center justify-between gap-2.5 shadow-lg">
+        <div class="flex items-center gap-3 w-full sm:w-auto flex-1">
+          <div class="flex items-center gap-1.5 text-xs font-black text-amber-300 whitespace-nowrap">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>마력 게이지</span>
+            <span id="skill-gauge-text" class="font-mono text-white">0%</span>
+          </div>
+          <div class="flex-1 bg-slate-950 h-2.5 rounded-full overflow-hidden border border-slate-700 p-0.5">
+            <div id="skill-gauge-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+          <span id="battle-combo-badge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 whitespace-nowrap">0 COMBO</span>
+        </div>
+
+        <button id="btn-cast-ultimate" onclick="App.castUltimateSkill()" disabled class="w-full sm:w-auto px-4 py-1.5 rounded-xl text-xs font-black bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed transition flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <i class="fa-solid fa-wand-sparkles"></i>
+          <span id="btn-ultimate-label">아르카나 초월 파동 (Lv.1)</span>
+        </button>
+      </div>
+
       <!-- 하단 수학 주문 시전 패널 -->
       <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col gap-3">
         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
@@ -328,8 +359,9 @@
             </span>
             <span id="problem-topic-tag" class="text-xs font-bold text-amber-300">[제곱근] 마도 연산 주문</span>
           </div>
-          <span class="text-[10px] text-slate-400 font-mono">정답 시 적 타격 · 오답 시 공격 무효 및 반격 방어</span>
+          <span id="battle-turn-hint" class="text-[10px] text-slate-400 font-mono">정답 시 게이지 +25% · 100% 시 필살기 발동!</span>
         </div>
+
 
         <!-- 수식 문제 본문 (KaTeX 렌더링) -->
         <div class="py-2 sm:py-3 text-center">
@@ -486,6 +518,10 @@
         <button id="armory-tab-btn-pets" onclick="App.switchArmoryTab('pets')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-paw mr-1"></i>수호 환상수(4종)
         </button>
+        
+<button id="armory-tab-btn-skills" onclick="App.switchArmoryTab('skills')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-bolt mr-1 text-amber-400"></i>필살기 연마
+        </button>
         <button id="armory-tab-btn-auras" onclick="App.switchArmoryTab('auras')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-sun mr-1"></i>전설 오라 & 칭호
         </button>
@@ -494,9 +530,11 @@
       <div class="overflow-y-auto space-y-3 pr-1 text-xs flex-1">
         <div id="armory-content-weapons" class="space-y-2.5"></div>
         <div id="armory-content-suits" class="space-y-2.5 hidden"></div>
+        <div id="armory-content-skills" class="space-y-2.5 hidden"></div>
         <div id="armory-content-pets" class="space-y-2.5 hidden"></div>
         <div id="armory-content-auras" class="space-y-2.5 hidden"></div>
       </div>
+
     </div>
   </div>
 
@@ -961,6 +999,11 @@
             { name: "심연의 룬 골렘", hp: 1100, atk: 115, exp: 160, gold: 190, dropMin: 3, dropMax: 4 },
             { name: "대지의 심판목", hp: 1550, atk: 135, exp: 230, gold: 270, dropMin: 3, dropMax: 5 },
             { name: "대지근원 고대목 네메시스", hp: 2150, atk: 155, exp: 370, gold: 420, dropMin: 4, dropMax: 6 }
+          ],
+          t4: [
+            { name: "[초월] 무리수 심연수호자", hp: 3200, atk: 195, exp: 480, gold: 420, dropMin: 5, dropMax: 7 },
+            { name: "[초월] 태초의 세계수 정령", hp: 5000, atk: 230, exp: 720, gold: 620, dropMin: 6, dropMax: 8 },
+            { name: "[신역] 근원의 창세신 아카샤", hp: 7800, atk: 270, exp: 1200, gold: 980, dropMin: 7, dropMax: 10 }
           ]
         }
       },
@@ -986,6 +1029,11 @@
             { name: "미지수 거대골렘", hp: 1120, atk: 118, exp: 165, gold: 195, dropMin: 3, dropMax: 4 },
             { name: "이차식의 지배자", hp: 1600, atk: 138, exp: 240, gold: 280, dropMin: 3, dropMax: 5 },
             { name: "혼돈의 이중 판별자", hp: 2200, atk: 158, exp: 380, gold: 430, dropMin: 4, dropMax: 6 }
+          ],
+          t4: [
+            { name: "[초월] 방정식 심판기계", hp: 3300, atk: 198, exp: 490, gold: 430, dropMin: 5, dropMax: 7 },
+            { name: "[초월] 허근의 시공집행자", hp: 5150, atk: 235, exp: 740, gold: 640, dropMin: 6, dropMax: 8 },
+            { name: "[신역] 절대등식의 군주 크로노스", hp: 8000, atk: 275, exp: 1250, gold: 1000, dropMin: 7, dropMax: 10 }
           ]
         }
       },
@@ -1011,6 +1059,11 @@
             { name: "상승기류 거대수", hp: 1100, atk: 116, exp: 162, gold: 192, dropMin: 3, dropMax: 4 },
             { name: "정점의 뇌전용", hp: 1570, atk: 136, exp: 235, gold: 275, dropMin: 3, dropMax: 5 },
             { name: "파괴의 포물선 비룡", hp: 2180, atk: 156, exp: 375, gold: 425, dropMin: 4, dropMax: 6 }
+          ],
+          t4: [
+            { name: "[초월] 천공의 극점수호룡", hp: 3250, atk: 196, exp: 485, gold: 425, dropMin: 5, dropMax: 7 },
+            { name: "[초월] 창공의 뇌전 바하무트", hp: 5050, atk: 232, exp: 730, gold: 630, dropMin: 6, dropMax: 8 },
+            { name: "[신역] 궤적의 천상황제 아우렐", hp: 7900, atk: 272, exp: 1220, gold: 990, dropMin: 7, dropMax: 10 }
           ]
         }
       },
@@ -1036,6 +1089,11 @@
             { name: "기하학의 거대석상", hp: 1080, atk: 120, exp: 160, gold: 190, dropMin: 3, dropMax: 4 },
             { name: "경사각의 심문관", hp: 1540, atk: 140, exp: 230, gold: 270, dropMin: 3, dropMax: 5 },
             { name: "탄젠트의 마신 아스펙트", hp: 2150, atk: 160, exp: 370, gold: 420, dropMin: 4, dropMax: 6 }
+          ],
+          t4: [
+            { name: "[초월] 황금비의 파수거인", hp: 3200, atk: 200, exp: 480, gold: 420, dropMin: 5, dropMax: 7 },
+            { name: "[초월] 삼각법의 심연사신", hp: 4950, atk: 238, exp: 720, gold: 620, dropMin: 6, dropMax: 8 },
+            { name: "[신역] 기하학의 패왕 피타고라스", hp: 7850, atk: 278, exp: 1210, gold: 985, dropMin: 7, dropMax: 10 }
           ]
         }
       },
@@ -1061,10 +1119,17 @@
             { name: "내접 다각형 거수", hp: 1120, atk: 115, exp: 165, gold: 195, dropMin: 3, dropMax: 4 },
             { name: "원주율의 시공악마", hp: 1580, atk: 135, exp: 238, gold: 278, dropMin: 3, dropMax: 5 },
             { name: "차원 원환의 파멸신", hp: 2200, atk: 155, exp: 380, gold: 435, dropMin: 4, dropMax: 6 }
+          ],
+          t4: [
+            { name: "[초월] 무한원환의 감시자", hp: 3300, atk: 195, exp: 490, gold: 430, dropMin: 5, dropMax: 7 },
+            { name: "[초월] 시공접선의 파멸수", hp: 5100, atk: 232, exp: 735, gold: 635, dropMin: 6, dropMax: 8 },
+            { name: "[신역] 영원회귀의 신 우로보로스", hp: 8100, atk: 272, exp: 1260, gold: 1020, dropMin: 7, dropMax: 10 }
           ]
         }
       }
     ];
+
+
 
     const WEAPON_CATALOG = {
       staff: {
@@ -1522,17 +1587,20 @@
       getRandomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; },
       getRandomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; },
 
-      generateProblem(unitId, tier, targetType = null) {
+    generateProblem(unitId, tier, targetType = null) {
         let prob = null;
         let attempts = 0;
         do {
           attempts++;
-          if (unitId === 1) prob = this.genUnit1(tier, targetType);
+          if (tier === 4) {
+            prob = this.genTier4Advanced(unitId, targetType);
+          } else if (unitId === 1) prob = this.genUnit1(tier, targetType);
           else if (unitId === 2) prob = this.genUnit2(tier, targetType);
           else if (unitId === 3) prob = this.genUnit3(tier, targetType);
           else if (unitId === 4) prob = this.genUnit4(tier, targetType);
           else prob = this.genUnit5(tier, targetType);
         } while (this.recentKeys.includes(prob.question) && attempts < 10);
+
 
         this.recentKeys.push(prob.question);
         if (this.recentKeys.length > 10) this.recentKeys.shift();
@@ -1979,7 +2047,8 @@ genUnit1(tier, forcedType = null) {
             answer: angle,
             solution: `같은 호에 대한 원주각의 크기는 서로 같으므로 $\\angle AQB = ${angle}^\\circ$ 입니다.`
           };
-        } else {
+      
+} else {
           const half = tier === 1 ? this.getRandomInt(3, 5) : (tier === 2 ? this.getRandomInt(6, 10) : this.getRandomInt(11, 16));
           return {
             type: 7,
@@ -1989,6 +2058,205 @@ genUnit1(tier, forcedType = null) {
             solution: `원의 중심에서 현에 내린 수선은 그 현을 수직이등분하므로 현의 전체 길이는 $${half} \\times 2 = ${half * 2}$ 입니다.`
           };
         }
+      },
+
+      // [Tier 4 심연의 신역 전용] 중3 전단원 심화 응용 주관식 문제 은행
+      genTier4Advanced(unitId, forcedType = null) {
+        const type = forcedType || this.getRandomInt(1, 3);
+        if (unitId === 1) {
+          if (type === 1) {
+            // 근호 복합 유리화 + 덧셈: a/sqrt(2) + sqrt(8*b^2) = k*sqrt(2)
+            const m = this.getRandomInt(3, 8);
+            const b = this.getRandomInt(2, 5);
+            const top = 2 * m;
+            const inside = 2 * b * b;
+            return {
+              type: 1,
+              topic: `[제곱근 심화] 유리화와 근호 덧셈의 결합 (T4)`,
+              question: `$\\frac{${top}}{\\sqrt{2}} + \\sqrt{${inside}} = k\\sqrt{2}$ 일 때, 유리수 $k$의 값은?`,
+              answer: m + b,
+              solution: `$\\frac{${top}}{\\sqrt{2}} = ${m}\\sqrt{2}$ 이고 $\\sqrt{${inside}} = ${b}\\sqrt{2}$ 이므로 합은 $(${m}+${b})\\sqrt{2} = ${m + b}\\sqrt{2}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 무리수의 정수부분과 소수부분 응용: sqrt(n^2 + d)의 정수부분 a, 소수부분 b -> a + (b + n) = 2n + sqrt - n
+            const n = this.getRandomInt(4, 9);
+            const d = this.getRandomInt(2, n);
+            const inside = n * n + d;
+            // (정수부분) * 2 + d 계산 문제로 정수 답안 유도
+            return {
+              type: 2,
+              topic: `[제곱근 심화] 무리수의 정수 부분 응용 (T4)`,
+              question: `$\\sqrt{${inside}}$ 의 정수 부분을 $a$라 할 때, $${inside} - a^2$ 의 값은?`,
+              answer: d,
+              solution: `$${n}^2 = ${n * n} < ${inside} < ${(n + 1) * (n + 1)}$ 이므로 정수 부분 $a = ${n}$ 입니다. 따라서 $${inside} - ${n}^2 = ${d}$ 입니다.`
+            };
+          } else {
+            // 제곱근이 자연수가 되기 위한 가장 작은 자연수 x 곱하기
+            const base = this.getRandomChoice([2, 3, 5, 6, 7]);
+            const sq = this.getRandomInt(2, 4);
+            const num = base * sq * sq;
+            return {
+              type: 3,
+              topic: `[제곱근 심화] 자연수가 되는 조건 (T4)`,
+              question: `$\\sqrt{${num}x}$ 가 자연수가 되도록 하는 가장 작은 자연수 $x$의 값은?`,
+              answer: base,
+              solution: `$${num} = ${sq}^2 \\times ${base}$ 이므로 지수가 홀수인 소인수 $${base}$ 를 곱하면 자연수가 됩니다. 따라서 $x = ${base}$ 입니다.`
+            };
+          }
+        } else if (unitId === 2) {
+          if (type === 1) {
+            // 중근을 가질 조건: x^2 - 2kx + (k^2 + m) = 0 -> 상수항 구하기
+            const k = this.getRandomInt(4, 11);
+            const doubleK = 2 * k;
+            return {
+              type: 1,
+              topic: `[이차방정식 심화] 중근을 가질 조건 (T4)`,
+              question: `이차방정식 $x^2 - ${doubleK}x + (k + 10) = 0$ 이 중근을 가질 때, 상수 $k$의 값은?`,
+              answer: k * k - 10,
+              solution: `중근을 가지려면 상수항이 $(-\\frac{${doubleK}}{2})^2 = ${k * k}$ 이어야 하므로 $k + 10 = ${k * k} \\implies k = ${k * k - 10}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 한 근이 주어졌을 때 다른 한 근 구하기
+            const r1 = this.getRandomInt(-6, -2);
+            const r2 = this.getRandomInt(3, 9);
+            const b = -(r1 + r2);
+            const c = r1 * r2;
+            return {
+              type: 2,
+              topic: `[이차방정식 심화] 한 근과 다른 한 근 (T4)`,
+              question: `이차방정식 $x^2 ${b >= 0 ? '+' + b : b}x + a = 0$ 의 한 근이 $x = ${r1}$ 일 때, 다른 한 근은?`,
+              answer: r2,
+              solution: `두 근의 합이 $${-b}$ 이므로 다른 한 근은 $${-b} - (${r1}) = ${r2}$ 입니다.`
+            };
+          } else {
+            // 두 근의 제곱의 합: alpha^2 + beta^2 = (alpha+beta)^2 - 2*alpha*beta
+            const r1 = this.getRandomInt(1, 5);
+            const r2 = this.getRandomInt(2, 6);
+            const b = -(r1 + r2);
+            const c = r1 * r2;
+            const sqSum = r1 * r1 + r2 * r2;
+            return {
+              type: 3,
+              topic: `[이차방정식 심화] 두 근의 제곱의 합 (T4)`,
+              question: `이차방정식 $x^2 ${b}x + ${c} = 0$ 의 두 근을 $\\alpha, \\beta$ 라 할 때, $\\alpha^2 + \\beta^2$ 의 값은?`,
+              answer: sqSum,
+              solution: `두 근이 $${r1}, ${r2}$ 이므로 $\\alpha^2 + \\beta^2 = ${r1}^2 + ${r2}^2 = ${sqSum}$ 입니다.`
+            };
+          }
+        } else if (unitId === 3) {
+          if (type === 1) {
+            // 일반형을 표준형으로 고쳐 꼭짓점 y좌표 구하기: y = x^2 - 2px + c
+            const p = this.getRandomInt(2, 7);
+            const q = this.getRandomInt(-9, 9);
+            const c = p * p + q;
+            return {
+              type: 1,
+              topic: `[이차함수 심화] 일반형의 꼭짓점 y좌표 (T4)`,
+              question: `이차함수 $y = x^2 - ${2 * p}x ${c >= 0 ? '+' + c : c}$ 의 최솟값(꼭짓점의 $y$좌표)은?`,
+              answer: q,
+              solution: `$y = (x - ${p})^2 ${q >= 0 ? '+' + q : q}$ 이므로 최솟값은 $${q}$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 평행이동 후 y절편 구하기
+            const p = this.getRandomInt(2, 5);
+            const q = this.getRandomInt(3, 10);
+            const yInt = 2 * p * p - q;
+            return {
+              type: 2,
+              topic: `[이차함수 심화] 그래프 평행이동과 y절편 (T4)`,
+              question: `$y = 2x^2$ 의 그래프를 $x$축 방향으로 $${p}$만큼, $y$축 방향으로 $-${q}$만큼 평행이동한 그래프의 $y$절편은?`,
+              answer: yInt,
+              solution: `$y = 2(x - ${p})^2 - ${q}$ 에 $x = 0$ 을 대입하면 $y = 2(${p * p}) - ${q} = ${yInt}$ 입니다.`
+            };
+          } else {
+            // x절편 두 개 사이의 거리
+            const r1 = this.getRandomInt(-5, -1);
+            const r2 = this.getRandomInt(2, 7);
+            const b = -(r1 + r2);
+            const c = r1 * r2;
+            return {
+              type: 3,
+              topic: `[이차함수 심화] x축과의 두 교점 사이 거리 (T4)`,
+              question: `이차함수 $y = x^2 ${b >= 0 ? '+' + b : b}x ${c}$ 의 그래프가 $x$축과 만나는 두 점 사이의 거리는?`,
+              answer: r2 - r1,
+              solution: `$x$절편이 $${r1}$ 과 $${r2}$ 이므로 두 점 사이의 거리는 $${r2} - (${r1}) = ${r2 - r1}$ 입니다.`
+            };
+          }
+        } else if (unitId === 4) {
+          if (type === 1) {
+            // 직각삼각형 피타고라스 + 삼각비 곱: 3:4:5 또는 5:12:13 비율
+            const scale = this.getRandomInt(1, 3);
+            const a = 3 * scale, b = 4 * scale, c = 5 * scale;
+            // c * sinA + c * cosA = a + b
+            return {
+              type: 1,
+              topic: `[삼각비 심화] 직각삼각형 변의 길이와 삼각비 (T4)`,
+              question: `$\\angle C = 90^\\circ$ 인 직각삼각형 $ABC$에서 $\\overline{BC} = ${a}, \\overline{AC} = ${b}$ 일 때, $5(\\sin A + \\cos A)$ 의 값은?`,
+              answer: 7,
+              solution: `빗변 $\\overline{AB} = ${c}$ 이므로 $\\sin A = \\frac{3}{5}, \\cos A = \\frac{4}{5}$ 입니다. 따라서 $5(\\frac{3}{5} + \\frac{4}{5}) = 7$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 특수각 혼합 사칙연산
+            const k = this.getRandomInt(4, 10);
+            return {
+              type: 2,
+              topic: `[삼각비 심화] 특수각 삼각비 복합 계산 (T4)`,
+              question: `$${k}\\tan 45^\\circ - 6\\sin 30^\\circ + 4\\cos 60^\\circ$ 의 값은?`,
+              answer: k - 1,
+              solution: `$${k}(1) - 6(\\frac{1}{2}) + 4(\\frac{1}{2}) = ${k} - 3 + 2 = ${k - 1}$ 입니다.`
+            };
+          } else {
+            // 삼각형 넓이 공식: 1/2 * a * b * sin30
+            const a = this.getRandomChoice([6, 8, 10, 12]);
+            const b = this.getRandomChoice([4, 6, 8, 10]);
+            const area = (a * b) / 4;
+            return {
+              type: 3,
+              topic: `[삼각비 심화] 삼각비를 이용한 삼각형의 넓이 (T4)`,
+              question: `두 변의 길이가 각각 $${a}, ${b}$ 이고 그 끼인각의 크기가 $30^\\circ$ 인 삼각형의 넓이는?`,
+              answer: area,
+              solution: `넓이 $= \\frac{1}{2} \\times ${a} \\times ${b} \\times \\sin 30^\\circ = \\frac{1}{2} \\times ${a} \\times ${b} \\times \\frac{1}{2} = ${area}$ 입니다.`
+            };
+          }
+        } else {
+          if (type === 1) {
+            // 접선과 현이 이루는 각 (접현각)
+            const angle = this.getRandomChoice([42, 54, 63, 71]);
+            return {
+              type: 1,
+              topic: `[원의 성질 심화] 접선과 현이 이루는 각 (T4)`,
+              question: `원 $O$의 접선 $AT$와 현 $AB$가 이루는 각 $\\angle BAT = ${angle}^\\circ$ 일 때, 호 $AB$에 대한 원주각 $\\angle ACB$의 크기는 몇 도($^\\circ$)인가?`,
+              answer: angle,
+              solution: `접선과 현이 이루는 각의 크기는 그 호에 대한 원주각의 크기와 같으므로 $${angle}^\\circ$ 입니다.`
+            };
+          } else if (type === 2) {
+            // 원 밖의 한 점에서 그은 두 접선과 중심각 사각형
+            const pAngle = this.getRandomChoice([40, 50, 64, 72]);
+            const central = 180 - pAngle;
+            return {
+              type: 2,
+              topic: `[원의 성질 심화] 두 접선과 중심각의 관계 (T4)`,
+              question: `원 밖의 점 $P$에서 원 $O$에 그은 두 접선의 접점을 $A, B$라 하자. $\\angle APB = ${pAngle}^\\circ$ 일 때, 중심각 $\\angle AOB$의 크기는 몇 도($^\\circ$)인가?`,
+              answer: central,
+              solution: `사각형 $PAOB$에서 $\\angle A = \\angle B = 90^\\circ$ 이므로 $\\angle AOB = 180^\\circ - ${pAngle}^\\circ = ${central}^\\circ$ 입니다.`
+            };
+          } else {
+            // 원의 할선/현의 길이 비례 응용 (PA * PB = PC * PD)
+            const pa = this.getRandomInt(3, 6);
+            const pb = this.getRandomChoice([8, 10, 12]);
+            const pc = this.getRandomChoice([4, 6]);
+            // pb가 pc의 배수가 되도록 조정
+            const prod = pa * 6;
+            const ansPd = prod / 3;
+            return {
+              type: 3,
+              topic: `[원의 성질 심화] 원과 비례 성질 (T4)`,
+              question: `원 내부의 한 점 $P$를 지나는 두 현 $AB, CD$에 대하여 $\\overline{PA} = ${pa}, \\overline{PB} = 6, \\overline{PC} = 3$ 일 때, $\\overline{PD}$ 의 길이는?`,
+              answer: ansPd,
+              solution: `$\\overline{PA} \\times \\overline{PB} = \\overline{PC} \\times \\overline{PD}$ 이므로 $${pa} \\times 6 = 3 \\times \\overline{PD} \\implies \\overline{PD} = ${ansPd}$ 입니다.`
+            };
+          }
+        }
       }
      
     };
@@ -1996,7 +2264,7 @@ genUnit1(tier, forcedType = null) {
     const App = {
       backendUrl: "https://script.google.com/macros/s/AKfycbxwhVUO2iLNCuJ9uRuKwUgZWz0q08D63psh8M6wiUWG6GmsD3SC7UVMXa0_EcU71V59/exec",
 
-      state: {
+     state: {
         pin: "",
         level: 1,
         exp: 0,
@@ -2010,7 +2278,7 @@ genUnit1(tier, forcedType = null) {
         maxPotionCapacity: 5,
         potions: { minor: 2, normal: 1, major: 0 },
         materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
-        progress: { tier1: {}, tier2: {}, tier3: {} },
+        progress: { tier1: {}, tier2: {}, tier3: {}, tier4: {} },
         stats: { solved: 0, correct: 0 },
         grimoire: [],
         grimoireLockUntil: 0,
@@ -2018,6 +2286,9 @@ genUnit1(tier, forcedType = null) {
         equippedSuit: "robe",
         ownedWeapons: ["staff"],
         ownedSuits: ["robe"],
+        weaponUpgrades: { staff: 0, greatsword: 0, rapier: 0 },
+        suitUpgrades: { robe: 0, titan: 0, mirage: 0 },
+        skillLevel: 1,
         activePet: null,
         activeAura: null,
         ownedPets: [],
@@ -2047,7 +2318,8 @@ genUnit1(tier, forcedType = null) {
         this.setupAlchemySelects();
       },
 
-      sanitizeArmoryState() {
+
+sanitizeArmoryState() {
         if (!Array.isArray(this.state.ownedWeapons)) this.state.ownedWeapons = ["staff"];
         if (!this.state.ownedWeapons.includes("staff")) this.state.ownedWeapons.unshift("staff");
         if (!this.state.equippedWeapon) this.state.equippedWeapon = "staff";
@@ -2055,6 +2327,18 @@ genUnit1(tier, forcedType = null) {
         if (!Array.isArray(this.state.ownedSuits)) this.state.ownedSuits = ["robe"];
         if (!this.state.ownedSuits.includes("robe")) this.state.ownedSuits.unshift("robe");
         if (!this.state.equippedSuit) this.state.equippedSuit = "robe";
+
+        if (!this.state.weaponUpgrades || typeof this.state.weaponUpgrades !== "object") {
+          this.state.weaponUpgrades = { staff: 0, greatsword: 0, rapier: 0 };
+        }
+        if (!this.state.suitUpgrades || typeof this.state.suitUpgrades !== "object") {
+          this.state.suitUpgrades = { robe: 0, titan: 0, mirage: 0 };
+        }
+        if (!this.state.skillLevel || this.state.skillLevel < 1) {
+          this.state.skillLevel = 1;
+        }
+        if (!this.state.progress) this.state.progress = { tier1: {}, tier2: {}, tier3: {}, tier4: {} };
+        if (!this.state.progress.tier4) this.state.progress.tier4 = {};
 
         if (!Array.isArray(this.state.ownedPets)) this.state.ownedPets = [];
         if (!Array.isArray(this.state.ownedAuras)) this.state.ownedAuras = [];
@@ -2065,15 +2349,24 @@ genUnit1(tier, forcedType = null) {
       },
 
       calculateStats() {
-        const lv = Math.min(30, this.state.level);
+        this.sanitizeArmoryState();
+        const lv = Math.min(100, Math.max(1, this.state.level));
         const weaponDef = WEAPON_CATALOG[this.state.equippedWeapon] || WEAPON_CATALOG.staff;
         const suitDef = SUIT_CATALOG[this.state.equippedSuit] || SUIT_CATALOG.robe;
 
-        const baseAtk = 22 + (lv - 1) * 3 + this.state.weapon * 10;
-        const baseDef = 5 + (lv - 1) * 1.5 + this.state.armor * 5;
-        const baseMaxHp = 100 + (lv - 1) * 12 + this.state.armor * 35;
+        // 장착 중인 특화 무기/슈트의 개별 강화 수치 (+0 ~ +10)
+        const wSpecLv = this.state.weaponUpgrades[this.state.equippedWeapon] || 0;
+        const sSpecLv = this.state.suitUpgrades[this.state.equippedSuit] || 0;
 
-        this.state.atk = Math.round(baseAtk * weaponDef.atkMultiplier);
+        // 100레벨 기준 균형 스펙 계산식 (대장간 기초강화 + 레벨성장 + 특화장비 개별강화)
+        const baseAtk = 22 + (lv - 1) * 2.5 + this.state.weapon * 12 + wSpecLv * 18;
+        const baseDef = 5 + (lv - 1) * 1.2 + this.state.armor * 6 + sSpecLv * 6;
+        const baseMaxHp = 100 + (lv - 1) * 15 + this.state.armor * 45 + sSpecLv * 75;
+
+        // 특화 무기 개별 강화 1강당 배율 +4% 추가 증폭
+        const finalAtkMult = weaponDef.atkMultiplier + (wSpecLv * 0.04);
+
+        this.state.atk = Math.round(baseAtk * finalAtkMult);
         this.state.def = Math.round(baseDef + (suitDef.defBonus || 0));
         this.state.maxHp = Math.round(baseMaxHp + (suitDef.hpBonus || 0));
 
@@ -2082,6 +2375,8 @@ genUnit1(tier, forcedType = null) {
         }
         this.state.hp = Math.min(this.state.maxHp, this.state.hp);
       },
+
+
 
       renderMath() {
         if (window.katex) {
@@ -2111,14 +2406,19 @@ genUnit1(tier, forcedType = null) {
         });
       },
 
-      switchTier(tier) {
+switchTier(tier) {
         this.selectedTier = tier;
-        [1, 2, 3].forEach(t => {
+        [1, 2, 3, 4].forEach(t => {
           const btn = document.getElementById(`tab-tier-${t}`);
+          if (!btn) return;
           if (t === tier) {
-            btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-slate-950 shadow-lg transition";
+            btn.className = t === 4
+              ? "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-gradient-to-r from-rose-600 to-amber-500 text-slate-950 shadow-lg transition"
+              : "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-amber-500 text-slate-950 shadow-lg transition";
           } else {
-            btn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition";
+            btn.className = t === 4
+              ? "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-rose-300 border border-rose-500/40 hover:bg-rose-950/60 transition"
+              : "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition";
           }
         });
         this.renderLobbyDungeons();
@@ -2131,9 +2431,13 @@ genUnit1(tier, forcedType = null) {
 
         const tierKey = `tier${this.selectedTier}`;
         const tierProgress = this.state.progress[tierKey] || {};
+        const tier3Progress = this.state.progress.tier3 || {};
 
         DUNGEON_DATA.forEach(d => {
           const clears = tierProgress[`u${d.id}`] || 0;
+          const t3Clears = tier3Progress[`u${d.id}`] || 0;
+          const isTier4Locked = this.selectedTier === 4 && t3Clears < 1;
+
           const monList = d.monsters[`t${this.selectedTier}`];
           const finalMon = monList[monList.length - 1];
           const matCount = this.state.materials[d.matKey] || 0;
@@ -2144,14 +2448,27 @@ genUnit1(tier, forcedType = null) {
 
           if (this.selectedTier === 2) {
             recText = "권장: +5~+9강 (티탄 중갑)";
-            if (avgGear < 5) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold">⚠️️ 방어구 제련 필요</span>`;
+            if (avgGear < 5) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold">⚠ 방어구 제련 필요</span>`;
           } else if (this.selectedTier === 3) {
             recText = "권장: +10~+15강 (종결 슈트)";
             if (avgGear < 9) dangerBadge = `<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-600/50 px-1.5 py-0.5 rounded font-bold animate-pulse">☠️ 즉사 주의!</span>`;
+          } else if (this.selectedTier === 4) {
+            recText = "권장: Lv.60↑ · 특화제련 +7↑";
+            dangerBadge = `<span class="text-[9px] bg-purple-950 text-amber-300 border border-amber-500/50 px-1.5 py-0.5 rounded font-bold">🛡️ 마력보호막</span>`;
           }
 
           const card = document.createElement("div");
-          card.className = "bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-4 flex flex-col justify-between transition group shadow-xl relative overflow-hidden";
+          card.className = `bg-slate-900 border ${this.selectedTier === 4 ? 'border-rose-500/50 hover:border-amber-400' : 'border-slate-800 hover:border-amber-500/50'} rounded-2xl p-4 flex flex-col justify-between transition group shadow-xl relative overflow-hidden`;
+
+          const actionBtnHtml = isTier4Locked
+            ? `<button disabled class="w-full bg-slate-800 border border-slate-700 text-slate-400 font-bold py-2 rounded-xl text-xs cursor-not-allowed flex items-center justify-center gap-1.5">
+                <i class="fa-solid fa-lock text-rose-400"></i>
+                <span>T3 보스 성소 정복 필요</span>
+              </button>`
+            : `<button onclick="App.startBattle(${d.id}, ${this.selectedTier})" class="w-full bg-gradient-to-r ${this.selectedTier === 4 ? 'from-rose-600 to-amber-500' : 'from-amber-500 to-amber-600'} hover:brightness-110 text-slate-950 font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
+                <span>${this.selectedTier === 4 ? '심연의 신역 돌입' : '던전 원정 출발'}</span>
+                <i class="fa-solid fa-dungeon"></i>
+              </button>`;
 
           card.innerHTML = `
             <div>
@@ -2179,16 +2496,13 @@ genUnit1(tier, forcedType = null) {
               </div>
             </div>
 
-            <button onclick="App.startBattle(${d.id}, ${this.selectedTier})" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:brightness-110 text-slate-950 font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5">
-              <span>던전 원정 출발</span>
-              <i class="fa-solid fa-dungeon"></i>
-            </button>
+            ${actionBtnHtml}
           `;
           grid.appendChild(card);
         });
       },
 
-      startBattle(unitId, tier) {
+startBattle(unitId, tier) {
         if (this.state.hp <= 0) {
           this.showModal("행동 불가", "체력이 모두 소진되었습니다! 마을에서 물약을 복용하여 회복하세요.", "fa-solid fa-heart-crack text-rose-500");
           return;
@@ -2206,7 +2520,10 @@ genUnit1(tier, forcedType = null) {
           monsterList,
           accumulatedRewards: { exp: 0, gold: 0, materials: 0, potions: 0 },
           monster: null,
-          currentProblem: null
+          currentProblem: null,
+          skillGauge: 0,
+          combo: 0,
+          turnCount: 0
         };
         this.isTurnBusy = false;
 
@@ -2214,7 +2531,8 @@ genUnit1(tier, forcedType = null) {
         document.getElementById("view-battle").classList.remove("hidden");
 
         document.getElementById("battle-dungeon-badge").textContent = dungeon.name;
-        document.getElementById("battle-tier-badge").textContent = tier === 1 ? "T1 하급 마물림" : (tier === 2 ? "T2 정예 유적" : "T3 보스 성소");
+        const tierLabels = { 1: "T1 하급 마물림", 2: "T2 정예 유적", 3: "T3 보스 성소", 4: "T4 심연의 신역" };
+        document.getElementById("battle-tier-badge").textContent = tierLabels[tier] || `T${tier}`;
         document.getElementById("battle-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
 
         const wNames = { staff: "지팡이", greatsword: "대검", rapier: "레이피어" };
@@ -2235,7 +2553,113 @@ genUnit1(tier, forcedType = null) {
           petEl.classList.add("hidden");
         }
 
+        this.updateSkillGaugeUI();
         this.spawnCurrentWaveMonster();
+      },
+
+      updateSkillGaugeUI() {
+        if (!this.currentBattle) return;
+        const b = this.currentBattle;
+        const gauge = Math.min(100, Math.max(0, b.skillGauge || 0));
+        const combo = b.combo || 0;
+        const skLv = this.state.skillLevel || 1;
+
+        const bar = document.getElementById("skill-gauge-bar");
+        const txt = document.getElementById("skill-gauge-text");
+        const comboBadge = document.getElementById("battle-combo-badge");
+        const btn = document.getElementById("btn-cast-ultimate");
+        const btnLabel = document.getElementById("btn-ultimate-label");
+
+        if (bar) bar.style.width = `${gauge}%`;
+        if (txt) txt.textContent = `${gauge}%`;
+        if (comboBadge) {
+          comboBadge.textContent = `${combo} COMBO`;
+          comboBadge.className = combo >= 3
+            ? "text-[10px] font-mono font-black px-2 py-0.5 rounded bg-amber-500/20 border border-amber-400/50 text-amber-300 whitespace-nowrap"
+            : "text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-slate-800 text-slate-400 whitespace-nowrap";
+        }
+        if (btnLabel) btnLabel.textContent = `아르카나 초월 파동 (Lv.${skLv})`;
+
+        if (btn) {
+          if (gauge >= 100) {
+            btn.disabled = false;
+            btn.className = "w-full sm:w-auto px-4 py-1.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 hover:brightness-110 text-slate-950 border border-yellow-200 shadow-lg animate-pulse cursor-pointer transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+          } else {
+            btn.disabled = true;
+            btn.className = "w-full sm:w-auto px-4 py-1.5 rounded-xl text-xs font-black bg-slate-800 text-slate-500 border border-slate-700 cursor-not-allowed transition flex items-center justify-center gap-1.5 whitespace-nowrap";
+          }
+        }
+      },
+
+      castUltimateSkill() {
+        if (this.isTurnBusy || !this.currentBattle) return;
+        const b = this.currentBattle;
+        if ((b.skillGauge || 0) < 100 || b.monster.hp <= 0) return;
+
+        this.isTurnBusy = true;
+        b.skillGauge = 0;
+        this.updateSkillGaugeUI();
+
+        const skLv = this.state.skillLevel || 1;
+        const dmgMult = 2.5 + (skLv - 1) * 0.30; // Lv.1: 250% -> Lv.10: 520%
+        const healRate = 0.15 + (skLv - 1) * 0.02; // Lv.1: 15% -> Lv.10: 33%
+
+        SoundManager.playCrit();
+        const pSprite = document.getElementById("battle-player-sprite");
+        const mSprite = document.getElementById("monster-svg-target");
+        const mSlash = document.getElementById("monster-slash-fx");
+
+        pSprite.classList.remove("anim-idle");
+        pSprite.classList.add("anim-player-attack");
+
+        setTimeout(() => {
+          SoundManager.playVictory();
+          if (mSlash) {
+            mSlash.classList.remove("hidden");
+            mSlash.classList.add("anim-slash");
+          }
+          mSprite.classList.remove("anim-idle");
+          mSprite.classList.add("anim-hit-shake");
+
+          // 초월 보스 마력 보호막 즉시 파괴!
+          let breakNotice = "";
+          if (b.monster.hasShield) {
+            b.monster.hasShield = false;
+            const shieldBadge = document.getElementById("monster-shield-badge");
+            if (shieldBadge) shieldBadge.classList.add("hidden");
+            breakNotice = " 💥보호막 BREAK!";
+          }
+
+          const ultDmg = Math.max(20, Math.round(this.state.atk * dmgMult));
+          b.monster.hp = Math.max(0, b.monster.hp - ultDmg);
+          this.showDamagePopup("monster-damage-pos", `⚡초월파동! -${ultDmg}${breakNotice}`);
+          this.updateBattleStageHpUI();
+
+          const healAmt = Math.max(10, Math.round(this.state.maxHp * healRate));
+          this.state.hp = Math.min(this.state.maxHp, this.state.hp + healAmt);
+          this.showDamagePopup("player-damage-pos", `+${healAmt} (마력재생)`);
+          this.updateHeaderUI();
+
+          this.showToast(`⚡ [아르카나 초월 파동 Lv.${skLv}] 발동! 적에게 ${ultDmg} 마법 피해${breakNotice}`, "success");
+
+          setTimeout(() => {
+            pSprite.classList.remove("anim-player-attack");
+            pSprite.classList.add("anim-idle");
+            if (mSlash) {
+              mSlash.classList.add("hidden");
+              mSlash.classList.remove("anim-slash");
+            }
+            mSprite.classList.remove("anim-hit-shake");
+            mSprite.classList.add("anim-idle");
+
+            if (b.monster.hp <= 0) {
+              this.handleMonsterDefeat();
+            } else {
+              // 필살기는 보너스 턴이므로 몬스터 반격 없이 바로 다음 문제로!
+              this.isTurnBusy = false;
+            }
+          }, 300);
+        }, 300);
       },
 
       spawnCurrentWaveMonster() {
@@ -2244,6 +2668,7 @@ genUnit1(tier, forcedType = null) {
         const template = b.monsterList[b.wave - 1];
 
         this.wavePotionCount = 0;
+        b.turnCount = 0;
         b.monster = {
           name: template.name,
           maxHp: template.hp,
@@ -2252,8 +2677,19 @@ genUnit1(tier, forcedType = null) {
           exp: template.exp,
           gold: template.gold,
           dropMin: template.dropMin || 1,
-          dropMax: template.dropMax || 2
+          dropMax: template.dropMax || 2,
+          hasShield: b.tier === 4 // Tier 4 초월 보스는 마력 보호막 보유
         };
+
+        const shieldBadge = document.getElementById("monster-shield-badge");
+        if (shieldBadge) {
+          if (b.monster.hasShield) {
+            shieldBadge.classList.remove("hidden");
+            this.showToast(`🛡️ [${b.monster.name}]이(가) 마력 보호막(피해 75% 감소)을 전개했습니다! 필살기 또는 3연속 정답으로 파괴하세요!`, "info");
+          } else {
+            shieldBadge.classList.add("hidden");
+          }
+        }
 
         document.getElementById("battle-wave-text").textContent = `WAVE ${b.wave} / ${b.maxWaves}`;
         document.getElementById("battle-monster-name").textContent = b.monster.name;
@@ -2277,7 +2713,7 @@ genUnit1(tier, forcedType = null) {
         const choiceArea = document.getElementById("choice-buttons-area");
         const keypadArea = document.getElementById("keypad-input-area");
 
-        if (b.tier === 3) {
+        if (b.tier >= 3) {
           choiceArea.classList.add("hidden");
           keypadArea.classList.remove("hidden");
           this.keypadInput = "";
@@ -2315,6 +2751,21 @@ genUnit1(tier, forcedType = null) {
         if (isCorrect) this.state.stats.correct++;
 
         if (isCorrect) {
+          // 정답 시 콤보 +1 및 마력 게이지 +25% 충전
+          b.combo = (b.combo || 0) + 1;
+          b.skillGauge = Math.min(100, (b.skillGauge || 0) + 25);
+          this.updateSkillGaugeUI();
+
+          // 연속 3콤보 정답 달성 시 초월 보스 마력 보호막 파괴!
+          let shieldBrokenNow = false;
+          if (b.monster.hasShield && b.combo >= 3) {
+            b.monster.hasShield = false;
+            shieldBrokenNow = true;
+            const shieldBadge = document.getElementById("monster-shield-badge");
+            if (shieldBadge) shieldBadge.classList.add("hidden");
+            this.showToast("💥 3연속 정답 공명! 보스의 [마력 보호막]이 산산조각 났습니다!", "success");
+          }
+
           let isCrit = false;
           let critMultiplier = 1.0;
 
@@ -2346,8 +2797,16 @@ genUnit1(tier, forcedType = null) {
             mSprite.classList.add("anim-hit-shake");
 
             let dmg = Math.max(5, Math.round(this.state.atk * critMultiplier));
+            let shieldTag = "";
+            if (b.monster.hasShield) {
+              dmg = Math.max(1, Math.round(dmg * 0.25)); // 보호막 활성 시 피해 75% 감소
+              shieldTag = " (보호막)";
+            } else if (shieldBrokenNow) {
+              shieldTag = " 💥BREAK!";
+            }
+
             b.monster.hp = Math.max(0, b.monster.hp - dmg);
-            this.showDamagePopup("monster-damage-pos", isCrit ? `⚡CRIT! -${dmg}` : `-${dmg}`);
+            this.showDamagePopup("monster-damage-pos", (isCrit ? `⚡CRIT! -${dmg}` : `-${dmg}`) + shieldTag);
             this.updateBattleStageHpUI();
 
             if (this.state.equippedWeapon === "staff") {
@@ -2375,13 +2834,18 @@ genUnit1(tier, forcedType = null) {
             }, 260);
           }, 300);
         } else {
+          // 오답 시 콤보 초기화 & 게이지 -25% 차감 (오토마우스 원천 봉쇄)
+          b.combo = 0;
+          b.skillGauge = Math.max(0, (b.skillGauge || 0) - 25);
+          this.updateSkillGaugeUI();
+
           SoundManager.playDefeat();
           this.recordWrongAnswer(b);
           this.showSolutionModal();
         }
       },
 
- recordWrongAnswer(battle) {
+      recordWrongAnswer(battle) {
         if (!battle || !battle.currentProblem) return;
         const prob = battle.currentProblem;
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
@@ -2447,6 +2911,9 @@ genUnit1(tier, forcedType = null) {
         const b = this.currentBattle;
         if (!b || b.monster.hp <= 0) return;
 
+        b.turnCount = (b.turnCount || 0) + 1;
+        const isEnragedStrike = b.tier === 4 && (b.turnCount % 3 === 0);
+
         if (this.state.equippedSuit === "mirage" && Math.random() < 0.30) {
           this.showDamagePopup("player-damage-pos", `MISS! (회피)`);
           this.showToast("신기루 잔상으로 몬스터의 공격을 완전히 회피했습니다!", "info");
@@ -2470,7 +2937,8 @@ genUnit1(tier, forcedType = null) {
           pSprite.classList.remove("anim-idle");
           pSprite.classList.add("anim-hit-shake");
 
-          let finalDmg = Math.max(1, Math.round(b.monster.atk - this.state.def));
+          const rawAtk = isEnragedStrike ? Math.round(b.monster.atk * 1.5) : b.monster.atk;
+          let finalDmg = Math.max(1, Math.round(rawAtk - this.state.def));
 
           if (this.state.equippedSuit === "titan") {
             finalDmg = Math.max(1, Math.round(finalDmg * 0.80));
@@ -2485,7 +2953,7 @@ genUnit1(tier, forcedType = null) {
           }
 
           this.state.hp = Math.max(0, this.state.hp - finalDmg);
-          this.showDamagePopup("player-damage-pos", `-${finalDmg}`);
+          this.showDamagePopup("player-damage-pos", isEnragedStrike ? `🔥광폭강타! -${finalDmg}` : `-${finalDmg}`);
           this.updateHeaderUI();
 
           setTimeout(() => {
@@ -2591,7 +3059,8 @@ genUnit1(tier, forcedType = null) {
 
         this.triggerCloudSave(false);
 
-        let clearMsg = `축하합니다! [${dungeon.name} (${b.tier === 1 ? '하급' : (b.tier === 2 ? '정예' : '보스 성소')})] 의 모든 구역을 완벽히 정복했습니다!\n\n` +
+const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 성소", 4: "심연의 신역" }[b.tier] || `Tier ${b.tier}`;
+        let clearMsg = `축하합니다! [${dungeon.name} (${tierClearName})] 의 모든 구역을 완벽히 정복했습니다!\n\n` +
           `• 획득 골드: +${b.accumulatedRewards.gold + bonusGold} G (보너스 포함)\n` +
           `• 획득 경험치: +${b.accumulatedRewards.exp} EXP\n` +
           `• 확보한 특산물: ${dungeon.matName} 총 ${b.accumulatedRewards.materials + bonusMat}개 획득!\n` +
@@ -2815,7 +3284,7 @@ genUnit1(tier, forcedType = null) {
         const choiceArea = document.getElementById("g-challenge-choices");
         const keypadArea = document.getElementById("g-challenge-keypad");
 
-        if (item.tier === 3 || !twinProblem.choices || twinProblem.choices.length === 0) {
+       if (item.tier >= 3 || !twinProblem.choices || twinProblem.choices.length === 0) {
           choiceArea.classList.add("hidden");
           keypadArea.classList.remove("hidden");
           const inputEl = document.getElementById("g-challenge-input");
@@ -2934,7 +3403,7 @@ genUnit1(tier, forcedType = null) {
         }
       },
 
-      updateArmoryPreview() {
+updateArmoryPreview() {
         const previewEl = document.getElementById("armory-player-preview");
         if (previewEl) {
           previewEl.innerHTML = MonsterSvgRenderer.renderPlayer(
@@ -2947,16 +3416,22 @@ genUnit1(tier, forcedType = null) {
         }
         const summaryEl = document.getElementById("armory-current-summary");
         if (summaryEl) {
-          const wName = (WEAPON_CATALOG[this.state.equippedWeapon] || {}).name || "지팡이";
-          const sName = (SUIT_CATALOG[this.state.equippedSuit] || {}).name || "로브";
-          const auraTitle = this.state.activeAura && AURA_CATALOG[this.state.activeAura] ? AURA_CATALOG[this.state.activeAura].title : "오라 없음";
-          summaryEl.textContent = `${wName} · ${sName} · [${auraTitle}]`;
+          const wId = this.state.equippedWeapon || "staff";
+          const sId = this.state.equippedSuit || "robe";
+          const wLv = (this.state.weaponUpgrades && this.state.weaponUpgrades[wId]) || 0;
+          const sLv = (this.state.suitUpgrades && this.state.suitUpgrades[sId]) || 0;
+          const wName = `${(WEAPON_CATALOG[wId] || {}).name || "지팡이"}${wLv > 0 ? `(+${wLv})` : ""}`;
+          const sName = `${(SUIT_CATALOG[sId] || {}).name || "로브"}${sLv > 0 ? `(+${sLv})` : ""}`;
+          const skLv = this.state.skillLevel || 1;
+          summaryEl.textContent = `${wName} · ${sName} · 필살기 Lv.${skLv}`;
         }
+        const goldEl = document.getElementById("armory-gold-display");
+        if (goldEl) goldEl.textContent = this.state.gold;
       },
 
       switchArmoryTab(tab) {
         this.currentArmoryTab = tab;
-        ["weapons", "suits", "pets", "auras"].forEach(t => {
+        ["weapons", "suits", "skills", "pets", "auras"].forEach(t => {
           const btn = document.getElementById(`armory-tab-btn-${t}`);
           const content = document.getElementById(`armory-content-${t}`);
           if (btn && content) {
@@ -2972,8 +3447,16 @@ genUnit1(tier, forcedType = null) {
 
         if (tab === "weapons") this.renderArmoryWeapons();
         else if (tab === "suits") this.renderArmorySuits();
+        else if (tab === "skills") this.renderArmorySkills();
         else if (tab === "pets") this.renderArmoryPets();
         else if (tab === "auras") this.renderArmoryAuras();
+      },
+
+      getSpecialGearUpgradeCost(currentLv) {
+        // 특화 무기/슈트 개별 강화 비용 (+0 -> +10): 골드 + 5대 특산 재료 모두 소모
+        const reqGold = (currentLv + 1) * 350 + currentLv * currentLv * 65;
+        const reqMat = 2 + currentLv * 2;
+        return { reqGold, reqMat };
       },
 
       renderArmoryWeapons() {
@@ -2982,33 +3465,81 @@ genUnit1(tier, forcedType = null) {
         container.innerHTML = "";
         const owned = Array.isArray(this.state.ownedWeapons) ? this.state.ownedWeapons : ["staff"];
         this.state.ownedWeapons = owned;
+
         Object.values(WEAPON_CATALOG).forEach(w => {
           const isOwned = owned.includes(w.id);
           const isEquipped = (this.state.equippedWeapon || "staff") === w.id;
+          const upgLv = (this.state.weaponUpgrades && this.state.weaponUpgrades[w.id]) || 0;
+          const costInfo = this.getSpecialGearUpgradeCost(upgLv);
 
           let btnHtml = "";
-          if (isEquipped) {
-            btnHtml = `<span class="bg-indigo-950 text-indigo-300 border border-indigo-500/50 px-3 py-1.5 rounded-lg font-bold">장착 중</span>`;
-          } else if (isOwned) {
-            btnHtml = `<button onclick="App.equipWeapon('${w.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg font-bold transition">장착하기</button>`;
-          } else {
+          if (!isOwned) {
             btnHtml = `<button onclick="App.buyWeapon('${w.id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg transition">${w.cost} G 구매</button>`;
+          } else {
+            const equipPart = isEquipped
+              ? `<span class="bg-indigo-950 text-indigo-300 border border-indigo-500/50 px-2.5 py-1 rounded-lg font-bold text-[11px]">장착 중</span>`
+              : `<button onclick="App.equipWeapon('${w.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] transition">장착</button>`;
+
+            const upgPart = upgLv >= 10
+              ? `<span class="bg-amber-950 text-amber-300 border border-amber-500/50 px-2.5 py-1 rounded-lg font-mono font-bold text-[11px]">MAX (+10)</span>`
+              : `<button onclick="App.upgradeSpecialWeapon('${w.id}')" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-slate-950 font-black px-2.5 py-1 rounded-lg text-[11px] transition shadow">
+                  제련 +${upgLv + 1} (${costInfo.reqGold}G · 재료각${costInfo.reqMat})
+                </button>`;
+
+            btnHtml = `<div class="flex flex-col items-end gap-1.5">${equipPart}${upgPart}</div>`;
           }
+
+          const bonusInfo = isOwned
+            ? `<div class="text-[10px] text-amber-300 font-mono mt-1">현재 제련 보너스: 기본 ATK +${upgLv * 18} · 배율 +${upgLv * 4}%</div>`
+            : "";
 
           const card = document.createElement("div");
           card.className = `p-3 rounded-xl border flex items-center justify-between gap-3 ${isEquipped ? 'bg-indigo-950/40 border-indigo-500/70' : 'bg-slate-950 border-slate-800'}`;
           card.innerHTML = `
             <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-bold text-sm text-slate-100">${w.name}</span>
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="font-bold text-sm text-slate-100">${w.name} ${isOwned ? `<span class="text-amber-400 font-mono">[+${upgLv}]</span>` : ""}</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full border ${w.badgeColor} font-mono">${w.badge}</span>
               </div>
               <p class="text-[11px] text-slate-400">${w.desc}</p>
+              ${bonusInfo}
             </div>
             <div>${btnHtml}</div>
           `;
           container.appendChild(card);
         });
+      },
+
+      upgradeSpecialWeapon(id) {
+        if (!this.state.ownedWeapons.includes(id)) return;
+        const currentLv = (this.state.weaponUpgrades && this.state.weaponUpgrades[id]) || 0;
+        if (currentLv >= 10) {
+          this.showToast("이미 최고 제련 단계(+10)에 도달했습니다!", "info");
+          return;
+        }
+        const { reqGold, reqMat } = this.getSpecialGearUpgradeCost(currentLv);
+        if (this.state.gold < reqGold) {
+          this.showToast(`골드가 부족합니다! (${reqGold} G 필요)`, "error");
+          return;
+        }
+        for (const d of DUNGEON_DATA) {
+          if ((this.state.materials[d.matKey] || 0) < reqMat) {
+            this.showToast(`${d.matName}이(가) 부족합니다! (각 ${reqMat}개 필요)`, "error");
+            return;
+          }
+        }
+
+        this.state.gold -= reqGold;
+        DUNGEON_DATA.forEach(d => { this.state.materials[d.matKey] -= reqMat; });
+        this.state.weaponUpgrades[id] = currentLv + 1;
+
+        this.calculateStats();
+        SoundManager.playVictory();
+        this.showToast(`⚡ [${WEAPON_CATALOG[id].name}] +${currentLv + 1}강 제련 성공!`, "success");
+        this.updateArmoryPreview();
+        this.renderArmoryWeapons();
+        this.updateHeaderUI();
+        this.triggerCloudSave(false);
       },
 
       buyWeapon(id) {
@@ -3048,33 +3579,81 @@ genUnit1(tier, forcedType = null) {
         container.innerHTML = "";
         const owned = Array.isArray(this.state.ownedSuits) ? this.state.ownedSuits : ["robe"];
         this.state.ownedSuits = owned;
+
         Object.values(SUIT_CATALOG).forEach(s => {
           const isOwned = owned.includes(s.id);
           const isEquipped = (this.state.equippedSuit || "robe") === s.id;
+          const upgLv = (this.state.suitUpgrades && this.state.suitUpgrades[s.id]) || 0;
+          const costInfo = this.getSpecialGearUpgradeCost(upgLv);
 
           let btnHtml = "";
-          if (isEquipped) {
-            btnHtml = `<span class="bg-purple-950 text-purple-300 border border-purple-500/50 px-3 py-1.5 rounded-lg font-bold">착용 중</span>`;
-          } else if (isOwned) {
-            btnHtml = `<button onclick="App.equipSuit('${s.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg font-bold transition">착용하기</button>`;
-          } else {
+          if (!isOwned) {
             btnHtml = `<button onclick="App.buySuit('${s.id}')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold px-3 py-1.5 rounded-lg transition">${s.cost} G 구매</button>`;
+          } else {
+            const equipPart = isEquipped
+              ? `<span class="bg-purple-950 text-purple-300 border border-purple-500/50 px-2.5 py-1 rounded-lg font-bold text-[11px]">착용 중</span>`
+              : `<button onclick="App.equipSuit('${s.id}')" class="bg-purple-600 hover:bg-purple-500 text-white px-2.5 py-1 rounded-lg font-bold text-[11px] transition">착용</button>`;
+
+            const upgPart = upgLv >= 10
+              ? `<span class="bg-amber-950 text-amber-300 border border-amber-500/50 px-2.5 py-1 rounded-lg font-mono font-bold text-[11px]">MAX (+10)</span>`
+              : `<button onclick="App.upgradeSpecialSuit('${s.id}')" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-slate-950 font-black px-2.5 py-1 rounded-lg text-[11px] transition shadow">
+                  제련 +${upgLv + 1} (${costInfo.reqGold}G · 재료각${costInfo.reqMat})
+                </button>`;
+
+            btnHtml = `<div class="flex flex-col items-end gap-1.5">${equipPart}${upgPart}</div>`;
           }
+
+          const bonusInfo = isOwned
+            ? `<div class="text-[10px] text-purple-300 font-mono mt-1">현재 제련 보너스: 추가 HP +${upgLv * 75} · 추가 DEF +${upgLv * 6}</div>`
+            : "";
 
           const card = document.createElement("div");
           card.className = `p-3 rounded-xl border flex items-center justify-between gap-3 ${isEquipped ? 'bg-purple-950/40 border-purple-500/70' : 'bg-slate-950 border-slate-800'}`;
           card.innerHTML = `
             <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1">
-                <span class="font-bold text-sm text-slate-100">${s.name}</span>
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <span class="font-bold text-sm text-slate-100">${s.name} ${isOwned ? `<span class="text-purple-300 font-mono">[+${upgLv}]</span>` : ""}</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full border ${s.badgeColor} font-mono">${s.badge}</span>
               </div>
               <p class="text-[11px] text-slate-400">${s.desc}</p>
+              ${bonusInfo}
             </div>
             <div>${btnHtml}</div>
           `;
           container.appendChild(card);
         });
+      },
+
+      upgradeSpecialSuit(id) {
+        if (!this.state.ownedSuits.includes(id)) return;
+        const currentLv = (this.state.suitUpgrades && this.state.suitUpgrades[id]) || 0;
+        if (currentLv >= 10) {
+          this.showToast("이미 최고 제련 단계(+10)에 도달했습니다!", "info");
+          return;
+        }
+        const { reqGold, reqMat } = this.getSpecialGearUpgradeCost(currentLv);
+        if (this.state.gold < reqGold) {
+          this.showToast(`골드가 부족합니다! (${reqGold} G 필요)`, "error");
+          return;
+        }
+        for (const d of DUNGEON_DATA) {
+          if ((this.state.materials[d.matKey] || 0) < reqMat) {
+            this.showToast(`${d.matName}이(가) 부족합니다! (각 ${reqMat}개 필요)`, "error");
+            return;
+          }
+        }
+
+        this.state.gold -= reqGold;
+        DUNGEON_DATA.forEach(d => { this.state.materials[d.matKey] -= reqMat; });
+        this.state.suitUpgrades[id] = currentLv + 1;
+
+        this.calculateStats();
+        SoundManager.playVictory();
+        this.showToast(`🛡️ [${SUIT_CATALOG[id].name}] +${currentLv + 1}강 제련 성공!`, "success");
+        this.updateArmoryPreview();
+        this.renderArmorySuits();
+        this.updateHeaderUI();
+        this.triggerCloudSave(false);
       },
 
       buySuit(id) {
@@ -3104,6 +3683,104 @@ genUnit1(tier, forcedType = null) {
         this.showToast(`[${SUIT_CATALOG[id].name}] 슈트로 교체했습니다.`, "success");
         this.updateArmoryPreview();
         this.renderArmorySuits();
+        this.updateHeaderUI();
+        this.triggerCloudSave(false);
+      },
+
+      getSkillUpgradeCost(skLv) {
+        const reqGold = skLv * 450 + (skLv - 1) * (skLv - 1) * 90;
+        const reqMat = 2 + (skLv - 1) * 2;
+        return { reqGold, reqMat };
+      },
+
+      renderArmorySkills() {
+        const container = document.getElementById("armory-content-skills");
+        if (!container) return;
+
+        const skLv = this.state.skillLevel || 1;
+        const dmgPct = 250 + (skLv - 1) * 30; // Lv.1: 250% -> Lv.10: 520%
+        const healPct = 15 + (skLv - 1) * 2;  // Lv.1: 15%  -> Lv.10: 33%
+        const nextDmgPct = 250 + skLv * 30;
+        const nextHealPct = 15 + skLv * 2;
+        const costInfo = this.getSkillUpgradeCost(skLv);
+
+        let matStatusHtml = DUNGEON_DATA.map(d => {
+          const have = this.state.materials[d.matKey] || 0;
+          const ok = have >= costInfo.reqMat;
+          return `<span class="px-2 py-0.5 rounded bg-slate-900 border ${ok ? 'border-slate-700 text-slate-300' : 'border-rose-500/50 text-rose-400'} font-mono text-[10px]">${d.matName} ${have}/${costInfo.reqMat}</span>`;
+        }).join(" ");
+
+        container.innerHTML = `
+          <div class="bg-gradient-to-br from-indigo-950/70 via-slate-950 to-amber-950/30 border-2 border-amber-500/60 rounded-2xl p-4 space-y-3 shadow-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 text-xl">
+                  <i class="fa-solid fa-bolt"></i>
+                </div>
+                <div>
+                  <div class="font-black text-sm text-amber-300">궁극기: 아르카나 초월 파동</div>
+                  <div class="text-[11px] text-slate-400">전투 중 정답을 맞혀 마력 게이지 100% 충전 시 발동 가능</div>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-amber-500 text-slate-950 font-black font-mono text-xs">Lv.${skLv} / 10</span>
+            </div>
+
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 space-y-1.5 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 필살기 마법 피해량</span>
+                <span class="font-mono font-bold text-amber-300">공격력의 ${dmgPct}% ${skLv < 10 ? `<span class="text-emerald-400">➔ ${nextDmgPct}%</span>` : ""}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 시전 시 생명력 회복</span>
+                <span class="font-mono font-bold text-rose-400">최대 HP의 ${healPct}% ${skLv < 10 ? `<span class="text-emerald-400">➔ ${nextHealPct}%</span>` : ""}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 특수 효과 (Tier 4 보스전)</span>
+                <span class="font-bold text-sky-300">초월 보스의 [마력 보호막] 즉시 파괴(BREAK)!</span>
+              </div>
+            </div>
+
+            ${skLv < 10 ? `
+              <div class="space-y-2 pt-1">
+                <div class="text-[11px] text-slate-300 font-bold">다음 단계(Lv.${skLv + 1}) 연마 필요 재료: <span class="text-amber-300 font-mono">${costInfo.reqGold} G</span></div>
+                <div class="flex flex-wrap gap-1.5">${matStatusHtml}</div>
+                <button onclick="App.upgradeSkill()" class="w-full mt-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs transition shadow-lg">
+                  ⚡ 필살기 Lv.${skLv + 1} 연마하기 (${costInfo.reqGold} G)
+                </button>
+              </div>
+            ` : `
+              <div class="text-center py-2 bg-amber-950/40 border border-amber-500/40 rounded-xl text-amber-300 font-black">
+                ✨ 필살기 최고 경지(Lv.10 MAX)에 도달했습니다! ✨
+              </div>
+            `}
+          </div>
+        `;
+      },
+
+      upgradeSkill() {
+        const skLv = this.state.skillLevel || 1;
+        if (skLv >= 10) return;
+        const { reqGold, reqMat } = this.getSkillUpgradeCost(skLv);
+
+        if (this.state.gold < reqGold) {
+          this.showToast(`골드가 부족합니다! (${reqGold} G 필요)`, "error");
+          return;
+        }
+        for (const d of DUNGEON_DATA) {
+          if ((this.state.materials[d.matKey] || 0) < reqMat) {
+            this.showToast(`${d.matName}이(가) 부족합니다! (각 ${reqMat}개 필요)`, "error");
+            return;
+          }
+        }
+
+        this.state.gold -= reqGold;
+        DUNGEON_DATA.forEach(d => { this.state.materials[d.matKey] -= reqMat; });
+        this.state.skillLevel = skLv + 1;
+
+        SoundManager.playVictory();
+        this.showToast(`⚡ 필살기 [아르카나 초월 파동] Lv.${this.state.skillLevel} 달성!`, "success");
+        this.updateArmoryPreview();
+        this.renderArmorySkills();
         this.updateHeaderUI();
         this.triggerCloudSave(false);
       },
@@ -3628,15 +4305,21 @@ genUnit1(tier, forcedType = null) {
         this.openPotionSelectModal("물약을 성공적으로 복용했습니다.");
       },
 
+getRequiredExp(lv) {
+        // 1~30레벨은 기존과 유사한 빠른 성장, 31~100레벨은 점진적 도전 곡선
+        if (lv < 30) return lv * 45;
+        return Math.round(lv * 45 + Math.pow(lv - 29, 1.65) * 28);
+      },
+
       checkLevelUp() {
-        if (this.state.level >= 30) { this.state.level = 30; return; }
-        let neededExp = this.state.level * 45;
+        if (this.state.level >= 100) { this.state.level = 100; return; }
+        let neededExp = this.getRequiredExp(this.state.level);
         let leveledUp = false;
-        while (this.state.exp >= neededExp && this.state.level < 30) {
+        while (this.state.exp >= neededExp && this.state.level < 100) {
           this.state.exp -= neededExp;
           this.state.level++;
           leveledUp = true;
-          neededExp = this.state.level * 45;
+          neededExp = this.getRequiredExp(this.state.level);
         }
         if (leveledUp) {
           this.calculateStats();
@@ -3645,6 +4328,8 @@ genUnit1(tier, forcedType = null) {
           this.showToast(`✨ 레벨 업! Lv.${this.state.level} 달성! (HP 완전 회복)`, "success");
         }
       },
+
+
 
       getUpgradeCost(currentLv) {
         const reqMat = Math.floor(4 + currentLv * 3.5);
@@ -3868,11 +4553,18 @@ genUnit1(tier, forcedType = null) {
                 this.state.equippedSuit = u.inventory.equippedSuit || "robe";
                 this.state.ownedWeapons = u.inventory.ownedWeapons || ["staff"];
                 this.state.ownedSuits = u.inventory.ownedSuits || ["robe"];
+               
                 this.state.activePet = u.inventory.activePet || null;
                 this.state.activeAura = u.inventory.activeAura || null;
                 this.state.ownedPets = u.inventory.ownedPets || [];
                 this.state.ownedAuras = u.inventory.ownedAuras || [];
+                this.state.weaponUpgrades = u.inventory.weaponUpgrades || { staff: 0, greatsword: 0, rapier: 0 };
+                this.state.suitUpgrades = u.inventory.suitUpgrades || { robe: 0, titan: 0, mirage: 0 };
+                this.state.skillLevel = u.inventory.skillLevel || 1;
               }
+
+
+
 
               this.calculateStats();
               this.showToast(`[${this.state.nickname}] 마도사님 접속 완료!`, "success");
@@ -3988,6 +4680,9 @@ genUnit1(tier, forcedType = null) {
           activeAura: this.state.activeAura,
           ownedPets: this.state.ownedPets,
           ownedAuras: this.state.ownedAuras,
+          weaponUpgrades: this.state.weaponUpgrades,
+          suitUpgrades: this.state.suitUpgrades,
+          skillLevel: this.state.skillLevel,
           nickname: this.state.nickname,
           classNo: this.state.classNo
         };
@@ -4036,21 +4731,23 @@ genUnit1(tier, forcedType = null) {
         } catch (e) {}
       },
 
-      updateHeaderUI() {
-        const lv = Math.min(30, this.state.level);
+updateHeaderUI() {
+        const lv = Math.min(100, this.state.level);
         document.getElementById("header-level").textContent = lv;
 
         let title = "견습 수학술사";
         if (this.state.activeAura && AURA_CATALOG[this.state.activeAura]) {
           title = AURA_CATALOG[this.state.activeAura].title;
-        } else if (lv >= 30) title = "수학의 지배자 (MAX)";
-        else if (lv >= 25) title = "아르카니스 대마도사";
-        else if (lv >= 15) title = "정예 룬마스터";
-        else if (lv >= 8) title = "숙련 연산술사";
+        } else if (lv >= 100) title = "아르카니스 초월신 (MAX)";
+        else if (lv >= 80) title = "심연의 진리 탐구자";
+        else if (lv >= 60) title = "아르카니스 대마도황";
+        else if (lv >= 40) title = "수학의 지배자";
+        else if (lv >= 25) title = "정예 룬마스터";
+        else if (lv >= 10) title = "숙련 연산술사";
         document.getElementById("player-title").textContent = title;
 
-        const neededExp = lv * 45;
-        const expPct = lv >= 30 ? 100 : Math.min(100, (this.state.exp / neededExp) * 100);
+        const neededExp = this.getRequiredExp(lv);
+        const expPct = lv >= 100 ? 100 : Math.min(100, (this.state.exp / neededExp) * 100);
         document.getElementById("header-exp-bar").style.width = `${expPct}%`;
 
         document.getElementById("header-hp").textContent = `${this.state.hp} / ${this.state.maxHp}`;
