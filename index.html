@@ -2318,6 +2318,7 @@ genUnit1(tier, forcedType = null) {
 
      state: {
         pin: "",
+        sessionTicket: "",
         level: 1,
         exp: 0,
         gold: 100,
@@ -4587,9 +4588,10 @@ getRequiredExp(lv) {
             return;
           }
 
-         if (result.status === "success") {
+        if (result.status === "success") {
             const wasOtherUserLoggedIn = Boolean(this.state.pin && this.state.nickname !== nickVal);
             this.state.pin = pinInput;
+            this.state.sessionTicket = result.sessionTicket || "";
             this.state.nickname = nickVal;
             this.state.classNo = classVal;
 
@@ -4755,9 +4757,11 @@ getRequiredExp(lv) {
             body: JSON.stringify({
               action: "save",
               token: "ARCANIS_MATH_SECURE_2026_TOKEN_KEY", // 보안 토큰 추가
+              sessionTicket: this.state.sessionTicket || "",
               pin: this.state.pin,
               nickname: this.state.nickname,
               classNo: this.state.classNo,
+
               data: {
                 nickname: this.state.nickname,
                 classNo: this.state.classNo,
