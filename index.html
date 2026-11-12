@@ -433,11 +433,12 @@
       <!-- 오답 리스트 컨테이너 -->
       <div id="grimoire-list-container" class="overflow-y-auto space-y-2.5 pr-1 text-xs flex-1 min-h-[280px]"></div>
 
-      <div class="border-t border-slate-800 pt-2.5 mt-2 flex justify-between items-center text-[11px] text-slate-400">
+    <div class="border-t border-slate-800 pt-2.5 mt-2 flex justify-between items-center text-[11px] text-slate-400">
         <div>
-          <span class="text-amber-400 font-bold">※ 극복 보상:</span> 오답 문제를 재도전하여 정답을 맞히면 <strong class="text-amber-300">+100 G</strong> 와 <strong class="text-sky-300">+50 EXP</strong> 를 지급합니다!
+          <span class="text-amber-400 font-bold">※ 복습 규칙:</span> 미극복 주문은 <strong class="text-rose-300">최대 5개</strong>까지 보관되며, 극복 시 던전 난이도에 따라 <strong class="text-amber-300">T1(15G) ~ T4(250G)</strong>의 복습 보상을 지급합니다.
         </div>
-      </div>
+      </div>  
+
     </div>
   </div>
 
@@ -2896,7 +2897,7 @@ startBattle(unitId, tier) {
         }
       },
 
-      recordWrongAnswer(battle) {
+recordWrongAnswer(battle) {
         if (!battle || !battle.currentProblem) return;
         const prob = battle.currentProblem;
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
@@ -2910,6 +2911,12 @@ startBattle(unitId, tier) {
           this.state.grimoire[existingIdx].problemType = prob.type || this.state.grimoire[existingIdx].problemType || 1;
           this.state.grimoire[existingIdx].updatedAt = Date.now();
         } else {
+          // 미극복 오답 보관 한도(최대 5개) 검사
+          const unsolvedCount = this.state.grimoire.filter(g => !g.solved).length;
+          if (unsolvedCount >= 5) {
+            this.showToast("📚 마도 비전서가 가득 찼습니다(최대 5개)! 비전서를 먼저 복습하세요.", "info");
+            return;
+          }
           this.state.grimoire.unshift({
             id: "grim_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
             dungeonId: battle.dungeon.id,
@@ -3388,18 +3395,21 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
           item.solved = true;
           item.solvedAt = Date.now();
 
-          // 찍기 방지: 틀린 적 없으면 100G/50EXP, 1번 틀렸으면 50G/25EXP, 2번 이상 틀렸으면 20G/10EXP
-          const attempts = item.challengeAttempts || 0;
-          let bonusGold = 100;
-          let bonusExp = 50;
+// 티어별 차등 복습 보상 (던전 몬스터 1마리 처치 보상보다 낮게 책정하여 어뷰징 방지)
+          const tierRewardMap = {
+            1: { gold: 15, exp: 10 },
+            2: { gold: 45, exp: 35 },
+            3: { gold: 110, exp: 90 },
+            4: { gold: 250, exp: 250 }
+          };
+          const baseReward = tierRewardMap[item.tier] || { gold: 15, exp: 10 };
 
-          if (attempts === 1) {
-            bonusGold = 50;
-            bonusExp = 25;
-          } else if (attempts >= 2) {
-            bonusGold = 20;
-            bonusExp = 10;
-          }
+          // 찍기 방지: 재도전 실패 횟수에 따라 보상 반감
+          const attempts = item.challengeAttempts || 0;
+          const penaltyMult = attempts === 0 ? 1.0 : (attempts === 1 ? 0.5 : 0.25);
+
+          const bonusGold = Math.max(5, Math.round(baseReward.gold * penaltyMult));
+          const bonusExp = Math.max(5, Math.round(baseReward.exp * penaltyMult));
 
           this.state.gold += bonusGold;
           this.state.exp += bonusExp;
