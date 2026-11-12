@@ -616,7 +616,7 @@
           </div>
           <div>
             <h3 class="text-base font-bold text-amber-300">아르카니스 명예의 전당</h3>
-            <p class="text-[11px] text-slate-400">전교생 실시간 다각화 순위 및 학급 대항전 집계</p>
+            <p class="text-[11px] text-slate-400">전교생 실시간 순위 집계 <span class="text-emerald-400 font-bold">(등재 기준: 최소 20문제 풀이 &amp; 정답률 60% 이상)</span></p>
           </div>
         </div>
         <div class="flex items-center gap-2">
@@ -3307,7 +3307,7 @@ genUnit1(tier, forcedType = null) {
         this.renderRankingList();
       },
 
-      renderRankingList() {
+     renderRankingList() {
         const container = document.getElementById("ranking-list-container");
         if (!container) return;
 
@@ -3319,12 +3319,27 @@ genUnit1(tier, forcedType = null) {
         container.innerHTML = "";
         const tab = this.currentRankTab || "power";
 
-        // 동일 아이디(닉네임+학급) 중복 제거 후 최고 점수 1개만 남기는 헬퍼 함수
-        const deduplicateUsers = (rawList, scoreKey) => {
+        // 랭킹 자격 판별 헬퍼 (최소 20문제 이상 풀이 & 정답률 60% 이상)
+        const calcAccuracy = (u) => {
+          const solved = Number(u.solvedCount) || 0;
+          const correct = Number(u.correctCount) || 0;
+          return solved > 0 ? Math.round((correct / solved) * 1000) / 10 : 0;
+        };
+
+        // 동일 아이디(닉네임+학급) 중복 제거 + 미달자 숨김 처리 헬퍼 함수
+        const filterAndDeduplicateUsers = (rawList, scoreKey) => {
           const userMap = new Map();
           rawList.forEach(u => {
+            const solved = Number(u.solvedCount) || 0;
+            const acc = u.accuracy !== undefined ? Number(u.accuracy) : calcAccuracy(u);
+
+            // [핵심 필터] 20문제 미만 또는 정답률 60% 미만(오토마우스 등) 숨김 처리
+            if (solved < 20 || acc < 60.0) return;
+
+            u._accuracy = acc;
             const uniqueKey = `${(u.name || "").trim()}_${(u.classNo || "").trim()}`;
             const currentScore = Number(u[scoreKey]) || 0;
+
             if (!userMap.has(uniqueKey)) {
               userMap.set(uniqueKey, u);
             } else {
@@ -3338,20 +3353,19 @@ genUnit1(tier, forcedType = null) {
           return Array.from(userMap.values()).sort((a, b) => (Number(b[scoreKey]) || 0) - (Number(a[scoreKey]) || 0));
         };
 
-if (tab === "class") {
-          // 백엔드에서 전교생 전체를 대상으로 중복 제거 후 합산한 학급 대항전 데이터를 그대로 사용
+        if (tab === "class") {
           const classList = [...(this.cachedRankings.classBattle || [])].sort(
             (a, b) => (Number(b.totalCorrect) || 0) - (Number(a.totalCorrect) || 0)
           );
 
           if (classList.length === 0) {
-
-            container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>아직 학급 대항전에 등록된 학급이 없습니다.</p></div>`;
+            container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>아직 학급 대항전 기준(정답률 60%↑)을 충족한 학급이 없습니다.</p></div>`;
             return;
           }
 
           classList.forEach((c, idx) => {
             const medal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `${idx + 1}위`));
+            const avgAccText = c.avgAccuracy ? ` · 평균 정답률 ${c.avgAccuracy}%` : "";
             const card = document.createElement("div");
             card.className = `p-3 rounded-xl border flex items-center justify-between ${idx === 0 ? 'bg-amber-950/30 border-amber-500/60' : 'bg-slate-950 border-slate-800'}`;
             card.innerHTML = `
@@ -3359,12 +3373,12 @@ if (tab === "class") {
                 <span class="w-8 font-black text-center text-sm ${idx < 3 ? 'text-amber-400 font-mono' : 'text-slate-500'}">${medal}</span>
                 <div>
                   <div class="font-bold text-sm text-slate-100">${c.classNo}</div>
-                  <div class="text-[11px] text-slate-400">참여 인원: ${c.participants}명</div>
+                  <div class="text-[11px] text-slate-400">인증 마도사: ${c.participants}명${avgAccText}</div>
                 </div>
               </div>
               <div class="text-right">
                 <div class="font-black text-amber-300 font-mono text-sm">${c.totalCorrect} 정답</div>
-                <div class="text-[10px] text-slate-400">학급 누적 합산</div>
+                <div class="text-[10px] text-emerald-400">정답률 60%↑ 합산</div>
               </div>
             `;
             container.appendChild(card);
@@ -3378,15 +3392,29 @@ if (tab === "class") {
           gold: "gold"
         };
         const rawList = this.cachedRankings.rankings[tab] || [];
-        const list = deduplicateUsers(rawList, scoreKeyMap[tab]);
+        const list = filterAndDeduplicateUsers(rawList, scoreKeyMap[tab]);
 
         if (list.length === 0) {
-          container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>해당 부문에 기록된 학생이 없습니다.</p></div>`;
+          container.innerHTML = `
+            <div class="py-12 text-center text-slate-400 space-y-1">
+              <p class="font-bold text-slate-300">아직 랭킹 등재 기준을 충족한 학생이 없습니다.</p>
+              <p class="text-[11px]">(최소 20문제 이상 풀이 &amp; 정답률 60% 이상 달성 시 자동 등록)</p>
+            </div>`;
           return;
         }
 
         list.forEach((u, idx) => {
           const medal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `${idx + 1}위`));
+          const acc = u._accuracy;
+
+          // 정답률 구간별 명예 뱃지 디자인
+          let accBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-sky-950 text-sky-300 border border-sky-500/40">정답률 ${acc}%</span>`;
+          if (acc >= 90) {
+            accBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-950 text-amber-300 border border-amber-400/60">👑 무결점 ${acc}%</span>`;
+          } else if (acc >= 75) {
+            accBadge = `<span class="text-[10px] px-1.5 py-0.2 rounded font-mono font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/50">🛡️ 정교함 ${acc}%</span>`;
+          }
+
           let scoreText = "";
           let scoreLabel = "";
 
@@ -3407,11 +3435,12 @@ if (tab === "class") {
             <div class="flex items-center gap-3">
               <span class="w-8 font-black text-center text-sm ${idx < 3 ? 'text-amber-400 font-mono' : 'text-slate-500'}">${medal}</span>
               <div>
-                <div class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 flex-wrap">
                   <span class="font-bold text-slate-100">${u.name}</span>
                   ${u.classNo ? `<span class="text-[10px] bg-indigo-950 border border-indigo-500/40 text-indigo-300 px-1.5 py-0.2 rounded font-bold">${u.classNo}</span>` : ''}
+                  ${accBadge}
                 </div>
-                <div class="text-[10px] text-amber-300/80 font-mono">${u.title || '견습 수학술사'}</div>
+                <div class="text-[10px] text-amber-300/80 font-mono mt-0.5">${u.title || '견습 수학술사'}</div>
               </div>
             </div>
             <div class="text-right">
