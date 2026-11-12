@@ -1214,47 +1214,98 @@
       pantheon: { id: "pantheon", name: "아르카니스 대마도황", cost: 2500, title: "아르카니스 대마도황", desc: "캐릭터 발밑에 에메랄드 기하 마법진이 상시 전개됩니다." }
     };
 
-    const MonsterSvgRenderer = {
+const MonsterSvgRenderer = {
       render(unitId, tier) {
         if (unitId === 1) {
           if (tier === 1) {
             return `<svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #10b981)"><circle cx="50" cy="55" r="26" fill="#064e3b" stroke="#34d399" stroke-width="3"/><path d="M42 32 C48 18 52 18 58 32 Z" fill="#10b981"/><circle cx="42" cy="52" r="3.5" fill="#a7f3d0"/><circle cx="58" cy="52" r="3.5" fill="#a7f3d0"/><path d="M46 63 Q50 67 54 63" stroke="#a7f3d0" stroke-width="2" fill="none" stroke-linecap="round"/><text x="50" y="80" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="bold">√</text></svg>`;
           } else if (tier === 2) {
             return `<svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #059669)"><path d="M25 85 Q40 30 60 25 Q80 30 95 85 Q60 105 25 85 Z" fill="#022c22" stroke="#10b981" stroke-width="3"/><ellipse cx="45" cy="55" rx="5" ry="8" fill="#ef4444"/><ellipse cx="75" cy="55" rx="5" ry="8" fill="#ef4444"/><text x="60" y="48" text-anchor="middle" fill="#34d399" font-size="16" font-weight="900" font-family="monospace">√x</text></svg>`;
-          } else {
+          } else if (tier === 3) {
             return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 18px #047857)"><circle cx="70" cy="70" r="55" fill="#022c22" stroke="#059669" stroke-width="4"/><circle cx="55" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/><circle cx="85" cy="65" r="7" fill="#f59e0b" filter="drop-shadow(0 0 6px #f59e0b)"/><text x="70" y="125" text-anchor="middle" fill="#6ee7b7" font-size="16" font-weight="900">RADIX TITAN</text></svg>`;
+          } else {
+            // Tier 4 초월 보스: 근원의 창세신 아카샤 (황금 세계수 왕관 + 삼중 마법진 + 6개의 에메랄드 안광)
+            return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 22px #fbbf24)">
+              <circle cx="70" cy="70" r="62" fill="none" stroke="#f59e0b" stroke-width="2" stroke-dasharray="12,5,3,5"/>
+              <circle cx="70" cy="70" r="52" fill="#021f18" stroke="#10b981" stroke-width="4"/>
+              <path d="M22 45 L10 18 L34 32 M118 45 L130 18 L106 32" fill="#065f46" stroke="#34d399" stroke-width="2.5"/>
+              <polygon points="52,22 60,8 70,18 80,8 88,22" fill="#fbbf24" stroke="#fef08a" stroke-width="1.5"/>
+              <path d="M35 88 L50 88 L60 105 L76 42 L106 42" fill="none" stroke="#34d399" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="53" cy="64" r="6" fill="#f43f5e"/><circle cx="87" cy="64" r="6" fill="#f43f5e"/><circle cx="70" cy="52" r="4.5" fill="#fbbf24"/>
+              <text x="70" y="131" text-anchor="middle" fill="#fde047" font-size="13" font-weight="900" letter-spacing="1">✦ AKASHA ✦</text>
+            </svg>`;
           }
         } else if (unitId === 2) {
           if (tier === 1) {
             return `<svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #8b5cf6)"><rect x="25" y="25" width="50" height="50" rx="10" fill="#2e1065" stroke="#a78bfa" stroke-width="3"/><line x1="38" y1="46" x2="62" y2="46" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/><line x1="38" y1="56" x2="62" y2="56" stroke="#fbbf24" stroke-width="4" stroke-linecap="round"/></svg>`;
           } else if (tier === 2) {
             return `<svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #7c3aed)"><rect x="30" y="25" width="60" height="70" rx="8" fill="#1e1b4b" stroke="#8b5cf6" stroke-width="3"/><circle cx="60" cy="60" r="22" fill="#0f172a" stroke="#c084fc" stroke-width="2" stroke-dasharray="6,4"/><text x="60" y="66" text-anchor="middle" fill="#c084fc" font-size="14" font-weight="900">x²</text></svg>`;
-          } else {
+          } else if (tier === 3) {
             return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 18px #6d28d9)"><polygon points="70,10 120,40 120,100 70,130 20,100 20,40" fill="#1e1b4b" stroke="#a855f7" stroke-width="4"/><circle cx="52" cy="55" r="8" fill="#38bdf8"/><circle cx="88" cy="55" r="8" fill="#f43f5e"/><text x="70" y="42" text-anchor="middle" fill="#e9d5ff" font-size="16" font-weight="bold">α · β</text></svg>`;
+          } else {
+            // Tier 4 초월 보스: 절대등식의 군주 크로노스 (이중 다비드 별진 + 시공 시계 코어 + 황금 등호)
+            return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 22px #c084fc)">
+              <polygon points="70,6 126,102 14,102" fill="none" stroke="#f59e0b" stroke-width="2.5"/>
+              <polygon points="70,134 126,38 14,38" fill="#170e36" stroke="#c084fc" stroke-width="3.5"/>
+              <circle cx="70" cy="70" r="26" fill="#090518" stroke="#fbbf24" stroke-width="3"/>
+              <line x1="56" y1="64" x2="84" y2="64" stroke="#fde047" stroke-width="5" stroke-linecap="round"/>
+              <line x1="56" y1="76" x2="84" y2="76" stroke="#fde047" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="44" cy="54" r="5" fill="#38bdf8"/><circle cx="96" cy="54" r="5" fill="#f43f5e"/>
+              <text x="70" y="132" text-anchor="middle" fill="#fde047" font-size="13" font-weight="900" letter-spacing="1">✦ KRONOS ✦</text>
+            </svg>`;
           }
         } else if (unitId === 3) {
           if (tier === 1) {
             return `<svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #38bdf8)"><ellipse cx="50" cy="50" rx="30" ry="18" fill="#082f49" stroke="#38bdf8" stroke-width="3"/><path d="M25 45 Q50 75 75 45" fill="none" stroke="#7dd3fc" stroke-width="3" stroke-linecap="round"/></svg>`;
           } else if (tier === 2) {
             return `<svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #0284c7)"><path d="M20 75 Q60 15 100 75 Q60 115 20 75 Z" fill="#0c4a6e" stroke="#38bdf8" stroke-width="3"/><text x="60" y="98" text-anchor="middle" fill="#7dd3fc" font-size="14" font-weight="900">f(x)=ax²</text></svg>`;
-          } else {
+          } else if (tier === 3) {
             return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #0369a1)"><path d="M15 90 Q70 10 125 90 L110 125 L30 125 Z" fill="#082f49" stroke="#0ea5e9" stroke-width="4"/><circle cx="70" cy="30" r="10" fill="#f43f5e" filter="drop-shadow(0 0 10px #f43f5e)"/></svg>`;
+          } else {
+            // Tier 4 초월 보스: 궤적의 천상황제 아우렐 (쌍포물선 천공 날개 + 태양 코어)
+            return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 22px #38bdf8)">
+              <path d="M6 65 Q35 12 70 55 Q105 12 134 65 Q100 80 70 70 Q40 80 6 65 Z" fill="#0c4a6e" stroke="#7dd3fc" stroke-width="3"/>
+              <path d="M24 108 Q70 14 116 108 L96 120 L44 120 Z" fill="#041e30" stroke="#fbbf24" stroke-width="3.5"/>
+              <circle cx="70" cy="34" r="11" fill="#fbbf24" stroke="#f43f5e" stroke-width="3"/>
+              <circle cx="56" cy="76" r="5" fill="#38bdf8"/><circle cx="84" cy="76" r="5" fill="#38bdf8"/>
+              <text x="70" y="133" text-anchor="middle" fill="#fde047" font-size="13" font-weight="900" letter-spacing="1">✦ AUREL ✦</text>
+            </svg>`;
           }
         } else if (unitId === 4) {
           if (tier === 1) {
             return `<svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f59e0b)"><polygon points="25,75 75,75 75,25" fill="#451a03" stroke="#fbbf24" stroke-width="3"/><rect x="63" y="63" width="12" height="12" fill="none" stroke="#fbbf24" stroke-width="2"/></svg>`;
           } else if (tier === 2) {
             return `<svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #d97706)"><polygon points="20,95 100,95 100,20" fill="#292524" stroke="#f59e0b" stroke-width="4"/><text x="50" y="85" fill="#fef08a" font-size="14" font-weight="900">tan θ</text></svg>`;
-          } else {
+          } else if (tier === 3) {
             return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #b45309)"><polygon points="15,115 125,115 125,15" fill="#1c1917" stroke="#f59e0b" stroke-width="5"/><circle cx="95" cy="55" r="9" fill="#ef4444"/><text x="70" y="55" fill="#fbbf24" font-size="16" font-weight="900">ARCHDEMON</text></svg>`;
+          } else {
+            // Tier 4 초월 보스: 기하학의 패왕 피타고라스 (전능의 황금 피라미드 + 진리의 눈 + 후광)
+            return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 22px #f59e0b)">
+              <circle cx="70" cy="68" r="56" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="6,6"/>
+              <polygon points="70,12 128,114 12,114" fill="#1c1206" stroke="#fbbf24" stroke-width="4"/>
+              <polygon points="70,34 106,102 34,102" fill="#451a03" stroke="#f97316" stroke-width="2"/>
+              <ellipse cx="70" cy="72" rx="18" ry="10" fill="#fef08a" stroke="#ef4444" stroke-width="2"/>
+              <circle cx="70" cy="72" r="5.5" fill="#dc2626"/>
+              <text x="70" y="132" text-anchor="middle" fill="#fde047" font-size="12" font-weight="900" letter-spacing="1">✦ PYTHAGORAS ✦</text>
+            </svg>`;
           }
         } else {
           if (tier === 1) {
             return `<svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 8px #f43f5e)"><circle cx="50" cy="50" r="32" fill="#4c0519" stroke="#fb7185" stroke-width="3"/><circle cx="50" cy="50" r="16" fill="none" stroke="#fda4af" stroke-width="2" stroke-dasharray="5,3"/></svg>`;
           } else if (tier === 2) {
             return `<svg viewBox="0 0 120 120" class="w-full h-full filter drop-shadow(0 0 12px #e11d48)"><circle cx="60" cy="60" r="44" fill="#200109" stroke="#f43f5e" stroke-width="4"/><text x="60" y="102" text-anchor="middle" fill="#fda4af" font-size="14" font-weight="900">2θ</text></svg>`;
-          } else {
+          } else if (tier === 3) {
             return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 20px #be123c)"><circle cx="70" cy="70" r="58" fill="#1a0006" stroke="#f43f5e" stroke-width="4" stroke-dasharray="10,5"/><text x="70" y="32" text-anchor="middle" fill="#fecdd3" font-size="15" font-weight="900">OUROBOROS</text></svg>`;
+          } else {
+            // Tier 4 초월 보스: 영원회귀의 신 우로보로스 (심연 일식 링 + 황금 왕관 + 붉은 심연의 눈)
+            return `<svg viewBox="0 0 140 140" class="w-full h-full filter drop-shadow(0 0 24px #f43f5e)">
+              <circle cx="70" cy="70" r="60" fill="#120005" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="14,4,4,4"/>
+              <circle cx="70" cy="70" r="44" fill="#2b030e" stroke="#f43f5e" stroke-width="4"/>
+              <polygon points="50,24 60,10 70,22 80,10 90,24" fill="#fbbf24"/>
+              <ellipse cx="70" cy="70" rx="24" ry="13" fill="#ffe4e6" stroke="#f43f5e" stroke-width="2.5"/>
+              <ellipse cx="70" cy="70" rx="6" ry="12" fill="#881337"/>
+              <text x="70" y="134" text-anchor="middle" fill="#fde047" font-size="12" font-weight="900" letter-spacing="1">✦ INFINITE GOD ✦</text>
+            </svg>`;
           }
         }
       },
