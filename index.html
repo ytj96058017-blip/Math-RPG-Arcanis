@@ -523,6 +523,9 @@
 <button id="armory-tab-btn-skills" onclick="App.switchArmoryTab('skills')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-bolt mr-1 text-amber-400"></i>필살기 연마
         </button>
+        <button id="armory-tab-btn-awakening" onclick="App.switchArmoryTab('awakening')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-amber-300 border border-amber-500/40 hover:bg-amber-950/50">
+          <i class="fa-solid fa-fire-flame-curved mr-1 text-amber-400"></i>초월 각성
+        </button>
         <button id="armory-tab-btn-auras" onclick="App.switchArmoryTab('auras')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-sun mr-1"></i>전설 오라 & 칭호
         </button>
@@ -532,6 +535,7 @@
         <div id="armory-content-weapons" class="space-y-2.5"></div>
         <div id="armory-content-suits" class="space-y-2.5 hidden"></div>
         <div id="armory-content-skills" class="space-y-2.5 hidden"></div>
+        <div id="armory-content-awakening" class="space-y-2.5 hidden"></div>
         <div id="armory-content-pets" class="space-y-2.5 hidden"></div>
         <div id="armory-content-auras" class="space-y-2.5 hidden"></div>
       </div>
@@ -628,6 +632,47 @@
           <button id="btn-upgrade-bag" onclick="App.upgradeBagCapacity()" class="w-full sm:w-auto bg-gradient-to-r from-cyan-600 to-sky-600 hover:brightness-110 text-slate-950 font-black px-4 py-2 rounded-xl transition shadow">
             가방 확장 (400 G)
           </button>
+        </div>
+
+        <!-- 던전 원정 전투 축복 버프 (1회성 도핑) -->
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-purple-500/40 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-purple-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-fire"></i> 원정 전용 전투 축복 (다음 던전 1회 전체 적용)
+            </span>
+            <span class="text-[10px] text-slate-400 font-mono">입장 시 자동 발동</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div class="bg-slate-900 border border-rose-900/60 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-rose-300 mb-0.5">🔥 광전사의 영약</div>
+                <p class="text-[10px] text-slate-400 mb-2">다음 원정 동안 최종 공격력 +25% 증폭</p>
+              </div>
+              <button id="btn-buff-atkBoost" onclick="App.buyBattleBuff('atkBoost')" class="w-full bg-rose-950 hover:bg-rose-900 border border-rose-500/50 text-rose-200 py-1.5 rounded-lg font-bold transition">
+                구매 (1,200 G)
+              </button>
+            </div>
+
+            <div class="bg-slate-900 border border-sky-900/60 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-sky-300 mb-0.5">🛡️ 수호신의 가호</div>
+                <p class="text-[10px] text-slate-400 mb-2">다음 원정 동안 받는 피해 -25% 경감</p>
+              </div>
+              <button id="btn-buff-defBoost" onclick="App.buyBattleBuff('defBoost')" class="w-full bg-sky-950 hover:bg-sky-900 border border-sky-500/50 text-sky-200 py-1.5 rounded-lg font-bold transition">
+                구매 (1,200 G)
+              </button>
+            </div>
+
+            <div class="bg-slate-900 border border-amber-900/60 p-2.5 rounded-xl flex flex-col justify-between">
+              <div>
+                <div class="font-bold text-amber-300 mb-0.5">⚡ 마력 폭주 스크롤</div>
+                <p class="text-[10px] text-slate-400 mb-2">전투 시작 즉시 마력 게이지 100% 충전!</p>
+              </div>
+              <button id="btn-buff-fullGauge" onclick="App.buyBattleBuff('fullGauge')" class="w-full bg-amber-950 hover:bg-amber-900 border border-amber-500/50 text-amber-200 py-1.5 rounded-lg font-bold transition">
+                구매 (1,800 G)
+              </button>
+            </div>
+          </div>
         </div>
 
         <!-- 특산 재료 골드 구매 -->
@@ -831,7 +876,7 @@
 
       <div class="space-y-4 text-xs">
         <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
-          <div class="font-bold text-indigo-300 mb-2">단원 특산물 3:1 원소 변환</div>
+          <div class="font-bold text-indigo-300 mb-2">1. 단원 특산물 3:1 원소 변환</div>
           <p class="text-[11px] text-slate-400 mb-3">남는 단원의 재료 3개를 다른 단원의 재료 1개로 교환합니다.</p>
           <div class="flex gap-2 items-center mb-3">
             <select id="alchemy-give-mat" class="flex-1 bg-slate-900 border border-slate-700 rounded-lg p-2 text-slate-200"></select>
@@ -841,6 +886,27 @@
           <button onclick="App.tradeMaterials()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition">
             재료 연금 변환 실행
           </button>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-xl border border-amber-500/40 space-y-2.5">
+          <div class="font-bold text-amber-300 flex items-center gap-1.5">
+            <i class="fa-solid fa-sparkles"></i> 2. 잉여 특산물 황금 연성술 (모든 재료 1개씩 소모)
+          </div>
+          <p class="text-[11px] text-slate-400">5대 단원 특산물을 각 1개씩(총 5개) 연성하여 고급 보상으로 변환합니다.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+            <button onclick="App.transmuteAllMaterials('exp')" class="bg-sky-950 hover:bg-sky-900 border border-sky-500/50 text-sky-200 p-2.5 rounded-xl font-bold transition flex flex-col items-center gap-1">
+              <span>📘 지혜의 비약</span>
+              <span class="text-[10px] text-sky-400 font-mono">+450 EXP 획득</span>
+            </button>
+            <button onclick="App.transmuteAllMaterials('potion')" class="bg-rose-950 hover:bg-rose-900 border border-rose-500/50 text-rose-200 p-2.5 rounded-xl font-bold transition flex flex-col items-center gap-1">
+              <span>🧪 기원의 엘릭서</span>
+              <span class="text-[10px] text-rose-400 font-mono">최고급 물약 +1개</span>
+            </button>
+            <button onclick="App.transmuteAllMaterials('gold')" class="bg-amber-950 hover:bg-amber-900 border border-amber-500/50 text-amber-200 p-2.5 rounded-xl font-bold transition flex flex-col items-center gap-1">
+              <span>💰 황금 주괴 연성</span>
+              <span class="text-[10px] text-amber-400 font-mono">+350 G 환전</span>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -956,6 +1022,59 @@
       <button id="btn-solution-action" onclick="App.closeSolutionModalAndDefense()" class="w-full bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-1.5">
         <i class="fa-solid fa-shield-halved"></i>
         <span>풀이를 이해했습니다! (몬스터 반격 방어)</span>
+      </button>
+    </div>
+  </div>
+<!-- [모달: 대규모 업데이트 패치노트 (최초 1회 자동 노출)] -->
+  <div id="modal-patch-note" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-amber-400/80 max-w-lg w-full rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-rose-500 text-slate-950 flex items-center justify-center text-lg font-black shadow">
+            <i class="fa-solid fa-scroll"></i>
+          </div>
+          <div>
+            <span class="text-[10px] px-2 py-0.5 rounded-full bg-rose-950 border border-rose-500/50 text-rose-300 font-mono font-bold">MAJOR UPDATE v2.0</span>
+            <h3 class="text-base sm:text-lg font-black text-amber-300 mt-0.5">아르카니스 초월 대규모 패치노트!</h3>
+          </div>
+        </div>
+        <button onclick="App.closePatchNoteModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto space-y-2.5 pr-1 text-xs text-slate-200 flex-1">
+        <div class="bg-slate-950 border border-rose-500/40 rounded-xl p-3">
+          <div class="font-black text-rose-300 mb-1">🔥 1. 최고 레벨 100 확장 &amp; Tier 4 [심연의 신역] 개방</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            최대 레벨이 <strong>Lv.100</strong>으로 확장되었습니다! Tier 3 보스 성소를 정복하면 중3 심화 주관식과 <strong>[🛡️ 마력 보호막]</strong> 기믹을 가진 5대 초월 보스에 도전할 수 있습니다.
+          </p>
+        </div>
+
+        <div class="bg-slate-950 border border-purple-500/40 rounded-xl p-3">
+          <div class="font-black text-purple-300 mb-1">⚡ 2. 필살기 스킬 &amp; 장비 개별 제련 (+10강) · 초월 각성</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            전투 중 정답을 맞혀 마력 게이지 100% 충전 시 <strong>[아르카나 초월 파동]</strong>을 발동해 보스 보호막을 파괴하세요! 성소에서 무기·슈트 개별 제련(+10강)과 무한 <strong>[초월 각성]</strong>도 가능합니다.
+          </p>
+        </div>
+
+        <div class="bg-slate-950 border border-emerald-500/40 rounded-xl p-3">
+          <div class="font-black text-emerald-300 mb-1">🧪 3. 만물 상점 [원정 축복] &amp; 연금술 [황금 연성술]</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            상점에서 던전 1회용 <strong>전투 축복 버프</strong>(공격력 +25%, 피해 -25%, 시작 게이지 100%)를 구매하고, 연금술 공방에서 남는 재료를 경험치·엘릭서·골드로 변환하세요!
+          </p>
+        </div>
+
+        <div class="bg-slate-950 border border-amber-500/40 rounded-xl p-3">
+          <div class="font-black text-amber-300 mb-1">🏰 4. 명예의 전당 [학급 마탑 골드 기부] &amp; 공정 랭킹</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            명예의 전당 <strong>학급 대항전</strong> 탭에서 남는 골드를 우리 반 마탑에 기부해 반 순위를 역전시켜 보세요! (랭킹 등재 기준: 20문제 이상 풀이 &amp; 정답률 60% 이상)
+          </p>
+        </div>
+      </div>
+
+      <button onclick="App.closePatchNoteModal()" class="w-full mt-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 hover:brightness-110 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition shadow-lg">
+        확인했습니다! 새로운 모험 시작하기 🚀
       </button>
     </div>
   </div>
@@ -2342,6 +2461,8 @@ genUnit1(tier, forcedType = null) {
         weaponUpgrades: { staff: 0, greatsword: 0, rapier: 0 },
         suitUpgrades: { robe: 0, titan: 0, mirage: 0 },
         skillLevel: 1,
+        awakeningLevel: 0,
+        battleBuffs: { atkBoost: false, defBoost: false, fullGauge: false },
         activePet: null,
         activeAura: null,
         ownedPets: [],
@@ -2361,7 +2482,7 @@ genUnit1(tier, forcedType = null) {
       activeGrimoireItem: null,
       cachedRankings: null,
 
-      init() {
+     init() {
         this.loadFromLocalStorage();
         if (!Array.isArray(this.state.grimoire)) this.state.grimoire = [];
         this.sanitizeArmoryState();
@@ -2369,6 +2490,24 @@ genUnit1(tier, forcedType = null) {
         this.renderLobbyDungeons();
         this.updateHeaderUI();
         this.setupAlchemySelects();
+        this.checkAndShowPatchNote();
+      },
+
+      checkAndShowPatchNote() {
+        try {
+          const seen = localStorage.getItem("ARCANIS_PATCH_SEEN_V2");
+          if (!seen) {
+            const modal = document.getElementById("modal-patch-note");
+            if (modal) modal.classList.remove("hidden");
+          }
+        } catch (e) {}
+      },
+
+      closePatchNoteModal() {
+        try {
+          localStorage.setItem("ARCANIS_PATCH_SEEN_V2", "1");
+        } catch (e) {}
+        this.closeModal("modal-patch-note");
       },
 
 
@@ -2387,8 +2526,14 @@ sanitizeArmoryState() {
         if (!this.state.suitUpgrades || typeof this.state.suitUpgrades !== "object") {
           this.state.suitUpgrades = { robe: 0, titan: 0, mirage: 0 };
         }
-        if (!this.state.skillLevel || this.state.skillLevel < 1) {
+       if (!this.state.skillLevel || this.state.skillLevel < 1) {
           this.state.skillLevel = 1;
+        }
+        if (!this.state.awakeningLevel || this.state.awakeningLevel < 0) {
+          this.state.awakeningLevel = 0;
+        }
+        if (!this.state.battleBuffs || typeof this.state.battleBuffs !== "object") {
+          this.state.battleBuffs = { atkBoost: false, defBoost: false, fullGauge: false };
         }
         if (!this.state.progress) this.state.progress = { tier1: {}, tier2: {}, tier3: {}, tier4: {} };
         if (!this.state.progress.tier4) this.state.progress.tier4 = {};
@@ -2407,14 +2552,15 @@ sanitizeArmoryState() {
         const weaponDef = WEAPON_CATALOG[this.state.equippedWeapon] || WEAPON_CATALOG.staff;
         const suitDef = SUIT_CATALOG[this.state.equippedSuit] || SUIT_CATALOG.robe;
 
-        // 장착 중인 특화 무기/슈트의 개별 강화 수치 (+0 ~ +10)
+        // 장착 중인 특화 무기/슈트의 개별 강화 수치 (+0 ~ +10) & 초월 각성 단계
         const wSpecLv = this.state.weaponUpgrades[this.state.equippedWeapon] || 0;
         const sSpecLv = this.state.suitUpgrades[this.state.equippedSuit] || 0;
+        const awkLv = this.state.awakeningLevel || 0;
 
-        // 100레벨 기준 균형 스펙 계산식 (대장간 기초강화 + 레벨성장 + 특화장비 개별강화)
-        const baseAtk = 22 + (lv - 1) * 2.5 + this.state.weapon * 12 + wSpecLv * 18;
-        const baseDef = 5 + (lv - 1) * 1.2 + this.state.armor * 6 + sSpecLv * 6;
-        const baseMaxHp = 100 + (lv - 1) * 15 + this.state.armor * 45 + sSpecLv * 75;
+        // 100레벨 기준 균형 스펙 계산식 (대장간 + 레벨성장 + 특화제련 + 초월각성)
+        const baseAtk = 22 + (lv - 1) * 2.5 + this.state.weapon * 12 + wSpecLv * 18 + awkLv * 15;
+        const baseDef = 5 + (lv - 1) * 1.2 + this.state.armor * 6 + sSpecLv * 6 + awkLv * 4;
+        const baseMaxHp = 100 + (lv - 1) * 15 + this.state.armor * 45 + sSpecLv * 75 + awkLv * 60;
 
         // 특화 무기 개별 강화 1강당 배율 +4% 추가 증폭
         const finalAtkMult = weaponDef.atkMultiplier + (wSpecLv * 0.04);
@@ -2564,6 +2710,16 @@ startBattle(unitId, tier) {
         const dungeon = DUNGEON_DATA.find(d => d.id === unitId);
         const monsterList = dungeon.monsters[`t${tier}`];
 
+        this.sanitizeArmoryState();
+        const activeBuffs = {
+          atkBoost: Boolean(this.state.battleBuffs.atkBoost),
+          defBoost: Boolean(this.state.battleBuffs.defBoost),
+          fullGauge: Boolean(this.state.battleBuffs.fullGauge)
+        };
+        // 입장 시 1회성 버프 소모 처리
+        this.state.battleBuffs = { atkBoost: false, defBoost: false, fullGauge: false };
+        this.saveToLocalStorage();
+
         this.wavePotionCount = 0;
         this.currentBattle = {
           dungeon,
@@ -2574,11 +2730,20 @@ startBattle(unitId, tier) {
           accumulatedRewards: { exp: 0, gold: 0, materials: 0, potions: 0 },
           monster: null,
           currentProblem: null,
-          skillGauge: 0,
+          skillGauge: activeBuffs.fullGauge ? 100 : 0,
           combo: 0,
-          turnCount: 0
+          turnCount: 0,
+          buffs: activeBuffs
         };
         this.isTurnBusy = false;
+
+        const activeList = [];
+        if (activeBuffs.atkBoost) activeList.push("🔥공격력+25%");
+        if (activeBuffs.defBoost) activeList.push("🛡️피해-25%");
+        if (activeBuffs.fullGauge) activeList.push("⚡초기게이지100%");
+        if (activeList.length > 0) {
+          this.showToast(`✨ 원정 축복 발동: ${activeList.join(" · ")}`, "success");
+        }
 
         document.getElementById("view-lobby").classList.add("hidden");
         document.getElementById("view-battle").classList.remove("hidden");
@@ -2683,7 +2848,8 @@ startBattle(unitId, tier) {
             breakNotice = " 💥보호막 BREAK!";
           }
 
-          const ultDmg = Math.max(20, Math.round(this.state.atk * dmgMult));
+          const buffAtkMult = (b.buffs && b.buffs.atkBoost) ? 1.25 : 1.0;
+          const ultDmg = Math.max(20, Math.round(this.state.atk * dmgMult * buffAtkMult));
           b.monster.hp = Math.max(0, b.monster.hp - ultDmg);
           this.showDamagePopup("monster-damage-pos", `⚡초월파동! -${ultDmg}${breakNotice}`);
           this.updateBattleStageHpUI();
@@ -2849,7 +3015,8 @@ startBattle(unitId, tier) {
             mSprite.classList.remove("anim-idle");
             mSprite.classList.add("anim-hit-shake");
 
-            let dmg = Math.max(5, Math.round(this.state.atk * critMultiplier));
+           const buffAtkMult = (b.buffs && b.buffs.atkBoost) ? 1.25 : 1.0;
+            let dmg = Math.max(5, Math.round(this.state.atk * critMultiplier * buffAtkMult));
             let shieldTag = "";
             if (b.monster.hasShield) {
               dmg = Math.max(1, Math.round(dmg * 0.25)); // 보호막 활성 시 피해 75% 감소
@@ -3008,6 +3175,10 @@ recordWrongAnswer(battle) {
           }
 
           if (this.state.activePet === "bird") {
+            finalDmg = Math.max(1, Math.round(finalDmg * 0.75));
+          }
+
+          if (b.buffs && b.buffs.defBoost) {
             finalDmg = Math.max(1, Math.round(finalDmg * 0.75));
           }
 
@@ -3493,7 +3664,7 @@ updateArmoryPreview() {
 
       switchArmoryTab(tab) {
         this.currentArmoryTab = tab;
-        ["weapons", "suits", "skills", "pets", "auras"].forEach(t => {
+        ["weapons", "suits", "skills", "awakening", "pets", "auras"].forEach(t => {
           const btn = document.getElementById(`armory-tab-btn-${t}`);
           const content = document.getElementById(`armory-content-${t}`);
           if (btn && content) {
@@ -3501,7 +3672,9 @@ updateArmoryPreview() {
               btn.className = "px-3 py-1.5 rounded-lg font-bold bg-purple-600 text-white";
               content.classList.remove("hidden");
             } else {
-              btn.className = "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+              btn.className = t === "awakening"
+                ? "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-amber-300 border border-amber-500/40 hover:bg-amber-950/50"
+                : "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
               content.classList.add("hidden");
             }
           }
@@ -3510,8 +3683,102 @@ updateArmoryPreview() {
         if (tab === "weapons") this.renderArmoryWeapons();
         else if (tab === "suits") this.renderArmorySuits();
         else if (tab === "skills") this.renderArmorySkills();
+        else if (tab === "awakening") this.renderArmoryAwakening();
         else if (tab === "pets") this.renderArmoryPets();
         else if (tab === "auras") this.renderArmoryAuras();
+      },
+
+      getAwakeningCost(awkLv) {
+        // 초월 각성 무한 한계돌파 비용: 골드 + 5대 특산 재료 모두 소모
+        const reqGold = 2500 + awkLv * 800;
+        const reqMat = 10 + awkLv * 4;
+        return { reqGold, reqMat };
+      },
+
+      renderArmoryAwakening() {
+        const container = document.getElementById("armory-content-awakening");
+        if (!container) return;
+
+        const awkLv = this.state.awakeningLevel || 0;
+        const costInfo = this.getAwakeningCost(awkLv);
+
+        let matStatusHtml = DUNGEON_DATA.map(d => {
+          const have = this.state.materials[d.matKey] || 0;
+          const ok = have >= costInfo.reqMat;
+          return `<span class="px-2 py-0.5 rounded bg-slate-900 border ${ok ? 'border-slate-700 text-slate-300' : 'border-rose-500/50 text-rose-400'} font-mono text-[10px]">${d.matName} ${have}/${costInfo.reqMat}</span>`;
+        }).join(" ");
+
+        container.innerHTML = `
+          <div class="bg-gradient-to-br from-amber-950/50 via-slate-950 to-purple-950/40 border-2 border-amber-400/70 rounded-2xl p-4 space-y-3 shadow-xl">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-400/50 flex items-center justify-center text-amber-300 text-xl">
+                  <i class="fa-solid fa-fire-flame-curved"></i>
+                </div>
+                <div>
+                  <div class="font-black text-sm text-amber-300">아르카나 초월 각성 (무한 한계 돌파)</div>
+                  <div class="text-[11px] text-slate-400">잉여 골드와 5대 특산물을 바쳐 영구 기본 스탯을 끝없이 강화합니다.</div>
+                </div>
+              </div>
+              <span class="px-3 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black font-mono text-xs">각성 ${awkLv}단계</span>
+            </div>
+
+            <div class="bg-slate-950/90 border border-slate-800 rounded-xl p-3 space-y-1.5 text-xs">
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 영구 기본 공격력 (ATK)</span>
+                <span class="font-mono font-bold text-amber-300">+${awkLv * 15} <span class="text-emerald-400">➔ +${(awkLv + 1) * 15}</span></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 영구 기본 방어력 (DEF)</span>
+                <span class="font-mono font-bold text-sky-300">+${awkLv * 4} <span class="text-emerald-400">➔ +${(awkLv + 1) * 4}</span></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 영구 최대 체력 (Max HP)</span>
+                <span class="font-mono font-bold text-rose-400">+${awkLv * 60} <span class="text-emerald-400">➔ +${(awkLv + 1) * 60}</span></span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-400">• 명예의 전당 전투력(CP) 보너스</span>
+                <span class="font-mono font-bold text-purple-300">+${awkLv * 300} CP <span class="text-emerald-400">➔ +${(awkLv + 1) * 300} CP</span></span>
+              </div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+              <div class="text-[11px] text-slate-300 font-bold">초월 각성 ${awkLv + 1}단계 필요 재화: <span class="text-amber-300 font-mono">${costInfo.reqGold} G</span></div>
+              <div class="flex flex-wrap gap-1.5">${matStatusHtml}</div>
+              <button onclick="App.upgradeAwakening()" class="w-full mt-2 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs transition shadow-lg">
+                🔥 초월 각성 ${awkLv + 1}단계 돌파하기 (${costInfo.reqGold} G)
+              </button>
+            </div>
+          </div>
+        `;
+      },
+
+      upgradeAwakening() {
+        const awkLv = this.state.awakeningLevel || 0;
+        const { reqGold, reqMat } = this.getAwakeningCost(awkLv);
+
+        if (this.state.gold < reqGold) {
+          this.showToast(`골드가 부족합니다! (${reqGold} G 필요)`, "error");
+          return;
+        }
+        for (const d of DUNGEON_DATA) {
+          if ((this.state.materials[d.matKey] || 0) < reqMat) {
+            this.showToast(`${d.matName}이(가) 부족합니다! (각 ${reqMat}개 필요)`, "error");
+            return;
+          }
+        }
+
+        this.state.gold -= reqGold;
+        DUNGEON_DATA.forEach(d => { this.state.materials[d.matKey] -= reqMat; });
+        this.state.awakeningLevel = awkLv + 1;
+
+        this.calculateStats();
+        SoundManager.playVictory();
+        this.showToast(`🔥 [초월 각성 ${this.state.awakeningLevel}단계] 한계 돌파 성공!`, "success");
+        this.updateArmoryPreview();
+        this.renderArmoryAwakening();
+        this.updateHeaderUI();
+        this.triggerCloudSave(false);
       },
 
       getSpecialGearUpgradeCost(currentLv) {
@@ -4092,19 +4359,48 @@ updateArmoryPreview() {
           return Array.from(userMap.values()).sort((a, b) => (Number(b[scoreKey]) || 0) - (Number(a[scoreKey]) || 0));
         };
 
-        if (tab === "class") {
+       if (tab === "class") {
+          // 상단 학급 마탑 골드 기부 패널
+          const donateBox = document.createElement("div");
+          donateBox.className = "bg-gradient-to-r from-indigo-950/80 via-slate-950 to-amber-950/40 border border-amber-500/50 rounded-xl p-3 mb-2.5 flex flex-col sm:flex-row items-center justify-between gap-2.5";
+          const myClassLabel = this.state.classNo ? `우리 반(${this.state.classNo}) 마탑 건설` : "소속 반 미설정 (PIN 연동 필요)";
+          donateBox.innerHTML = `
+            <div>
+              <div class="font-bold text-xs text-amber-300 flex items-center gap-1.5">
+                <i class="fa-solid fa-chess-rook"></i> <span>${myClassLabel}</span>
+              </div>
+              <p class="text-[10px] text-slate-300 mt-0.5">잉여 골드를 기부하면 <strong class="text-emerald-300">100 G당 학급 점수 +1점</strong>이 즉시 합산됩니다!</p>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="App.donateClassGold(1000)" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-lg text-[11px] transition shadow">
+                1,000 G 기부 (+10점)
+              </button>
+              <button onclick="App.donateClassGold(5000)" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:brightness-110 text-slate-950 font-black px-3 py-1.5 rounded-lg text-[11px] transition shadow">
+                5,000 G 기부 (+50점)
+              </button>
+            </div>
+          `;
+          container.appendChild(donateBox);
+
           const classList = [...(this.cachedRankings.classBattle || [])].sort(
             (a, b) => (Number(b.totalCorrect) || 0) - (Number(a.totalCorrect) || 0)
           );
 
           if (classList.length === 0) {
-            container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>아직 학급 대항전 기준(정답률 60%↑)을 충족한 학급이 없습니다.</p></div>`;
+            const emptyDiv = document.createElement("div");
+            emptyDiv.className = "py-10 text-center text-slate-400";
+            emptyDiv.innerHTML = `<p>아직 학급 대항전 기준(정답률 60%↑)을 충족한 학급이 없습니다.</p>`;
+            container.appendChild(emptyDiv);
             return;
           }
 
           classList.forEach((c, idx) => {
             const medal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `${idx + 1}위`));
             const avgAccText = c.avgAccuracy ? ` · 평균 정답률 ${c.avgAccuracy}%` : "";
+            const donatedGold = Number(c.totalDonatedGold) || 0;
+            const bonusPts = Math.floor(donatedGold / 100);
+            const donateInfoText = donatedGold > 0 ? ` · 마탑기부 ${donatedGold.toLocaleString()}G (+${bonusPts}점)` : "";
+
             const card = document.createElement("div");
             card.className = `p-3 rounded-xl border flex items-center justify-between ${idx === 0 ? 'bg-amber-950/30 border-amber-500/60' : 'bg-slate-950 border-slate-800'}`;
             card.innerHTML = `
@@ -4112,12 +4408,12 @@ updateArmoryPreview() {
                 <span class="w-8 font-black text-center text-sm ${idx < 3 ? 'text-amber-400 font-mono' : 'text-slate-500'}">${medal}</span>
                 <div>
                   <div class="font-bold text-sm text-slate-100">${c.classNo}</div>
-                  <div class="text-[11px] text-slate-400">인증 마도사: ${c.participants}명${avgAccText}</div>
+                  <div class="text-[11px] text-slate-400">인증 마도사: ${c.participants}명${avgAccText}${donateInfoText}</div>
                 </div>
               </div>
               <div class="text-right">
-                <div class="font-black text-amber-300 font-mono text-sm">${c.totalCorrect} 정답</div>
-                <div class="text-[10px] text-emerald-400">정답률 60%↑ 합산</div>
+                <div class="font-black text-amber-300 font-mono text-sm">${c.totalCorrect} 점</div>
+                <div class="text-[10px] text-emerald-400">정답 + 마탑기부 합산</div>
               </div>
             `;
             container.appendChild(card);
@@ -4198,9 +4494,70 @@ updateArmoryPreview() {
         }
       },
 
+      async donateClassGold(amount) {
+        if (!this.state.pin || !this.state.nickname || !this.state.classNo) {
+          this.showToast("먼저 상단 클라우드 버튼에서 PIN과 소속 반을 연동하세요!", "error");
+          return;
+        }
+        if (this.state.gold < amount) {
+          this.showToast(`보유 골드가 부족합니다! (${amount.toLocaleString()} G 필요)`, "error");
+          return;
+        }
+
+        this.showToast(`${this.state.classNo} 마탑에 ${amount.toLocaleString()} G 기부 전송 중...`, "info");
+        try {
+          // 먼저 현재 상태를 시트에 동기화한 뒤 기부 처리
+          await this.triggerCloudSave(false);
+          const res = await fetch(this.backendUrl, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({
+              action: "donate_class",
+              token: "ARCANIS_MATH_SECURE_2026_TOKEN_KEY",
+              pin: this.state.pin,
+              nickname: this.state.nickname,
+              amount: amount
+            })
+          });
+          const result = await res.json();
+          if (result.status === "success") {
+            this.state.gold = result.newGold;
+            this.updateHeaderUI();
+            this.saveToLocalStorage();
+            SoundManager.playVictory();
+            this.showToast(`🏰 ${this.state.classNo} 마탑에 ${amount.toLocaleString()} G 기부 완료! (+${amount / 100}점)`, "success");
+            this.fetchRankings(true);
+          } else {
+            this.showToast(result.message || "기부 처리에 실패했습니다.", "error");
+          }
+        } catch (e) {
+          this.showToast("서버와 통신할 수 없습니다.", "error");
+        }
+      },
+
       openShopModal() {
+        this.sanitizeArmoryState();
         document.getElementById("shop-gold-display").textContent = this.state.gold;
         document.getElementById("shop-bag-status").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+
+        const buffMeta = {
+          atkBoost: { label: "구매 (1,200 G)", activeClass: "w-full bg-rose-950 hover:bg-rose-900 border border-rose-500/50 text-rose-200 py-1.5 rounded-lg font-bold transition" },
+          defBoost: { label: "구매 (1,200 G)", activeClass: "w-full bg-sky-950 hover:bg-sky-900 border border-sky-500/50 text-sky-200 py-1.5 rounded-lg font-bold transition" },
+          fullGauge: { label: "구매 (1,800 G)", activeClass: "w-full bg-amber-950 hover:bg-amber-900 border border-amber-500/50 text-amber-200 py-1.5 rounded-lg font-bold transition" }
+        };
+        Object.keys(buffMeta).forEach(k => {
+          const btn = document.getElementById(`btn-buff-${k}`);
+          if (!btn) return;
+          if (this.state.battleBuffs[k]) {
+            btn.disabled = true;
+            btn.textContent = "✅ 준비 완료 (다음 원정 적용)";
+            btn.className = "w-full bg-emerald-950 border border-emerald-500/60 text-emerald-300 py-1.5 rounded-lg font-bold cursor-not-allowed";
+          } else {
+            btn.disabled = false;
+            btn.textContent = buffMeta[k].label;
+            btn.className = buffMeta[k].activeClass;
+          }
+        });
 
         const cap = this.state.maxPotionCapacity || 5;
         const btnBag = document.getElementById("btn-upgrade-bag");
@@ -4305,6 +4662,30 @@ updateArmoryPreview() {
         this.state.materials[matKey] = (this.state.materials[matKey] || 0) + 1;
         SoundManager.playPotion();
         this.showToast(`[${matName}] 1개 조달 완료! (보유: ${this.state.materials[matKey]}개)`, "success");
+        this.updateHeaderUI();
+        this.openShopModal();
+        this.saveToLocalStorage();
+      },
+
+      buyBattleBuff(buffKey) {
+        this.sanitizeArmoryState();
+        if (this.state.battleBuffs[buffKey]) {
+          this.showToast("이미 다음 원정을 위해 활성화되어 있습니다!", "info");
+          return;
+        }
+        const prices = { atkBoost: 1200, defBoost: 1200, fullGauge: 1800 };
+        const names = { atkBoost: "광전사의 영약", defBoost: "수호신의 가호", fullGauge: "마력 폭주 스크롤" };
+        const cost = prices[buffKey];
+
+        if (this.state.gold < cost) {
+          this.showToast(`골드가 부족합니다! (${cost} G 필요)`, "error");
+          return;
+        }
+
+        this.state.gold -= cost;
+        this.state.battleBuffs[buffKey] = true;
+        SoundManager.playVictory();
+        this.showToast(`✨ [${names[buffKey]}] 구매 완료! 다음 던전 원정 시 자동 발동됩니다.`, "success");
         this.updateHeaderUI();
         this.openShopModal();
         this.saveToLocalStorage();
@@ -4501,6 +4882,40 @@ getRequiredExp(lv) {
         this.saveToLocalStorage();
       },
 
+      transmuteAllMaterials(rewardType) {
+        for (const d of DUNGEON_DATA) {
+          if ((this.state.materials[d.matKey] || 0) < 1) {
+            this.showToast(`모든 5대 특산물이 최소 1개씩 필요합니다! (${d.matName} 부족)`, "error");
+            return;
+          }
+        }
+        if (rewardType === "potion" && this.getTotalPotionCount() >= this.state.maxPotionCapacity) {
+          this.showToast(`물약 가방이 가득 찼습니다! (최대 ${this.state.maxPotionCapacity}개)`, "error");
+          return;
+        }
+
+        DUNGEON_DATA.forEach(d => { this.state.materials[d.matKey] -= 1; });
+
+        if (rewardType === "exp") {
+          this.state.exp += 450;
+          this.checkLevelUp();
+          SoundManager.playVictory();
+          this.showToast("📘 지혜의 비약 연성 성공! +450 EXP 획득!", "success");
+        } else if (rewardType === "potion") {
+          this.state.potions.major = (this.state.potions.major || 0) + 1;
+          SoundManager.playPotion();
+          this.showToast("🧪 기원의 엘릭서(+75% HP) 1개 연성 완료!", "success");
+        } else if (rewardType === "gold") {
+          this.state.gold += 350;
+          SoundManager.playPotion();
+          this.showToast("💰 황금 주괴 연성 성공! +350 G 획득!", "success");
+        }
+
+        this.updateHeaderUI();
+        this.saveToLocalStorage();
+        this.triggerCloudSave(false);
+      },
+
       openPinModal() {
         const inputEl = document.getElementById("input-pin-code");
         if (inputEl) {
@@ -4624,6 +5039,7 @@ getRequiredExp(lv) {
                 this.state.weaponUpgrades = u.inventory.weaponUpgrades || { staff: 0, greatsword: 0, rapier: 0 };
                 this.state.suitUpgrades = u.inventory.suitUpgrades || { robe: 0, titan: 0, mirage: 0 };
                 this.state.skillLevel = u.inventory.skillLevel || 1;
+                this.state.awakeningLevel = u.inventory.awakeningLevel || 0;
               }
 
 
@@ -4675,6 +5091,7 @@ getRequiredExp(lv) {
             this.closeModal("modal-pin");
             this.updateHeaderUI();
             this.renderLobbyDungeons();
+            this.checkAndShowPatchNote();
           } else {
             this.showToast("인증에 실패했습니다. 다시 시도해 주세요.", "error");
           }
@@ -4746,6 +5163,7 @@ getRequiredExp(lv) {
           weaponUpgrades: this.state.weaponUpgrades,
           suitUpgrades: this.state.suitUpgrades,
           skillLevel: this.state.skillLevel,
+          awakeningLevel: this.state.awakeningLevel,
           nickname: this.state.nickname,
           classNo: this.state.classNo
         };
