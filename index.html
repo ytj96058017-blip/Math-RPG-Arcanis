@@ -3650,7 +3650,7 @@ genUnit1(tier, forcedType = null) {
         document.getElementById("bs-armor-lv").textContent = `+${aLv} / 15`;
 
         document.getElementById("bs-weapon-spec").textContent = `기초 공격력: +${wLv * 10} → +${(wLv + 1) * 10} (+10)`;
-        document.getElementById("bs-armor-spec").textContent = `기초 방어/HP: DEF +${Math.round(wLv * 5)} / HP +${wLv * 35} → DEF +${Math.round((aLv + 1) * 5)} / HP +${(aLv + 1) * 35}`;
+       document.getElementById("bs-armor-spec").textContent = `기초 방어/HP: DEF +${Math.round(aLv * 5)} / HP +${aLv * 35} → DEF +${Math.round((aLv + 1) * 5)} / HP +${(aLv + 1) * 35}`;
 
         const weaponCost = this.getUpgradeCost(wLv);
         const reqGold = weaponCost.reqGold;
@@ -3826,7 +3826,8 @@ genUnit1(tier, forcedType = null) {
             return;
           }
 
-          if (result.status === "success") {
+         if (result.status === "success") {
+            const wasOtherUserLoggedIn = Boolean(this.state.pin && this.state.nickname !== nickVal);
             this.state.pin = pinInput;
             this.state.nickname = nickVal;
             this.state.classNo = classVal;
@@ -3861,10 +3862,45 @@ genUnit1(tier, forcedType = null) {
               this.calculateStats();
               this.showToast(`[${this.state.nickname}] 마도사님 접속 완료!`, "success");
             } else {
+              // 다른 학생이 로그인되어 있던 공용 기기라면 기존 데이터를 완전히 초기화
+              if (wasOtherUserLoggedIn) {
+                this.state = {
+                  pin: pinInput,
+                  level: 1,
+                  exp: 0,
+                  gold: 100,
+                  hp: 100,
+                  maxHp: 100,
+                  atk: 22,
+                  def: 5,
+                  weapon: 0,
+                  armor: 0,
+                  maxPotionCapacity: 5,
+                  potions: { minor: 2, normal: 1, major: 0 },
+                  materials: { mat1: 0, mat2: 0, mat3: 0, mat4: 0, mat5: 0 },
+                  progress: { tier1: {}, tier2: {}, tier3: {} },
+                  stats: { solved: 0, correct: 0 },
+                  grimoire: [],
+                  grimoireLockUntil: 0,
+                  equippedWeapon: "staff",
+                  equippedSuit: "robe",
+                  ownedWeapons: ["staff"],
+                  ownedSuits: ["robe"],
+                  activePet: null,
+                  activeAura: null,
+                  ownedPets: [],
+                  ownedAuras: [],
+                  nickname: nickVal,
+                  classNo: classVal
+                };
+              }
+              this.calculateStats();
               this.showToast(`새로운 닉네임 [${nickVal}] 계정이 생성되었습니다!`, "success");
             }
 
             this.saveToLocalStorage();
+
+
             await this.triggerCloudSave(true);
             this.closeModal("modal-pin");
             this.updateHeaderUI();
