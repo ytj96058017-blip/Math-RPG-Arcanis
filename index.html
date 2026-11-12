@@ -3338,28 +3338,14 @@ genUnit1(tier, forcedType = null) {
           return Array.from(userMap.values()).sort((a, b) => (Number(b[scoreKey]) || 0) - (Number(a[scoreKey]) || 0));
         };
 
-        if (tab === "class") {
-          // 정답수 목록에서 중복 학생을 먼저 제거한 뒤 학급별 합산 재계산
-          const uniqueCorrectUsers = deduplicateUsers(this.cachedRankings.rankings.correct || [], "correctCount");
-          let classList = [];
-
-          if (uniqueCorrectUsers.length > 0) {
-            const classMap = new Map();
-            uniqueCorrectUsers.forEach(u => {
-              if (!u.classNo) return;
-              if (!classMap.has(u.classNo)) {
-                classMap.set(u.classNo, { classNo: u.classNo, participants: 0, totalCorrect: 0 });
-              }
-              const cData = classMap.get(u.classNo);
-              cData.participants += 1;
-              cData.totalCorrect += (Number(u.correctCount) || 0);
-            });
-            classList = Array.from(classMap.values()).sort((a, b) => b.totalCorrect - a.totalCorrect);
-          } else {
-            classList = this.cachedRankings.classBattle || [];
-          }
+if (tab === "class") {
+          // 백엔드에서 전교생 전체를 대상으로 중복 제거 후 합산한 학급 대항전 데이터를 그대로 사용
+          const classList = [...(this.cachedRankings.classBattle || [])].sort(
+            (a, b) => (Number(b.totalCorrect) || 0) - (Number(a.totalCorrect) || 0)
+          );
 
           if (classList.length === 0) {
+
             container.innerHTML = `<div class="py-12 text-center text-slate-400"><p>아직 학급 대항전에 등록된 학급이 없습니다.</p></div>`;
             return;
           }
