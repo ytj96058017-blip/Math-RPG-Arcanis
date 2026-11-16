@@ -184,7 +184,17 @@
           </p>
         </div>
 
-        <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
+       <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
+          <!-- 심연의 무한의 탑 (Lv.50↑ 1~50층 수직 도전) -->
+          <button onclick="App.openTowerModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-rose-600 via-red-600 to-amber-500 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-rose-300/70">
+            <i class="fa-solid fa-chess-rook text-amber-200"></i> 무한의 탑
+            <span id="lobby-tower-badge" class="bg-slate-950 text-rose-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">Lv.50↑</span>
+          </button>
+          <!-- 대현자 승급전 (Lv.60/80/100 전단원 융합 시험) -->
+          <button onclick="App.openPromotionModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-amber-500 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-amber-300/70">
+            <i class="fa-solid fa-graduation-cap text-amber-200"></i> 대현자 승급전
+            <span id="lobby-promo-badge" class="bg-slate-950 text-amber-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">0/3차</span>
+          </button>
           <!-- 시간의 균열 (Lv.50↑ 일일 3회 90초 타임어택) -->
           <button onclick="App.openTimeRiftModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 via-sky-500 to-indigo-600 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-cyan-300/70">
             <i class="fa-solid fa-hourglass-half"></i> 시간의 균열
@@ -466,6 +476,91 @@
     </section>
 
   </main>
+
+ <!-- [모달: 심연의 무한의 탑 (1층 ~ 50층 돌파 챌린지)] -->
+  <div id="modal-tower" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-rose-500/80 max-w-xl w-full rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-rose-500/20 border border-rose-400/50 text-rose-300 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-chess-rook"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-amber-300">심연의 무한의 탑 (1층 ~ 50층)</h3>
+            <p class="text-[11px] text-slate-400">층이 오를수록 고난도 수호자가 등장합니다. 5층 단위 보스 격파 시 대량 보상 지급!</p>
+          </div>
+        </div>
+        <button onclick="App.closeModal('modal-tower')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3 text-xs">
+        <div class="flex items-center justify-between">
+          <span class="text-slate-400">현재 최고 돌파 기록</span>
+          <span id="tower-best-floor-text" class="font-mono font-black text-base text-amber-300">0층 / 50층</span>
+        </div>
+        <div class="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
+          <div id="tower-progress-bar" class="bg-gradient-to-r from-rose-500 via-orange-500 to-amber-400 h-full transition-all" style="width: 0%"></div>
+        </div>
+        <div id="tower-next-floor-info" class="bg-slate-900/90 border border-rose-500/30 rounded-xl p-3 space-y-1 text-slate-300"></div>
+      </div>
+
+      <div class="flex gap-2.5">
+        <button onclick="App.closeModal('modal-tower')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl text-xs font-bold">닫기</button>
+        <button id="btn-enter-tower" onclick="App.startTowerBattle()" class="flex-1 bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg">
+          다음 층 도전하기! ⚔️
+        </button>
+      </div>
+    </div>
+  </div>
+
+ <!-- [모달: 아르카나 대현자 승급전 안내 & 시험대] -->
+  <div id="modal-promotion" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-fuchsia-500/80 max-w-xl w-full rounded-2xl p-5 sm:p-6 shadow-2xl flex flex-col space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-fuchsia-500/20 border border-fuchsia-400/50 text-fuchsia-300 flex items-center justify-center text-lg">
+            <i class="fa-solid fa-graduation-cap"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-black text-amber-300">아르카나 대현자 승급 시험관</h3>
+            <p class="text-[11px] text-slate-400">중3 5대 전단원 융합 5문제를 단 1번의 실수도 없이 통과하여 영구 패시브를 각성하세요!</p>
+          </div>
+        </div>
+        <button onclick="App.closePromotionModal()" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- 1. 승급 단계 선택 화면 -->
+      <div id="promo-select-view" class="space-y-2.5 text-xs"></div>
+
+      <!-- 2. 실시간 승급 시험 진행 화면 -->
+      <div id="promo-exam-view" class="hidden space-y-3">
+        <div class="flex items-center justify-between bg-slate-950 border border-fuchsia-500/40 rounded-xl px-3.5 py-2 text-xs">
+          <span id="promo-exam-stage-label" class="font-bold text-fuchsia-300">1차 승급 시험</span>
+          <span id="promo-exam-progress" class="font-mono font-black text-amber-300">문제 1 / 5</span>
+        </div>
+
+        <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 text-center space-y-2">
+          <div id="promo-exam-topic" class="text-[11px] font-bold text-amber-300"></div>
+          <div id="promo-exam-question" class="text-sm sm:text-base font-bold text-slate-100 leading-relaxed min-h-[3.5rem] flex items-center justify-center"></div>
+        </div>
+
+        <!-- 객관식 버튼 (1차 시험) -->
+        <div id="promo-choices-area" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+
+        <!-- 주관식 입력창 (2·3차 시험) -->
+        <div id="promo-keypad-area" class="hidden flex items-center gap-2">
+          <input type="text" id="promo-keypad-input" inputmode="numeric" placeholder="정답 입력 후 Enter" class="flex-1 bg-slate-950 border-2 border-fuchsia-500/60 focus:border-amber-400 rounded-xl px-4 py-2.5 text-center text-base font-mono font-bold text-amber-300 focus:outline-none select-text">
+          <button onclick="App.submitPromotionKeypadAnswer()" class="bg-gradient-to-r from-fuchsia-500 to-amber-500 hover:brightness-110 text-slate-950 font-black px-5 py-2.5 rounded-xl text-xs shadow">
+            제출
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- [모달: 시간의 균열 입장 안내] -->
   <div id="modal-timerift-intro" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
@@ -851,6 +946,9 @@
         </button>
         <button id="rank-tab-btn-gold" onclick="App.switchRankTab('gold')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-coins mr-1"></i>황금의 부호 (골드)
+        </button>
+       <button id="rank-tab-btn-tower" onclick="App.switchRankTab('tower')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-chess-rook mr-1"></i>무한의 탑 (최고층)
         </button>
         <button id="rank-tab-btn-donor" onclick="App.switchRankTab('donor')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-hand-holding-heart mr-1"></i>명예의 후원자 (기부)
@@ -2599,9 +2697,11 @@ genUnit1(tier, forcedType = null) {
         activeAura: null,
         ownedPets: [],
         ownedAuras: [],
-        runeStats: {},
+       runeStats: {},
         claimedRuneUnits: [],
-        riftDaily: { date: "", count: 0 },
+       riftDaily: { date: "", count: 0 },
+        promotionRank: 0,
+        towerFloor: 0,
         nickname: "",
         classNo: ""
       },
@@ -2611,6 +2711,7 @@ genUnit1(tier, forcedType = null) {
       currentRift: null,
       riftTimerInterval: null,
       currentRuneUnitTab: 1,
+      activePromotionExam: null,
       isTurnBusy: false,
       keypadInput: "",
       wavePotionCount: 0,
@@ -2703,8 +2804,11 @@ sanitizeArmoryState() {
         // 특화 무기 개별 강화 1강당 배율 +4% 추가 증폭
         const finalAtkMult = weaponDef.atkMultiplier + (wSpecLv * 0.04);
 
-        this.state.atk = Math.round(baseAtk * finalAtkMult);
-        this.state.def = Math.round(baseDef + (suitDef.defBonus || 0));
+        // 3차 초월 대현자 승급 완료 시 최종 공격력/방어력 +15% 영구 증폭
+        const promoMult = (Number(this.state.promotionRank) || 0) >= 3 ? 1.15 : 1.0;
+
+        this.state.atk = Math.round(baseAtk * finalAtkMult * promoMult);
+        this.state.def = Math.round((baseDef + (suitDef.defBonus || 0)) * promoMult);
         this.state.maxHp = Math.round(baseMaxHp + (suitDef.hpBonus || 0));
 
         if (this.state.hp === undefined || this.state.hp === null) {
@@ -3061,7 +3165,9 @@ startBattle(unitId, tier) {
         this.isTurnBusy = false;
 
         const b = this.currentBattle;
-        b.currentProblem = MathEngine.generateProblem(b.dungeon.id, b.tier);
+        const probUnitId = b.isTower ? MathEngine.getRandomInt(1, 5) : b.dungeon.id;
+        b.currentProblem = MathEngine.generateProblem(probUnitId, b.tier);
+        b.currentProblemUnitId = probUnitId;
 
         document.getElementById("problem-topic-tag").textContent = b.currentProblem.topic;
         const probTextEl = document.getElementById("problem-question-text");
@@ -3119,9 +3225,9 @@ startBattle(unitId, tier) {
         const b = this.currentBattle;
         const isCorrect = String(selectedVal).trim() === String(b.currentProblem.answer).trim();
 
-        this.state.stats.solved++;
+       this.state.stats.solved++;
         if (isCorrect) this.state.stats.correct++;
-        this.recordRuneProgress(b.dungeon.id, b.currentProblem.type, isCorrect);
+        this.recordRuneProgress(b.currentProblemUnitId || b.dungeon.id, b.currentProblem.type, isCorrect);
 
         if (isCorrect) {
           // 정답 시 콤보 +1 및 마력 게이지 +25% 충전
@@ -3388,15 +3494,20 @@ recordWrongAnswer(battle) {
         const dungeon = b.dungeon;
         const currentMon = b.monster;
 
+       const promoRank = Number(this.state.promotionRank) || 0;
         let goldMultiplier = 1.0;
         if (this.state.activePet === "squirrel") goldMultiplier += 0.30;
         if (this.state.equippedWeapon === "rapier") goldMultiplier += 0.25;
+        if (promoRank >= 2) goldMultiplier += 0.25; // 2차 승급 패시브: 골드 +25%
+
+        const expMultiplier = promoRank >= 1 ? 1.25 : 1.0; // 1차 승급 패시브: 경험치 +25%
 
         const earnedGold = Math.round(currentMon.gold * goldMultiplier);
+        const earnedExp = Math.round(currentMon.exp * expMultiplier);
         this.state.gold += earnedGold;
-        this.state.exp += currentMon.exp;
+        this.state.exp += earnedExp;
         b.accumulatedRewards.gold += earnedGold;
-        b.accumulatedRewards.exp += currentMon.exp;
+        b.accumulatedRewards.exp += earnedExp;
 
         const dropCount = Math.floor(Math.random() * (currentMon.dropMax - currentMon.dropMin + 1)) + currentMon.dropMin;
         this.state.materials[dungeon.matKey] = (this.state.materials[dungeon.matKey] || 0) + dropCount;
@@ -3436,6 +3547,34 @@ recordWrongAnswer(battle) {
           `;
 
           document.getElementById("modal-wave-clear").classList.remove("hidden");
+          return;
+        }
+
+       // [신규 4] 심연의 무한의 탑 클리어 분기 처리
+        if (b.isTower) {
+          const clearedFloor = b.towerFloor;
+          this.state.towerFloor = Math.max(Number(this.state.towerFloor) || 0, clearedFloor);
+          const isBossFloor = clearedFloor % 5 === 0;
+          const bonusExp = Math.round(clearedFloor * 35 * (isBossFloor ? 2.5 : 1.0) * expMultiplier);
+          const bonusGold = Math.round(clearedFloor * 20 * (isBossFloor ? 2.0 : 1.0) * goldMultiplier);
+
+          this.state.exp += bonusExp;
+          this.state.gold += bonusGold;
+          this.checkLevelUp();
+          this.triggerCloudSave(false);
+
+          let towerMsg = `🏰 [심연의 무한의 탑 제 ${clearedFloor}층] 수호자를 격파했습니다!\n\n` +
+            `• 층 돌파 보상 경험치: +${(earnedExp + bonusExp).toLocaleString()} EXP\n` +
+            `• 층 돌파 보상 골드: +${(earnedGold + bonusGold).toLocaleString()} G\n` +
+            `• 명예의 전당 전투력(CP) 보너스: +${this.state.towerFloor * 40} CP`;
+          if (isBossFloor) towerMsg += `\n\n🔥 5층 단위 수호 보스 격파 대보상 적용!`;
+
+          this.showModal(
+            clearedFloor >= 50 ? "👑 무한의 탑 50층 완전 정복! 👑" : `⚔️ 무한의 탑 ${clearedFloor}층 돌파!`,
+            towerMsg,
+            "fa-solid fa-chess-rook text-amber-400"
+          );
+          this.retreatToLobby();
           return;
         }
 
@@ -3519,6 +3658,347 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
           this.state.riftDaily = { date: today, count: 0 };
         }
         return Math.max(0, 3 - (Number(this.state.riftDaily.count) || 0));
+      },
+
+      // ==========================================
+      // [신규 3] 아르카나 대현자 승급전 로직
+      // ==========================================
+      getPromotionStages() {
+        return [
+          {
+            rank: 1,
+            reqLv: 60,
+            name: "1차 승급: 공인 대마도황",
+            tier: 2,
+            perkText: "영구 패시브: 모든 던전 경험치(EXP) +25% & 전투력 +500 CP",
+            desc: "5개 단원 중급(T2) 객관식 5문제를 연속으로 맞혀야 합격합니다."
+          },
+          {
+            rank: 2,
+            reqLv: 80,
+            name: "2차 승급: 심연의 대현자",
+            tier: 3,
+            perkText: "영구 패시브: 모든 골드 획득량 +25% & 전투력 +500 CP",
+            desc: "5개 단원 보스급(T3) 주관식 5문제를 단 한 번의 실수도 없이 풀어내야 합니다."
+          },
+          {
+            rank: 3,
+            reqLv: 100,
+            name: "최종 승급: 초월 대현자 (진리 정복자)",
+            tier: 4,
+            perkText: "영구 패시브: 최종 공격력·방어력 +15% 증폭 & 왕관 칭호",
+            desc: "5개 단원 심연 신역(T4) 심화 주관식 5문제를 모두 통과하는 최종 관문입니다."
+          }
+        ];
+      },
+
+     // ==========================================
+      // [신규 4] 심연의 무한의 탑 (1~50층) 로직
+      // ==========================================
+      openTowerModal() {
+        if (this.state.level < 50) {
+          this.showModal(
+            "입장 레벨 제한",
+            `[심연의 무한의 탑]은 Lv.50 이상 마도사만 도전할 수 있습니다!\n(현재 레벨: Lv.${this.state.level})`,
+            "fa-solid fa-lock text-rose-400"
+          );
+          return;
+        }
+        const curFloor = Math.min(50, Math.max(0, Number(this.state.towerFloor) || 0));
+        const nextFloor = curFloor + 1;
+
+        document.getElementById("tower-best-floor-text").textContent = `${curFloor}층 / 50층`;
+        document.getElementById("tower-progress-bar").style.width = `${(curFloor / 50) * 100}%`;
+
+        const infoBox = document.getElementById("tower-next-floor-info");
+        const enterBtn = document.getElementById("btn-enter-tower");
+
+        if (curFloor >= 50) {
+          infoBox.innerHTML = `<div class="font-bold text-amber-300">✨ 축하합니다! 심연의 무한의 탑 50층을 모두 정복했습니다! ✨</div>
+            <p class="text-[11px] text-slate-400">영구 명예 보너스 +2,000 CP가 적용 중입니다.</p>`;
+          enterBtn.disabled = true;
+          enterBtn.textContent = "50층 완전 정복 완료";
+          enterBtn.className = "flex-1 bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
+        } else {
+          const isBoss = nextFloor % 5 === 0;
+          const tierLabel = nextFloor <= 20 ? "T2 정예 (4지선다)" : (nextFloor <= 39 ? "T3 보스급 (주관식)" : "T4 초월 신역 (심화 주관식 + 보호막)");
+          const estExp = Math.round(nextFloor * 35 * (isBoss ? 2.5 : 1.0));
+          const estGold = Math.round(nextFloor * 20 * (isBoss ? 2.0 : 1.0));
+
+          infoBox.innerHTML = `
+            <div class="font-bold text-rose-300 flex items-center justify-between">
+              <span>다음 도전: 제 ${nextFloor}층 ${isBoss ? "🔥[5층 단위 수호 보스]" : ""}</span>
+              <span class="font-mono text-amber-300">+${estExp} EXP / +${estGold} G</span>
+            </div>
+            <p class="text-[11px] text-slate-400">출제 난이도: <strong class="text-slate-200">${tierLabel}</strong> (전단원 랜덤 출제)</p>
+          `;
+          enterBtn.disabled = false;
+          enterBtn.textContent = `제 ${nextFloor}층 도전하기! ⚔️`;
+          enterBtn.className = "flex-1 bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg";
+        }
+
+        document.getElementById("modal-tower").classList.remove("hidden");
+      },
+
+      startTowerBattle() {
+        if (this.state.level < 50) return;
+        if (this.state.hp <= 0) {
+          this.showToast("체력이 모두 소진되었습니다! 물약을 먼저 복용하세요.", "error");
+          return;
+        }
+        const curFloor = Math.min(50, Math.max(0, Number(this.state.towerFloor) || 0));
+        if (curFloor >= 50) return;
+
+        const targetFloor = curFloor + 1;
+        const isBoss = targetFloor % 5 === 0;
+        const tier = targetFloor <= 20 ? 2 : (targetFloor <= 39 ? 3 : 4);
+        const visualUnitId = ((targetFloor - 1) % 5) + 1;
+
+        this.closeModal("modal-tower");
+        this.sanitizeArmoryState();
+
+        const activeBuffs = {
+          atkBoost: Boolean(this.state.battleBuffs.atkBoost),
+          defBoost: Boolean(this.state.battleBuffs.defBoost),
+          fullGauge: Boolean(this.state.battleBuffs.fullGauge)
+        };
+        this.state.battleBuffs = { atkBoost: false, defBoost: false, fullGauge: false };
+        this.saveToLocalStorage();
+
+        // 층수에 비례해 강해지는 수호 몬스터 생성
+        const monHp = Math.round((450 + targetFloor * 145) * (isBoss ? 1.45 : 1.0));
+        const monAtk = Math.round((65 + targetFloor * 4.2) * (isBoss ? 1.2 : 1.0));
+
+        this.wavePotionCount = 0;
+        this.currentBattle = {
+          isTower: true,
+          towerFloor: targetFloor,
+          dungeon: { id: visualUnitId, name: `무한의 탑 ${targetFloor}층`, matKey: `mat${visualUnitId}`, matName: "심연의 파편" },
+          tier: tier,
+          wave: 1,
+          maxWaves: 1,
+          monsterList: [{
+            name: `${isBoss ? "👑 [수호보스] " : ""}제 ${targetFloor}층 심연 수호자`,
+            hp: monHp,
+            atk: monAtk,
+            exp: 40 + targetFloor * 12,
+            gold: 30 + targetFloor * 8,
+            dropMin: 1,
+            dropMax: 2
+          }],
+          accumulatedRewards: { exp: 0, gold: 0, materials: 0, potions: 0 },
+          monster: null,
+          currentProblem: null,
+          skillGauge: activeBuffs.fullGauge ? 100 : 0,
+          combo: 0,
+          turnCount: 0,
+          buffs: activeBuffs
+        };
+        this.isTurnBusy = false;
+
+        document.getElementById("view-lobby").classList.add("hidden");
+        document.getElementById("view-battle").classList.remove("hidden");
+
+        document.getElementById("battle-dungeon-badge").textContent = `무한의 탑 ${targetFloor}층`;
+        document.getElementById("battle-tier-badge").textContent = isBoss ? "🔥 5층 보스전" : `T${tier} 수직 도전`;
+        document.getElementById("battle-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+        document.getElementById("arena-player-atk").textContent = Math.round(this.state.atk);
+        document.getElementById("arena-player-def").textContent = Math.round(this.state.def);
+
+        document.getElementById("battle-bg-layer").innerHTML = MonsterSvgRenderer.renderBackground(visualUnitId);
+        document.getElementById("battle-player-sprite").innerHTML = MonsterSvgRenderer.renderPlayer(this.state.weapon, this.state.armor, this.state.equippedWeapon, this.state.equippedSuit, this.state.activeAura);
+
+        const petEl = document.getElementById("battle-pet-sprite");
+        if (this.state.activePet) {
+          petEl.innerHTML = MonsterSvgRenderer.renderPet(this.state.activePet);
+          petEl.classList.remove("hidden");
+        } else {
+          petEl.classList.add("hidden");
+        }
+
+        this.updateSkillGaugeUI();
+        this.spawnCurrentWaveMonster();
+      },
+
+      openPromotionModal() {
+        this.activePromotionExam = null;
+        document.getElementById("promo-select-view").classList.remove("hidden");
+        document.getElementById("promo-exam-view").classList.add("hidden");
+        this.renderPromotionStages();
+        document.getElementById("modal-promotion").classList.remove("hidden");
+      },
+
+      closePromotionModal() {
+        this.activePromotionExam = null;
+        this.closeModal("modal-promotion");
+      },
+
+      renderPromotionStages() {
+        const container = document.getElementById("promo-select-view");
+        if (!container) return;
+        container.innerHTML = "";
+
+        const curRank = Number(this.state.promotionRank) || 0;
+        const stages = this.getPromotionStages();
+
+        stages.forEach(st => {
+          const isCleared = curRank >= st.rank;
+          const isPrevCleared = curRank >= (st.rank - 1);
+          const isLvOk = this.state.level >= st.reqLv;
+
+          let actionHtml = "";
+          if (isCleared) {
+            actionHtml = `<span class="px-3 py-1.5 rounded-xl bg-emerald-950 border border-emerald-500/50 text-emerald-300 font-bold">✅ 승급 합격 완료</span>`;
+          } else if (!isPrevCleared) {
+            actionHtml = `<span class="px-3 py-1.5 rounded-xl bg-slate-800 text-slate-500 font-bold">🔒 이전 승급 필요</span>`;
+          } else if (!isLvOk) {
+            actionHtml = `<span class="px-3 py-1.5 rounded-xl bg-slate-800 text-rose-300 border border-rose-500/40 font-mono font-bold">Lv.${st.reqLv} 달성 필요</span>`;
+          } else {
+            actionHtml = `<button onclick="App.startPromotionExam(${st.rank})" class="px-4 py-2 rounded-xl bg-gradient-to-r from-fuchsia-500 to-amber-500 hover:brightness-110 text-slate-950 font-black shadow-lg">
+              승급 시험 응시! ⚔️
+            </button>`;
+          }
+
+          const card = document.createElement("div");
+          card.className = `p-3.5 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isCleared ? 'bg-emerald-950/20 border-emerald-500/40' : 'bg-slate-950 border-slate-800'}`;
+          card.innerHTML = `
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-black text-sm text-amber-300">${st.name}</span>
+                <span class="text-[10px] px-2 py-0.5 rounded-full bg-indigo-950 border border-indigo-500/40 text-indigo-300 font-mono">요구 Lv.${st.reqLv}</span>
+              </div>
+              <p class="text-[11px] text-slate-300">${st.desc}</p>
+              <p class="text-[11px] text-fuchsia-300 font-bold">${st.perkText}</p>
+            </div>
+            <div class="shrink-0">${actionHtml}</div>
+          `;
+          container.appendChild(card);
+        });
+      },
+
+      startPromotionExam(rank) {
+        const stage = this.getPromotionStages().find(s => s.rank === rank);
+        if (!stage || this.state.level < stage.reqLv) return;
+
+        // 1~5단원 문제를 무작위 순서로 1문제씩 총 5문제 출제
+        const units = [1, 2, 3, 4, 5].sort(() => Math.random() - 0.5);
+        const problems = units.map(uId => ({
+          unitId: uId,
+          prob: MathEngine.generateProblem(uId, stage.tier)
+        }));
+
+        this.activePromotionExam = {
+          stage,
+          problems,
+          index: 0
+        };
+
+        document.getElementById("promo-select-view").classList.add("hidden");
+        document.getElementById("promo-exam-view").classList.remove("hidden");
+        document.getElementById("promo-exam-stage-label").textContent = stage.name;
+        this.renderCurrentPromotionProblem();
+      },
+
+      renderCurrentPromotionProblem() {
+        const exam = this.activePromotionExam;
+        if (!exam) return;
+        const item = exam.problems[exam.index];
+        const prob = item.prob;
+
+        document.getElementById("promo-exam-progress").textContent = `문제 ${exam.index + 1} / 5 (무실점 합격 조건)`;
+        document.getElementById("promo-exam-topic").textContent = prob.topic;
+        this.renderFormulaInto(document.getElementById("promo-exam-question"), prob.question);
+
+        const choiceArea = document.getElementById("promo-choices-area");
+        const keypadArea = document.getElementById("promo-keypad-area");
+
+        if (exam.stage.tier >= 3) {
+          choiceArea.classList.add("hidden");
+          keypadArea.classList.remove("hidden");
+          const inp = document.getElementById("promo-keypad-input");
+          inp.value = "";
+          setTimeout(() => inp.focus(), 50);
+        } else {
+          choiceArea.classList.remove("hidden");
+          keypadArea.classList.add("hidden");
+          choiceArea.innerHTML = "";
+          prob.choices.forEach(val => {
+            const btn = document.createElement("button");
+            btn.className = "bg-slate-800 hover:bg-fuchsia-900 border border-slate-700 hover:border-fuchsia-400 p-3 rounded-xl font-bold text-slate-100 flex items-center justify-between transition shadow";
+            const span = document.createElement("span");
+            span.className = "math-render text-sm";
+            span.setAttribute("data-math", String(val));
+            btn.appendChild(span);
+            btn.innerHTML += `<i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>`;
+            btn.onclick = () => this.handlePromotionAnswer(val);
+            choiceArea.appendChild(btn);
+          });
+          this.renderMath();
+        }
+      },
+
+      submitPromotionKeypadAnswer() {
+        const inp = document.getElementById("promo-keypad-input");
+        const val = (inp ? inp.value : "").trim();
+        if (!val) {
+          this.showToast("정답을 입력하세요!", "error");
+          return;
+        }
+        this.handlePromotionAnswer(val);
+      },
+
+      handlePromotionAnswer(selectedVal) {
+        const exam = this.activePromotionExam;
+        if (!exam) return;
+        const item = exam.problems[exam.index];
+        const isCorrect = String(selectedVal).trim() === String(item.prob.answer).trim();
+
+        this.state.stats.solved++;
+        if (isCorrect) this.state.stats.correct++;
+        this.recordRuneProgress(item.unitId, item.prob.type, isCorrect);
+
+        if (!isCorrect) {
+          SoundManager.playDefeat();
+          this.activePromotionExam = null;
+          this.closeModal("modal-promotion");
+          this.saveToLocalStorage();
+          this.showModal(
+            "❌ 승급 시험 탈락!",
+            `[${item.prob.topic}] 문항에서 오답이 발생하여 승급 시험에 불합격했습니다.\n\n` +
+            `• 입력한 답: ${selectedVal}\n` +
+            `• 정답: ${item.prob.answer}\n\n` +
+            `전단원 개념을 다시 점검한 뒤 언제든 재응시할 수 있습니다!`,
+            "fa-solid fa-circle-xmark text-rose-500"
+          );
+          return;
+        }
+
+        SoundManager.playSlash();
+        exam.index += 1;
+
+        if (exam.index >= exam.problems.length) {
+          // 5문제 전승 합격!
+          this.state.promotionRank = Math.max(Number(this.state.promotionRank) || 0, exam.stage.rank);
+          this.calculateStats();
+          this.updateHeaderUI();
+          this.saveToLocalStorage();
+          this.triggerCloudSave(false);
+
+          const clearedStage = exam.stage;
+          this.activePromotionExam = null;
+          this.closeModal("modal-promotion");
+          SoundManager.playVictory();
+
+          this.showModal(
+            "👑 대현자 승급 시험 최종 합격! 👑",
+            `축하합니다! 중3 전단원 융합 5문제를 무실점으로 통과하여\n[${clearedStage.name}] 자격을 획득했습니다!\n\n` +
+            `• 각성된 패시브: ${clearedStage.perkText}`,
+            "fa-solid fa-crown text-amber-400"
+          );
+        } else {
+          this.showToast(`✨ ${exam.index}/5 통과! 다음 단원 문제로 넘어갑니다.`, "success");
+          this.renderCurrentPromotionProblem();
+        }
       },
 
       openTimeRiftModal() {
@@ -4844,9 +5324,9 @@ updateArmoryPreview() {
         }
       },
 
-     switchRankTab(tab) {
+    switchRankTab(tab) {
         this.currentRankTab = tab;
-        ["power", "correct", "gold", "donor", "class"].forEach(t => {
+        ["power", "correct", "gold", "tower", "donor", "class"].forEach(t => {
           const btn = document.getElementById(`rank-tab-btn-${t}`);
           if (btn) {
             if (t === tab) {
@@ -4967,15 +5447,18 @@ updateArmoryPreview() {
           return;
         }
 
-        const scoreKeyMap = {
+       const scoreKeyMap = {
           power: "powerScore",
           correct: "correctCount",
           gold: "gold",
-          donor: "donatedGold"
+          donor: "donatedGold",
+          tower: "towerFloor"
         };
         const rawSource = tab === "donor"
           ? (this.cachedRankings.rankings.donor || (this.cachedRankings.rankings.power || []).filter(u => (Number(u.donatedGold) || 0) > 0))
-          : (this.cachedRankings.rankings[tab] || []);
+          : (tab === "tower"
+            ? (this.cachedRankings.rankings.tower || (this.cachedRankings.rankings.power || []).filter(u => (Number(u.towerFloor) || 0) > 0))
+            : (this.cachedRankings.rankings[tab] || []));
         const list = filterAndDeduplicateUsers(rawSource, scoreKeyMap[tab]);
 
         if (list.length === 0) {
@@ -5019,6 +5502,10 @@ updateArmoryPreview() {
             const donated = Number(u.donatedGold) || 0;
             scoreText = `${donated.toLocaleString()} G 기부`;
             scoreLabel = `학급 기여 +${Math.floor(donated / 100)}점`;
+          } else if (tab === "tower") {
+            const floor = Number(u.towerFloor) || 0;
+            scoreText = `제 ${floor}층 돌파`;
+            scoreLabel = `Lv.${u.level} (${u.powerScore} CP)`;
           }
 
           const card = document.createElement("div");
@@ -5600,9 +6087,9 @@ getRequiredExp(lv) {
                 this.state.runeStats = u.inventory.runeStats || {};
                 this.state.claimedRuneUnits = u.inventory.claimedRuneUnits || [];
                 this.state.riftDaily = u.inventory.riftDaily || { date: "", count: 0 };
+                this.state.promotionRank = u.inventory.promotionRank || 0;
+                this.state.towerFloor = u.inventory.towerFloor || 0;
               }
-
-
 
 
               this.calculateStats();
@@ -5724,9 +6211,11 @@ getRequiredExp(lv) {
           suitUpgrades: this.state.suitUpgrades,
           skillLevel: this.state.skillLevel,
           awakeningLevel: this.state.awakeningLevel,
-          runeStats: this.state.runeStats || {},
+         runeStats: this.state.runeStats || {},
           claimedRuneUnits: this.state.claimedRuneUnits || [],
           riftDaily: this.state.riftDaily || { date: "", count: 0 },
+          promotionRank: this.state.promotionRank || 0,
+          towerFloor: this.state.towerFloor || 0,
           nickname: this.state.nickname,
           classNo: this.state.classNo
         };
@@ -5781,10 +6270,23 @@ updateHeaderUI() {
         const lv = Math.min(100, this.state.level);
         document.getElementById("header-level").textContent = lv;
 
+       const towerFloor = Number(this.state.towerFloor) || 0;
+        const towerBadge = document.getElementById("lobby-tower-badge");
+        if (towerBadge) {
+          towerBadge.textContent = this.state.level >= 50 ? `${towerFloor}/50층` : "Lv.50↑";
+        }
+
+       const promoRank = Number(this.state.promotionRank) || 0;
+        const promoBadge = document.getElementById("lobby-promo-badge");
+        if (promoBadge) promoBadge.textContent = `${promoRank}/3차`;
+
         let title = "견습 수학술사";
         if (this.state.activeAura && AURA_CATALOG[this.state.activeAura]) {
           title = AURA_CATALOG[this.state.activeAura].title;
-        } else if (lv >= 100) title = "아르카니스 초월신 (MAX)";
+        } else if (promoRank >= 3) title = "👑 초월 대현자 (진리 정복자)";
+        else if (promoRank >= 2) title = "🔮 심연의 대현자";
+        else if (promoRank >= 1) title = "⚡ 공인 대마도황";
+        else if (lv >= 100) title = "아르카니스 초월신 (MAX)";
         else if (lv >= 80) title = "심연의 진리 탐구자";
         else if (lv >= 60) title = "아르카니스 대마도황";
         else if (lv >= 40) title = "수학의 지배자";
@@ -5905,6 +6407,20 @@ updateHeaderUI() {
           if (e.key === "Enter") {
             e.preventDefault();
             App.submitKeypadAnswer();
+          }
+        });
+      }
+
+     // 승급전 주관식 입력창 필터링 및 Enter 제출
+      const promoKp = document.getElementById("promo-keypad-input");
+      if (promoKp) {
+        promoKp.addEventListener("input", (e) => {
+          e.target.value = e.target.value.replace(/[^0-9-]/g, "").slice(0, 8);
+        });
+        promoKp.addEventListener("keydown", (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            App.submitPromotionKeypadAnswer();
           }
         });
       }
