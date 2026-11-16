@@ -724,9 +724,13 @@
         <button id="rank-tab-btn-gold" onclick="App.switchRankTab('gold')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-coins mr-1"></i>황금의 부호 (골드)
         </button>
+        <button id="rank-tab-btn-donor" onclick="App.switchRankTab('donor')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
+          <i class="fa-solid fa-hand-holding-heart mr-1"></i>명예의 후원자 (기부)
+        </button>
         <button id="rank-tab-btn-class" onclick="App.switchRankTab('class')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
           <i class="fa-solid fa-school mr-1"></i>학급 대항전
         </button>
+
       </div>
 
       <div id="ranking-list-container" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 min-h-[280px]">
@@ -4317,9 +4321,9 @@ updateArmoryPreview() {
         }
       },
 
-      switchRankTab(tab) {
+     switchRankTab(tab) {
         this.currentRankTab = tab;
-        ["power", "correct", "gold", "class"].forEach(t => {
+        ["power", "correct", "gold", "donor", "class"].forEach(t => {
           const btn = document.getElementById(`rank-tab-btn-${t}`);
           if (btn) {
             if (t === tab) {
@@ -4443,17 +4447,24 @@ updateArmoryPreview() {
         const scoreKeyMap = {
           power: "powerScore",
           correct: "correctCount",
-          gold: "gold"
+          gold: "gold",
+          donor: "donatedGold"
         };
-        const rawList = this.cachedRankings.rankings[tab] || [];
-        const list = filterAndDeduplicateUsers(rawList, scoreKeyMap[tab]);
+        const rawSource = tab === "donor"
+          ? (this.cachedRankings.rankings.donor || (this.cachedRankings.rankings.power || []).filter(u => (Number(u.donatedGold) || 0) > 0))
+          : (this.cachedRankings.rankings[tab] || []);
+        const list = filterAndDeduplicateUsers(rawSource, scoreKeyMap[tab]);
 
         if (list.length === 0) {
-          container.innerHTML = `
-            <div class="py-12 text-center text-slate-400 space-y-1">
-              <p class="font-bold text-slate-300">아직 랭킹 등재 기준을 충족한 학생이 없습니다.</p>
-              <p class="text-[11px]">(최소 20문제 이상 풀이 &amp; 정답률 60% 이상 달성 시 자동 등록)</p>
-            </div>`;
+          container.innerHTML = tab === "donor"
+            ? `<div class="py-12 text-center text-slate-400 space-y-1">
+                <p class="font-bold text-slate-300">아직 마탑에 골드를 기부한 명예의 후원자가 없습니다.</p>
+                <p class="text-[11px]">([학급 대항전] 탭에서 우리 반 마탑에 첫 기부를 진행해 보세요!)</p>
+              </div>`
+            : `<div class="py-12 text-center text-slate-400 space-y-1">
+                <p class="font-bold text-slate-300">아직 랭킹 등재 기준을 충족한 학생이 없습니다.</p>
+                <p class="text-[11px]">(최소 20문제 이상 풀이 &amp; 정답률 60% 이상 달성 시 자동 등록)</p>
+              </div>`;
           return;
         }
 
@@ -4479,8 +4490,12 @@ updateArmoryPreview() {
             scoreText = `${u.correctCount} 정답`;
             scoreLabel = `총 ${u.solvedCount}문제 풀이`;
           } else if (tab === "gold") {
-            scoreText = `${u.gold} G`;
+            scoreText = `${Number(u.gold).toLocaleString()} G`;
             scoreLabel = `Lv.${u.level}`;
+          } else if (tab === "donor") {
+            const donated = Number(u.donatedGold) || 0;
+            scoreText = `${donated.toLocaleString()} G 기부`;
+            scoreLabel = `학급 기여 +${Math.floor(donated / 100)}점`;
           }
 
           const card = document.createElement("div");
