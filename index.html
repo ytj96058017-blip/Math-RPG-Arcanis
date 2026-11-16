@@ -118,12 +118,7 @@
       </div>
 
       <div class="flex items-center gap-2 sm:gap-4 flex-wrap">
-        <!-- 명예의 전당 랭킹 버튼 -->
-        <button onclick="App.openRankingModal()" class="flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:brightness-110 text-slate-950 font-black text-xs px-2.5 py-1.5 rounded-xl transition shadow-lg border border-yellow-300/60">
-          <i class="fa-solid fa-trophy"></i>
-          <span>명예의 전당</span>
-        </button>
-
+      
       <!-- 레벨 & 경험치 -->
         <div class="flex flex-col items-end">
           <div class="flex items-center gap-1.5 text-xs font-bold">
@@ -916,68 +911,7 @@
     </div>
   </div>
 
-  <!-- [모달: 명예의 전당] -->
-  <div id="modal-ranking" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
-    <div class="bg-slate-900 border-2 border-amber-500/70 max-w-2xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[92vh]">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg border border-amber-500/40">
-            <i class="fa-solid fa-trophy"></i>
-          </div>
-          <div>
-            <h3 class="text-base font-bold text-amber-300">아르카니스 명예의 전당</h3>
-            <p class="text-[11px] text-slate-400">전교생 실시간 순위 집계 <span class="text-emerald-400 font-bold">(등재 기준: 최소 20문제 풀이 &amp; 정답률 60% 이상)</span></p>
-          </div>
-        </div>
-        <div class="flex items-center gap-2">
-          <button onclick="App.fetchRankings(true)" class="bg-slate-800 hover:bg-slate-700 text-amber-300 px-2.5 py-1 rounded-lg text-xs font-bold border border-slate-700 transition flex items-center gap-1">
-            <i id="ranking-refresh-icon" class="fa-solid fa-rotate"></i>
-            <span>새로고침</span>
-          </button>
-          <button onclick="App.closeModal('modal-ranking')" class="text-slate-400 hover:text-white">
-            <i class="fa-solid fa-xmark text-lg"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="flex shrink-0 flex-wrap border-b border-slate-800 mb-3 gap-1.5 pb-2.5 text-xs">
-        <button id="rank-tab-btn-power" onclick="App.switchRankTab('power')" class="px-3 py-1.5 rounded-lg font-bold bg-amber-500 text-slate-950">
-          <i class="fa-solid fa-crown mr-1"></i>절대 패왕 (종합 스펙)
-        </button>
-        <button id="rank-tab-btn-correct" onclick="App.switchRankTab('correct')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-book-open-reader mr-1"></i>지혜의 개척자 (정답수)
-        </button>
-        <button id="rank-tab-btn-gold" onclick="App.switchRankTab('gold')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-coins mr-1"></i>황금의 부호 (골드)
-        </button>
-       <button id="rank-tab-btn-tower" onclick="App.switchRankTab('tower')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-chess-rook mr-1"></i>무한의 탑 (최고층)
-        </button>
-        <button id="rank-tab-btn-donor" onclick="App.switchRankTab('donor')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-hand-holding-heart mr-1"></i>명예의 후원자 (기부)
-        </button>
-        <button id="rank-tab-btn-class" onclick="App.switchRankTab('class')" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200">
-          <i class="fa-solid fa-school mr-1"></i>학급 대항전
-        </button>
-
-      </div>
-
-      <div id="ranking-list-container" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 min-h-[280px]">
-        <div class="py-12 text-center text-slate-400">
-          <i class="fa-solid fa-spinner fa-spin text-2xl text-amber-400 mb-2"></i>
-          <p>전교생 랭킹 데이터를 실시간 집계 중입니다...</p>
-        </div>
-      </div>
-
-      <div class="border-t border-slate-800 pt-2.5 mt-2 flex justify-between items-center text-[11px] text-slate-400">
-        <div>
-          <span class="text-amber-400 font-bold">※ 프라이버시 보호:</span> 본인 닉네임과 학급으로 표기됩니다.
-        </div>
-        <div id="ranking-updated-at" class="font-mono">동기화 대기 중</div>
-      </div>
-    </div>
-  </div>
-
+  
   <!-- [모달: PIN 클라우드 저장 및 프로필 설정] -->
   <div id="modal-pin" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-slate-800 max-w-sm w-full rounded-2xl p-5 shadow-2xl text-center">
@@ -1277,6 +1211,12 @@
       </div>
 
       <div class="overflow-y-auto space-y-2.5 pr-1 text-xs text-slate-200 flex-1">
+<div class="bg-slate-950 border border-amber-400/50 rounded-xl p-3">
+          <div class="font-black text-amber-300 mb-1">📜 [중대 안내] 명예의 전당 시스템 공식 폐지 안내</div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            아르카나 마도 수도의 마도사 여러분, 그동안 치열했던 '명예의 전당' 랭킹 시스템을 공식 폐지합니다. 수학은 남과 경쟁하여 순위를 매기는 과목이 아니라, 스스로의 한계를 극복하고 마법 지식을 넓혀가는 고결한 탐구이기 때문입니다. 랭킹 경쟁과 오토마우스 꼼수에서 벗어나, 이제 오직 나와 동료들을 위한 즐거운 마도 모험과 성장에만 온전히 집중해 주세요!
+          </p>
+        </div>
         <div class="bg-slate-950 border border-amber-400/50 rounded-xl p-3">
           <div class="font-black text-amber-300 mb-1">💎 1. [전 레벨 추천] 35종 마법 룬 도감 (초반 꿀팁!)</div>
           <p class="text-[11px] text-slate-300 leading-relaxed">
