@@ -185,6 +185,16 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
+          <!-- 시간의 균열 (Lv.50↑ 일일 3회 90초 타임어택) -->
+          <button onclick="App.openTimeRiftModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-cyan-600 via-sky-500 to-indigo-600 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-cyan-300/70">
+            <i class="fa-solid fa-hourglass-half"></i> 시간의 균열
+            <span id="lobby-rift-badge" class="bg-slate-950 text-cyan-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">Lv.50↑</span>
+          </button>
+          <!-- 35종 마법 룬 마스터리 도감 -->
+          <button onclick="App.openRuneCodexModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-orange-500 hover:brightness-110 text-slate-950 font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-yellow-200/70">
+            <i class="fa-solid fa-gem"></i> 마법 룬 도감
+            <span id="lobby-rune-badge" class="bg-slate-950 text-amber-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">0/35</span>
+          </button>
           <!-- 마도 비전서 (오답 복습 보관함) -->
           <button onclick="App.openGrimoireModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-rose-700 to-amber-600 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-amber-400/50">
             <i class="fa-solid fa-book-skull text-amber-300"></i> 마도 비전서
@@ -397,10 +407,128 @@
           </div>
         </div>
 
+     </div>
+    </section>
+
+    <!-- [뷰 3] 시간의 균열 (90초 벼락 연산 타임어택 스테이지) -->
+    <section id="view-timerift" class="w-full hidden flex flex-col gap-3.5 max-w-3xl mx-auto">
+      <div class="bg-gradient-to-r from-slate-900 via-cyan-950/60 to-slate-900 border-2 border-cyan-500/60 rounded-2xl p-4 shadow-2xl flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-10 h-10 rounded-xl bg-cyan-500/20 border border-cyan-400/60 text-cyan-300 flex items-center justify-center text-xl">
+            <i class="fa-solid fa-hourglass-half fa-spin"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-black text-sm sm:text-base text-cyan-300">시간의 균열: 마력 폭주 타임어택</span>
+              <span id="rift-combo-badge" class="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/60 text-amber-300 font-mono font-black">0 COMBO</span>
+            </div>
+            <p class="text-[11px] text-slate-300">90초 동안 전단원 주문을 연속 영창하세요! (오답 시 시간 -5초 차감)</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="text-right">
+            <div class="text-[10px] text-slate-400 font-mono">남은 시간</div>
+            <div id="rift-timer-text" class="text-2xl font-black font-mono text-cyan-300">90.0s</div>
+          </div>
+          <button onclick="App.finishTimeRift(true)" class="bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs px-3 py-2 rounded-xl border border-slate-700 font-bold">
+            중단 정산
+          </button>
+        </div>
+      </div>
+
+      <!-- 실시간 진행 바 및 누적 보상 -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 space-y-2">
+        <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-700">
+          <div id="rift-timer-bar" class="bg-gradient-to-r from-rose-500 via-amber-400 to-cyan-400 h-full transition-all duration-100" style="width: 100%"></div>
+        </div>
+        <div class="flex justify-between text-xs font-mono">
+          <span class="text-emerald-300 font-bold">정답 수: <span id="rift-correct-count">0</span>문제</span>
+          <span class="text-amber-300 font-bold">누적 획득 EXP: +<span id="rift-earned-exp">0</span> EXP</span>
+        </div>
+      </div>
+
+      <!-- 문제 출제 & 선택지 패널 -->
+      <div class="bg-slate-900 border-2 border-cyan-500/40 rounded-2xl p-5 shadow-xl flex flex-col gap-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+          <span id="rift-problem-topic" class="text-xs font-bold text-cyan-300">[전단원 융합] 마력 폭주 주문</span>
+          <span class="text-[10px] text-slate-400 font-mono">연속 콤보일수록 EXP 배율 폭증!</span>
+        </div>
+
+        <div class="py-3 text-center">
+          <p id="rift-problem-question" class="text-base sm:text-lg font-bold text-slate-100 leading-relaxed min-h-[3.5rem] flex items-center justify-center">
+            주문을 준비 중입니다...
+          </p>
+        </div>
+
+        <div id="rift-choices-area" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
       </div>
     </section>
 
   </main>
+
+  <!-- [모달: 시간의 균열 입장 안내] -->
+  <div id="modal-timerift-intro" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 border-2 border-cyan-400/80 max-w-md w-full rounded-2xl p-6 shadow-2xl text-center space-y-4">
+      <div class="w-14 h-14 mx-auto rounded-2xl bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 flex items-center justify-center text-3xl">
+        <i class="fa-solid fa-hourglass-half"></i>
+      </div>
+      <div>
+        <span class="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-950 border border-cyan-500/50 text-cyan-300 font-mono font-bold">고레벨 전용 EXP 부스터</span>
+        <h3 class="text-lg font-black text-amber-300 mt-1">시간의 균열 (90초 타임어택)</h3>
+      </div>
+      <div class="bg-slate-950 border border-slate-800 rounded-xl p-3.5 text-left text-xs text-slate-300 space-y-1.5 leading-relaxed">
+        <p>• <strong>입장 조건:</strong> <span class="text-amber-300 font-bold">Lv.50 이상</span> 마도사 (하루 최대 <strong>3회</strong> 입장 가능)</p>
+        <p>• <strong>규칙:</strong> 90초 동안 몬스터 반격 없이 중3 전단원 4지선다 주문을 연속으로 풀어냅니다.</p>
+        <p>• <strong>보상:</strong> 정답 1문제당 기본 <strong>65 EXP</strong> + 콤보 보너스(최대 +100%)가 즉시 누적됩니다!</p>
+        <p class="text-rose-300">• <strong>주의:</strong> 무작위 찍기를 막기 위해 오답 시 <strong>남은 시간이 5초 차감</strong>되고 콤보가 초기화됩니다.</p>
+      </div>
+      <div class="bg-slate-950 border border-cyan-500/40 rounded-xl p-2.5 text-xs font-mono text-cyan-300 font-bold" id="rift-daily-status-text">
+        오늘 남은 입장 횟수: 3 / 3회
+      </div>
+      <div class="flex gap-2.5">
+        <button onclick="App.closeModal('modal-timerift-intro')" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-2.5 rounded-xl text-xs font-bold">닫기</button>
+        <button id="btn-start-timerift" onclick="App.startTimeRift()" class="flex-1 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg">
+          균열 돌입하기! ⚡
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- [모달: 35종 마법 룬 마스터리 도감] -->
+  <div id="modal-rune-codex" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
+    <div class="bg-slate-900 border-2 border-amber-400/80 max-w-3xl w-full rounded-2xl p-5 shadow-2xl flex flex-col max-h-[92vh]">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+        <div class="flex items-center gap-2.5">
+          <div class="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-lg border border-amber-400/50">
+            <i class="fa-solid fa-gem"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-amber-300">아르카나 35종 마법 룬 도감 (개념 마스터리)</h3>
+            <p class="text-[11px] text-slate-400">각 유형별 <strong class="text-amber-300">15문제 이상 정답 &amp; 정답률 80%↑</strong> 달성 시 황금 룬 각인 (+50 CP)</p>
+          </div>
+        </div>
+        <button onclick="App.closeModal('modal-rune-codex')" class="text-slate-400 hover:text-white">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <!-- 단원 필터 탭 -->
+      <div class="flex flex-wrap gap-1.5 border-b border-slate-800 pb-2.5 mb-3 text-xs" id="rune-unit-tabs">
+        <button onclick="App.switchRuneUnitTab(1)" id="rune-tab-1" class="px-3 py-1.5 rounded-lg font-bold bg-emerald-600 text-white">1. 제곱근</button>
+        <button onclick="App.switchRuneUnitTab(2)" id="rune-tab-2" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400">2. 이차방정식</button>
+        <button onclick="App.switchRuneUnitTab(3)" id="rune-tab-3" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400">3. 이차함수</button>
+        <button onclick="App.switchRuneUnitTab(4)" id="rune-tab-4" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400">4. 삼각비</button>
+        <button onclick="App.switchRuneUnitTab(5)" id="rune-tab-5" class="px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400">5. 원의 성질</button>
+      </div>
+
+      <!-- 룬 카드 목록 -->
+      <div id="rune-codex-list" class="overflow-y-auto space-y-2 pr-1 text-xs flex-1 min-h-[280px]"></div>
+
+      <!-- 단원 완주 보상 수령 바 -->
+      <div id="rune-unit-reward-bar" class="border-t border-slate-800 pt-3 mt-3 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs"></div>
+    </div>
+  </div>
 
   <!-- [모달: 마도 비전서 (오답 복습 보관함)] -->
   <div id="modal-grimoire" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-3 sm:p-4">
@@ -2471,12 +2599,18 @@ genUnit1(tier, forcedType = null) {
         activeAura: null,
         ownedPets: [],
         ownedAuras: [],
+        runeStats: {},
+        claimedRuneUnits: [],
+        riftDaily: { date: "", count: 0 },
         nickname: "",
         classNo: ""
       },
 
       selectedTier: 1,
       currentBattle: null,
+      currentRift: null,
+      riftTimerInterval: null,
+      currentRuneUnitTab: 1,
       isTurnBusy: false,
       keypadInput: "",
       wavePotionCount: 0,
@@ -2965,6 +3099,19 @@ startBattle(unitId, tier) {
         }
       },
 
+      recordRuneProgress(unitId, probType, isCorrect) {
+        if (!this.state.runeStats || typeof this.state.runeStats !== "object") {
+          this.state.runeStats = {};
+        }
+        const safeType = Math.min(7, Math.max(1, Number(probType) || 1));
+        const key = `${unitId}_${safeType}`;
+        if (!this.state.runeStats[key]) {
+          this.state.runeStats[key] = { solved: 0, correct: 0 };
+        }
+        this.state.runeStats[key].solved += 1;
+        if (isCorrect) this.state.runeStats[key].correct += 1;
+      },
+
       handlePlayerAnswer(selectedVal) {
         if (this.isTurnBusy || !this.currentBattle) return;
         this.isTurnBusy = true;
@@ -2974,6 +3121,7 @@ startBattle(unitId, tier) {
 
         this.state.stats.solved++;
         if (isCorrect) this.state.stats.correct++;
+        this.recordRuneProgress(b.dungeon.id, b.currentProblem.type, isCorrect);
 
         if (isCorrect) {
           // 정답 시 콤보 +1 및 마력 게이지 +25% 충전
@@ -3341,11 +3489,386 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
 
       retreatToLobby() {
         this.currentBattle = null;
+        if (this.riftTimerInterval) {
+          clearInterval(this.riftTimerInterval);
+          this.riftTimerInterval = null;
+        }
+        this.currentRift = null;
         document.getElementById("view-battle").classList.add("hidden");
+        const riftView = document.getElementById("view-timerift");
+        if (riftView) riftView.classList.add("hidden");
         document.getElementById("view-lobby").classList.remove("hidden");
         this.updateHeaderUI();
         this.renderLobbyDungeons();
         this.triggerCloudSave(false);
+      },
+
+      // ==========================================
+      // [신규 1] 시간의 균열 (90초 타임어택) 로직
+      // ==========================================
+      getTodayDateStr() {
+        if (this.cachedRankings && this.cachedRankings.serverDate) return this.cachedRankings.serverDate;
+        const now = new Date();
+        const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+        return kst.toISOString().slice(0, 10);
+      },
+
+      getRemainingRiftCount() {
+        const today = this.getTodayDateStr();
+        if (!this.state.riftDaily || this.state.riftDaily.date !== today) {
+          this.state.riftDaily = { date: today, count: 0 };
+        }
+        return Math.max(0, 3 - (Number(this.state.riftDaily.count) || 0));
+      },
+
+      openTimeRiftModal() {
+        if (this.state.level < 50) {
+          this.showModal(
+            "입장 레벨 제한",
+            `[시간의 균열]은 Lv.50 이상 달성한 숙련 마도사만 입장할 수 있습니다!\n(현재 레벨: Lv.${this.state.level})`,
+            "fa-solid fa-lock text-cyan-400"
+          );
+          return;
+        }
+        const rem = this.getRemainingRiftCount();
+        const statusEl = document.getElementById("rift-daily-status-text");
+        const startBtn = document.getElementById("btn-start-timerift");
+        if (statusEl) statusEl.textContent = `오늘 남은 입장 횟수: ${rem} / 3회`;
+        if (startBtn) {
+          if (rem <= 0) {
+            startBtn.disabled = true;
+            startBtn.textContent = "오늘 입장 횟수 소진";
+            startBtn.className = "flex-1 bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
+          } else {
+            startBtn.disabled = false;
+            startBtn.textContent = "균열 돌입하기! ⚡";
+            startBtn.className = "flex-1 bg-gradient-to-r from-cyan-500 to-indigo-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg";
+          }
+        }
+        document.getElementById("modal-timerift-intro").classList.remove("hidden");
+      },
+
+      startTimeRift() {
+        if (this.state.level < 50) return;
+        const rem = this.getRemainingRiftCount();
+        if (rem <= 0) {
+          this.showToast("오늘의 시간의 균열 입장 횟수(3회)를 모두 사용했습니다!", "error");
+          return;
+        }
+        this.state.riftDaily.count += 1;
+        this.saveToLocalStorage();
+        this.closeModal("modal-timerift-intro");
+
+        this.currentRift = {
+          timeLeft: 90.0,
+          combo: 0,
+          maxCombo: 0,
+          correctCount: 0,
+          earnedExp: 0,
+          currentProblem: null,
+          currentUnitId: 1
+        };
+
+        document.getElementById("view-lobby").classList.add("hidden");
+        document.getElementById("view-battle").classList.add("hidden");
+        document.getElementById("view-timerift").classList.remove("hidden");
+
+        this.updateRiftUI();
+        this.nextRiftProblem();
+
+        if (this.riftTimerInterval) clearInterval(this.riftTimerInterval);
+        this.riftTimerInterval = setInterval(() => {
+          if (!this.currentRift) return;
+          this.currentRift.timeLeft = Math.max(0, Math.round((this.currentRift.timeLeft - 0.1) * 10) / 10);
+          this.updateRiftUI();
+          if (this.currentRift.timeLeft <= 0) {
+            this.finishTimeRift(false);
+          }
+        }, 100);
+      },
+
+      updateRiftUI() {
+        if (!this.currentRift) return;
+        const r = this.currentRift;
+        const timerText = document.getElementById("rift-timer-text");
+        const timerBar = document.getElementById("rift-timer-bar");
+        const comboBadge = document.getElementById("rift-combo-badge");
+        const corrEl = document.getElementById("rift-correct-count");
+        const expEl = document.getElementById("rift-earned-exp");
+
+        if (timerText) {
+          timerText.textContent = `${r.timeLeft.toFixed(1)}s`;
+          timerText.className = r.timeLeft <= 15
+            ? "text-2xl font-black font-mono text-rose-400 animate-pulse"
+            : "text-2xl font-black font-mono text-cyan-300";
+        }
+        if (timerBar) timerBar.style.width = `${Math.min(100, (r.timeLeft / 90) * 100)}%`;
+        if (comboBadge) comboBadge.textContent = `${r.combo} COMBO`;
+        if (corrEl) corrEl.textContent = r.correctCount;
+        if (expEl) expEl.textContent = r.earnedExp;
+      },
+
+      nextRiftProblem() {
+        if (!this.currentRift) return;
+        const unitId = MathEngine.getRandomInt(1, 5);
+        const tier = MathEngine.getRandomChoice([1, 2]); // 빠른 연산을 위해 4지선다 T1~T2 출제
+        const prob = MathEngine.generateProblem(unitId, tier);
+        this.currentRift.currentUnitId = unitId;
+        this.currentRift.currentProblem = prob;
+
+        document.getElementById("rift-problem-topic").textContent = prob.topic;
+        this.renderFormulaInto(document.getElementById("rift-problem-question"), prob.question);
+
+        const area = document.getElementById("rift-choices-area");
+        area.innerHTML = "";
+        prob.choices.forEach(val => {
+          const btn = document.createElement("button");
+          btn.className = "bg-slate-800 hover:bg-cyan-900 border border-slate-700 hover:border-cyan-400 p-3.5 rounded-xl font-bold text-slate-100 flex items-center justify-between transition shadow group";
+          const span = document.createElement("span");
+          span.className = "math-render text-sm";
+          span.setAttribute("data-math", String(val));
+          btn.appendChild(span);
+          btn.innerHTML += `<i class="fa-solid fa-bolt text-xs text-slate-500 group-hover:text-cyan-300"></i>`;
+          btn.onclick = () => this.handleRiftAnswer(val);
+          area.appendChild(btn);
+        });
+        this.renderMath();
+      },
+
+      handleRiftAnswer(selectedVal) {
+        if (!this.currentRift || this.currentRift.timeLeft <= 0) return;
+        const r = this.currentRift;
+        const isCorrect = String(selectedVal).trim() === String(r.currentProblem.answer).trim();
+
+        this.state.stats.solved++;
+        if (isCorrect) this.state.stats.correct++;
+        this.recordRuneProgress(r.currentUnitId, r.currentProblem.type, isCorrect);
+
+        if (isCorrect) {
+          SoundManager.playSlash();
+          r.combo += 1;
+          r.maxCombo = Math.max(r.maxCombo, r.combo);
+          r.correctCount += 1;
+          // 기본 65 EXP + 콤보 보너스 (콤보당 +10%, 최대 +100%)
+          const comboMult = Math.min(2.0, 1.0 + (r.combo - 1) * 0.1);
+          const gainExp = Math.round(65 * comboMult);
+          r.earnedExp += gainExp;
+          this.showToast(`⚡ 정답! +${gainExp} EXP (${r.combo} 콤보)`, "success");
+        } else {
+          SoundManager.playHit();
+          r.combo = 0;
+          r.timeLeft = Math.max(0, Math.round((r.timeLeft - 5.0) * 10) / 10);
+          this.showToast("💥 오답! 남은 시간 -5초 차감!", "error");
+        }
+
+        this.updateRiftUI();
+        if (r.timeLeft <= 0) {
+          this.finishTimeRift(false);
+        } else {
+          this.nextRiftProblem();
+        }
+      },
+
+      finishTimeRift(manualStop = false) {
+        if (this.riftTimerInterval) {
+          clearInterval(this.riftTimerInterval);
+          this.riftTimerInterval = null;
+        }
+        if (!this.currentRift) return;
+        const r = this.currentRift;
+        this.currentRift = null;
+
+        this.state.exp += r.earnedExp;
+        this.checkLevelUp();
+        this.retreatToLobby();
+
+        SoundManager.playVictory();
+        this.showModal(
+          manualStop ? "⏱️ 시간의 균열 조기 정산" : "⏱️ 시간의 균열 종료!",
+          `90초 마력 폭주 타임어택 결과입니다!\n\n` +
+          `• 총 정답 문제 수: ${r.correctCount}문제\n` +
+          `• 최고 연속 콤보: ${r.maxCombo} COMBO\n` +
+          `• 최종 획득 경험치: +${r.earnedExp.toLocaleString()} EXP\n\n` +
+          `오늘 남은 입장 횟수: ${this.getRemainingRiftCount()} / 3회`,
+          "fa-solid fa-hourglass-end text-cyan-400"
+        );
+      },
+
+      // ==========================================
+      // [신규 2] 35종 마법 룬 마스터리 도감 로직
+      // ==========================================
+      getRuneCatalog() {
+        return {
+          1: [
+            "1. 근호 밖으로 꺼내기 (a√b 꼴)",
+            "2. 분모의 유리화",
+            "3. 무리수의 정수 부분 판별",
+            "4. 제곱근의 기본 성질 (√a²)",
+            "5. 제곱근과 유리수의 대소 비교",
+            "6. 동류근의 덧셈과 뺄셈",
+            "7. 근호의 곱셈 연산"
+          ],
+          2: [
+            "1. 인수분해를 이용한 이차방정식 풀이",
+            "2. 완전제곱식과 중근 조건",
+            "3. 이차방정식 두 근의 합",
+            "4. 판별식(D = b²-4ac) 계산",
+            "5. 이차방정식 두 근의 곱",
+            "6. 한 근이 주어질 때 미지수 구하기",
+            "7. 제곱근을 이용한 이차방정식 풀이"
+          ],
+          3: [
+            "1. 이차함수 표준형 꼭짓점의 y좌표",
+            "2. 포물선 대칭축의 방정식",
+            "3. y축 방향 평행이동과 y절편",
+            "4. 표준형 그래프의 y절편 계산",
+            "5. 이차함수 특정 함숫값 f(k) 계산",
+            "6. x축 방향 평행이동과 꼭짓점 x좌표",
+            "7. 기본형 y=ax²의 꼭짓점 판별"
+          ],
+          4: [
+            "1. 특수각(30°, 45°, 60°) 삼각비 기본 연산",
+            "2. 탄젠트와 사인의 혼합 연산",
+            "3. 코사인을 이용한 빗변 길이 계산",
+            "4. 특수각 삼각비 제곱의 합",
+            "5. 탄젠트를 이용한 직각삼각형 높이",
+            "6. 0°와 90°의 삼각비 값 연산",
+            "7. 특수각 삼각비의 곱셈"
+          ],
+          5: [
+            "1. 중심각과 원주각의 크기 관계",
+            "2. 원에 내접하는 사각형의 대각 성질",
+            "3. 반원에 대한 원주각(90°) 응용",
+            "4. 원주각을 이용한 중심각 계산",
+            "5. 원의 접선과 반지름의 수직 성질",
+            "6. 같은 호에 대한 원주각의 크기",
+            "7. 현의 수직이등분선과 길이 계산"
+          ]
+        };
+      },
+
+      getMasteredRuneCount() {
+        const stats = this.state.runeStats || {};
+        let count = 0;
+        for (let u = 1; u <= 5; u++) {
+          for (let t = 1; t <= 7; t++) {
+            const s = stats[`${u}_${t}`];
+            if (s && s.correct >= 15 && s.solved > 0 && (s.correct / s.solved) >= 0.8) {
+              count++;
+            }
+          }
+        }
+        return count;
+      },
+
+      openRuneCodexModal() {
+        this.switchRuneUnitTab(this.currentRuneUnitTab || 1);
+        document.getElementById("modal-rune-codex").classList.remove("hidden");
+      },
+
+      switchRuneUnitTab(unitId) {
+        this.currentRuneUnitTab = unitId;
+        const unitColors = {
+          1: "bg-emerald-600 text-white",
+          2: "bg-violet-600 text-white",
+          3: "bg-sky-600 text-white",
+          4: "bg-amber-500 text-slate-950",
+          5: "bg-rose-600 text-white"
+        };
+        for (let u = 1; u <= 5; u++) {
+          const btn = document.getElementById(`rune-tab-${u}`);
+          if (!btn) continue;
+          btn.className = u === unitId
+            ? `px-3 py-1.5 rounded-lg font-bold ${unitColors[u]}`
+            : "px-3 py-1.5 rounded-lg font-bold bg-slate-800 text-slate-400 hover:text-slate-200";
+        }
+        this.renderRuneCodexList(unitId);
+      },
+
+      renderRuneCodexList(unitId) {
+        const container = document.getElementById("rune-codex-list");
+        const rewardBar = document.getElementById("rune-unit-reward-bar");
+        if (!container || !rewardBar) return;
+
+        container.innerHTML = "";
+        const catalog = this.getRuneCatalog()[unitId] || [];
+        const stats = this.state.runeStats || {};
+        let unitMasteredCount = 0;
+
+        catalog.forEach((title, idx) => {
+          const typeNum = idx + 1;
+          const rec = stats[`${unitId}_${typeNum}`] || { solved: 0, correct: 0 };
+          const acc = rec.solved > 0 ? Math.round((rec.correct / rec.solved) * 1000) / 10 : 0;
+          const isMastered = rec.correct >= 15 && acc >= 80.0;
+          if (isMastered) unitMasteredCount++;
+
+          const pct = Math.min(100, Math.round((rec.correct / 15) * 100));
+          const card = document.createElement("div");
+          card.className = isMastered
+            ? "p-3 rounded-xl border border-amber-400/70 bg-amber-950/25 flex items-center justify-between gap-3"
+            : "p-3 rounded-xl border border-slate-800 bg-slate-950 flex items-center justify-between gap-3";
+
+          card.innerHTML = `
+            <div class="flex-1 space-y-1.5">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="text-xs font-bold ${isMastered ? 'text-amber-300' : 'text-slate-200'}">${title}</span>
+                ${isMastered
+                  ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-black">✦ 황금 룬 각인 (+50 CP)</span>`
+                  : `<span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">미각인</span>`}
+              </div>
+              <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
+                <div class="${isMastered ? 'bg-amber-400' : 'bg-indigo-500'} h-full transition-all" style="width: ${pct}%"></div>
+              </div>
+            </div>
+            <div class="text-right font-mono shrink-0">
+              <div class="text-xs font-bold ${rec.correct >= 15 ? 'text-emerald-400' : 'text-slate-300'}">${rec.correct} / 15 정답</div>
+              <div class="text-[10px] ${acc >= 80 ? 'text-amber-300' : 'text-rose-400'}">정답률 ${acc}% (기준 80%↑)</div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+
+        const claimed = Array.isArray(this.state.claimedRuneUnits) && this.state.claimedRuneUnits.includes(unitId);
+        const unitName = (DUNGEON_DATA.find(d => d.id === unitId) || {}).name || `${unitId}단원`;
+
+        let btnHtml = "";
+        if (claimed) {
+          btnHtml = `<span class="px-3.5 py-2 rounded-xl bg-emerald-950 border border-emerald-500/50 text-emerald-300 font-bold">✅ 단원 마스터 보상 수령 완료</span>`;
+        } else if (unitMasteredCount >= 7) {
+          btnHtml = `<button onclick="App.claimRuneUnitReward(${unitId})" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 hover:brightness-110 text-slate-950 font-black shadow-lg animate-pulse">
+            🎁 [${unitName}] 완전 정복 보상 받기 (+1,500 EXP &amp; +1,000 G)
+          </button>`;
+        } else {
+          btnHtml = `<span class="text-slate-400 font-mono">단원 마스터 달성도: <strong class="text-amber-300">${unitMasteredCount} / 7</strong> (7개 모두 각인 시 보상 해금)</span>`;
+        }
+
+        rewardBar.innerHTML = `
+          <div class="text-slate-400">전체 룬 각인: <strong class="text-amber-300 font-mono">${this.getMasteredRuneCount()} / 35</strong></div>
+          <div>${btnHtml}</div>
+        `;
+      },
+
+      claimRuneUnitReward(unitId) {
+        if (!Array.isArray(this.state.claimedRuneUnits)) this.state.claimedRuneUnits = [];
+        if (this.state.claimedRuneUnits.includes(unitId)) return;
+
+        this.state.claimedRuneUnits.push(unitId);
+        this.state.exp += 1500;
+        this.state.gold += 1000;
+        this.checkLevelUp();
+        this.updateHeaderUI();
+        this.saveToLocalStorage();
+        this.triggerCloudSave(false);
+        this.renderRuneCodexList(unitId);
+
+        SoundManager.playVictory();
+        this.showModal(
+          "🏆 단원 마법 룬 완전 정복! 🏆",
+          `해당 단원의 7가지 핵심 수학 개념 룬을 모두 황금빛으로 각인했습니다!\n\n` +
+          `• 마스터리 보너스 경험치: +1,500 EXP\n` +
+          `• 마스터리 보너스 골드: +1,000 G`,
+          "fa-solid fa-gem text-amber-400"
+        );
       },
 
       openGrimoireModal() {
@@ -5074,6 +5597,9 @@ getRequiredExp(lv) {
                 this.state.suitUpgrades = u.inventory.suitUpgrades || { robe: 0, titan: 0, mirage: 0 };
                 this.state.skillLevel = u.inventory.skillLevel || 1;
                 this.state.awakeningLevel = u.inventory.awakeningLevel || 0;
+                this.state.runeStats = u.inventory.runeStats || {};
+                this.state.claimedRuneUnits = u.inventory.claimedRuneUnits || [];
+                this.state.riftDaily = u.inventory.riftDaily || { date: "", count: 0 };
               }
 
 
@@ -5198,6 +5724,9 @@ getRequiredExp(lv) {
           suitUpgrades: this.state.suitUpgrades,
           skillLevel: this.state.skillLevel,
           awakeningLevel: this.state.awakeningLevel,
+          runeStats: this.state.runeStats || {},
+          claimedRuneUnits: this.state.claimedRuneUnits || [],
+          riftDaily: this.state.riftDaily || { date: "", count: 0 },
           nickname: this.state.nickname,
           classNo: this.state.classNo
         };
@@ -5273,6 +5802,14 @@ updateHeaderUI() {
 
         document.getElementById("header-gold").textContent = this.state.gold;
         document.getElementById("lobby-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
+
+        const runeBadge = document.getElementById("lobby-rune-badge");
+        if (runeBadge) runeBadge.textContent = `${this.getMasteredRuneCount()}/35`;
+
+        const riftBadge = document.getElementById("lobby-rift-badge");
+        if (riftBadge) {
+          riftBadge.textContent = this.state.level >= 50 ? `${this.getRemainingRiftCount()}/3회` : "Lv.50↑";
+        }
 
         const grimoireBadge = document.getElementById("lobby-grimoire-badge");
         if (grimoireBadge) {
