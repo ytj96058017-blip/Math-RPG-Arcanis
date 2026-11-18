@@ -3727,7 +3727,32 @@ recordWrongAnswer(battle) {
 
         const actBtn = document.getElementById("btn-solution-action");
         actBtn.classList.remove("hidden");
-        actBtn.onclick = () => this.closeSolutionModalAndDefense();
+
+        // [핵심] 5초 동안은 버튼을 비활성화하고 카운트다운 표시
+        let countdown = 5;
+        actBtn.disabled = true;
+        actBtn.className = "w-full bg-slate-800 text-slate-400 font-bold py-3 rounded-xl text-xs sm:text-sm cursor-not-allowed transition flex items-center justify-center gap-1.5";
+        actBtn.innerHTML = `<i class="fa-solid fa-hourglass-half fa-spin text-amber-400"></i> <span>해설 정독 중... (${countdown}초 뒤에 방어 버튼이 활성화됩니다)</span>`;
+
+        if (this.solutionTimer) clearInterval(this.solutionTimer);
+        this.solutionTimer = setInterval(() => {
+          countdown--;
+          if (countdown > 0) {
+            actBtn.innerHTML = `<i class="fa-solid fa-hourglass-half fa-spin text-amber-400"></i> <span>해설 정독 중... (${countdown}초 뒤에 방어 버튼이 활성화됩니다)</span>`;
+          } else {
+            clearInterval(this.solutionTimer);
+            this.solutionTimer = null;
+            // 5초 경과 후 원래의 멋진 방어 버튼으로 활성화
+            actBtn.disabled = false;
+            actBtn.className = "w-full bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-1.5 cursor-pointer";
+            actBtn.innerHTML = `<i class="fa-solid fa-shield-halved"></i> <span>풀이를 이해했습니다! (몬스터 반격 방어)</span>`;
+          }
+        }, 1000);
+
+        actBtn.onclick = () => {
+          if (actBtn.disabled) return;
+          this.closeSolutionModalAndDefense();
+        };
 
         modal.classList.remove("hidden");
       },
@@ -5860,8 +5885,12 @@ updateArmoryPreview() {
         this.state.activePet = id;
         this.calculateStats();
         SoundManager.playPotion();
+        const petDef = PET_CATALOG[id];
         const st = this.getPetStage(id);
-        this.showToast(`[${PET_CATALOG[id].names[st - 1]}]이(가) 모험에 동반합니다.`, "success");
+        const tierIdx = Math.min(5, Math.floor((st - 1) / 10));
+        const tierTitle = petDef ? petDef.titles[tierIdx] : "";
+        
+        this.showToast(`[${petDef ? petDef.name : '수호 정령'} - ${tierTitle}]이(가) 모험에 동반합니다!`, "success");
         this.updateArmoryPreview();
         this.renderArmoryPets();
         this.updateHeaderUI();
