@@ -185,9 +185,9 @@
        <div class="flex items-center gap-2 sm:gap-2.5 flex-wrap justify-center">
           <!-- 심연의 무한의 탑 (Lv.50↑ 1~50층 수직 도전) -->
           <button onclick="App.openTowerModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-rose-600 via-red-600 to-amber-500 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-rose-300/70">
-            <i class="fa-solid fa-chess-rook text-amber-200"></i> 무한의 탑
-            <span id="lobby-tower-badge" class="bg-slate-950 text-rose-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">Lv.50↑</span>
-          </button>
+  <i class="fa-solid fa-chess-rook text-amber-200"></i> 무한의 탑
+  <span id="lobby-tower-badge" class="bg-slate-950 text-rose-300 text-[10px] font-black px-1.5 py-0.2 rounded-full font-mono">무한 등반</span>
+</button>
           <!-- 대현자 승급전 (Lv.60/80/100 전단원 융합 시험) -->
           <button onclick="App.openPromotionModal()" class="relative flex items-center gap-1.5 bg-gradient-to-r from-fuchsia-600 via-purple-600 to-amber-500 hover:brightness-110 text-white font-black text-xs sm:text-sm px-3.5 py-2 rounded-xl transition shadow-lg border border-amber-300/70">
             <i class="fa-solid fa-graduation-cap text-amber-200"></i> 대현자 승급전
@@ -4178,38 +4178,31 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
           );
           return;
         }
-        const curFloor = Math.min(50, Math.max(0, Number(this.state.towerFloor) || 0));
+        const curFloor = Math.max(0, Number(this.state.towerFloor) || 0);
         const nextFloor = curFloor + 1;
 
-        document.getElementById("tower-best-floor-text").textContent = `${curFloor}층 / 50층`;
-        document.getElementById("tower-progress-bar").style.width = `${(curFloor / 50) * 100}%`;
+        document.getElementById("tower-best-floor-text").textContent = `${curFloor}층 등반 중`;
+        document.getElementById("tower-progress-bar").style.width = `${Math.min(100, (curFloor / 50) * 100)}%`;
 
         const infoBox = document.getElementById("tower-next-floor-info");
         const enterBtn = document.getElementById("btn-enter-tower");
 
-        if (curFloor >= 50) {
-          infoBox.innerHTML = `<div class="font-bold text-amber-300">✨ 축하합니다! 심연의 무한의 탑 50층을 모두 정복했습니다! ✨</div>
-            <p class="text-[11px] text-slate-400">영구 명예 보너스 +2,000 CP가 적용 중입니다.</p>`;
-          enterBtn.disabled = true;
-          enterBtn.textContent = "50층 완전 정복 완료";
-          enterBtn.className = "flex-1 bg-slate-800 text-slate-500 font-bold py-2.5 rounded-xl text-xs cursor-not-allowed";
-        } else {
-          const isBoss = nextFloor % 5 === 0;
-          const tierLabel = nextFloor <= 20 ? "T2 정예 (4지선다)" : (nextFloor <= 39 ? "T3 보스급 (주관식)" : "T4 초월 신역 (심화 주관식 + 보호막)");
-          const estExp = Math.round(nextFloor * 35 * (isBoss ? 2.5 : 1.0));
-          const estGold = Math.round(nextFloor * 20 * (isBoss ? 2.0 : 1.0));
+        const isBoss = nextFloor % 5 === 0;
+        const tier = nextFloor <= 20 ? 2 : (nextFloor <= 40 ? 3 : 4);
+        const tierLabel = tier === 2 ? "T2 정예 (4지선다)" : (tier === 3 ? "T3 보스급 (주관식)" : "T4 초월 신역 (심화 주관식 + 보호막)");
+        const estExp = Math.round(nextFloor * 40 * (isBoss ? 2.5 : 1.0));
+        const estGold = Math.round(nextFloor * 25 * (isBoss ? 2.0 : 1.0));
 
-          infoBox.innerHTML = `
-            <div class="font-bold text-rose-300 flex items-center justify-between">
-              <span>다음 도전: 제 ${nextFloor}층 ${isBoss ? "🔥[5층 단위 수호 보스]" : ""}</span>
-              <span class="font-mono text-amber-300">+${estExp} EXP / +${estGold} G</span>
-            </div>
-            <p class="text-[11px] text-slate-400">출제 난이도: <strong class="text-slate-200">${tierLabel}</strong> (전단원 랜덤 출제)</p>
-          `;
-          enterBtn.disabled = false;
-          enterBtn.textContent = `제 ${nextFloor}층 도전하기! ⚔️`;
-          enterBtn.className = "flex-1 bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg";
-        }
+        infoBox.innerHTML = `
+          <div class="font-bold text-rose-300 flex items-center justify-between">
+            <span>다음 도전: 제 ${nextFloor}층 ${isBoss ? "🔥[5층 단위 수호 보스]" : ""}</span>
+            <span class="font-mono text-amber-300">+${estExp} EXP / +${estGold} G</span>
+          </div>
+          <p class="text-[11px] text-slate-400">출제 난이도: <strong class="text-slate-200">${tierLabel}</strong> (무한 등반 확장)</p>
+        `;
+        enterBtn.disabled = false;
+        enterBtn.textContent = `제 ${nextFloor}층 도전하기! ⚔️`;
+        enterBtn.className = "flex-1 bg-gradient-to-r from-rose-600 to-amber-500 hover:brightness-110 text-slate-950 font-black py-2.5 rounded-xl text-xs shadow-lg";
 
         document.getElementById("modal-tower").classList.remove("hidden");
       },
@@ -4220,12 +4213,11 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
           this.showToast("체력이 모두 소진되었습니다! 물약을 먼저 복용하세요.", "error");
           return;
         }
-        const curFloor = Math.min(50, Math.max(0, Number(this.state.towerFloor) || 0));
-        if (curFloor >= 50) return;
-
+        const curFloor = Math.max(0, Number(this.state.towerFloor) || 0);
         const targetFloor = curFloor + 1;
         const isBoss = targetFloor % 5 === 0;
-        const tier = targetFloor <= 20 ? 2 : (targetFloor <= 39 ? 3 : 4);
+        
+        const tier = targetFloor <= 20 ? 2 : (targetFloor <= 40 ? 3 : 4);
         const visualUnitId = ((targetFloor - 1) % 5) + 1;
 
         this.closeModal("modal-tower");
@@ -4241,9 +4233,8 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
         this.state.battleBuffs = { atkBoost: false, defBoost: false, fullGauge: false, reviveFeather: false, sealHourglass: false };
         this.saveToLocalStorage();
 
-        // 층수에 비례해 강해지는 수호 몬스터 생성
-        const monHp = Math.round((450 + targetFloor * 145) * (isBoss ? 1.45 : 1.0));
-        const monAtk = Math.round((65 + targetFloor * 4.2) * (isBoss ? 1.2 : 1.0));
+        const monHp = Math.round((450 + targetFloor * 165 * (targetFloor > 50 ? 1.3 : 1.0)) * (isBoss ? 1.5 : 1.0));
+        const monAtk = Math.round((65 + targetFloor * 4.8 * (targetFloor > 50 ? 1.25 : 1.0)) * (isBoss ? 1.25 : 1.0));
 
         this.wavePotionCount = 0;
         this.currentBattle = {
@@ -4257,8 +4248,8 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
             name: `${isBoss ? "👑 [수호보스] " : ""}제 ${targetFloor}층 심연 수호자`,
             hp: monHp,
             atk: monAtk,
-            exp: 40 + targetFloor * 12,
-            gold: 30 + targetFloor * 8,
+            exp: 45 + targetFloor * 14,
+            gold: 35 + targetFloor * 9,
             dropMin: 1,
             dropMax: 2
           }],
@@ -4276,7 +4267,7 @@ const tierClearName = { 1: "하급 마물림", 2: "정예 유적", 3: "보스 �
         document.getElementById("view-battle").classList.remove("hidden");
 
         document.getElementById("battle-dungeon-badge").textContent = `무한의 탑 ${targetFloor}층`;
-        document.getElementById("battle-tier-badge").textContent = isBoss ? "🔥 5층 보스전" : `T${tier} 수직 도전`;
+        document.getElementById("battle-tier-badge").textContent = isBoss ? "🔥 5층 단위 보스전" : `T${tier} 무한 수직 도전`;
         document.getElementById("battle-potion-count").textContent = `${this.getTotalPotionCount()} / ${this.state.maxPotionCapacity}`;
         document.getElementById("arena-player-atk").textContent = Math.round(this.state.atk);
         document.getElementById("arena-player-def").textContent = Math.round(this.state.def);
@@ -7181,7 +7172,11 @@ updateHeaderUI() {
        const towerFloor = Number(this.state.towerFloor) || 0;
         const towerBadge = document.getElementById("lobby-tower-badge");
         if (towerBadge) {
-          towerBadge.textContent = this.state.level >= 50 ? `${towerFloor}/50층` : "Lv.50↑";
+          if (this.state.level >= 50) {
+            towerBadge.textContent = towerFloor === 0 ? "도전 전" : `${towerFloor}층 돌파`;
+          } else {
+            towerBadge.textContent = "Lv.50↑";
+          }
         }
 
        const promoRank = Number(this.state.promotionRank) || 0;
