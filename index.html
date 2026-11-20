@@ -303,8 +303,8 @@
           </div>
 
           <div class="relative flex items-center justify-center">
-            <!-- 수호 정령(펫) 스프라이트: 수치 텍스트를 가리지 않도록 우측 어깨 옆(살짝 아래/바깥)으로 재배치 및 적정 크기(w-14 sm:w-16) 조정 -->
-            <div id="battle-pet-sprite" class="absolute top-2 -right-12 sm:-right-14 w-14 h-14 sm:w-16 sm:h-16 pointer-events-none anim-pet-idle hidden z-20"></div>
+            <!-- 수호 정령(펫) 스프라이트 -->
+            <div id="battle-pet-sprite" class="absolute top-1 -right-14 sm:-right-16 w-16 h-16 sm:w-20 sm:h-20 pointer-events-none anim-pet-idle hidden z-20"></div>
 
             <!-- 플레이어 아바타 -->
             <div id="battle-player-sprite" class="w-24 h-24 sm:w-28 sm:h-28 flex items-center justify-center anim-idle transition"></div>
@@ -2109,18 +2109,18 @@ const MonsterSvgRenderer = {
         
         let evoAura = "";
         if (tier === 5) {
-          evoAura = `<circle cx="50" cy="50" r="46" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="10,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="39" fill="none" stroke="#f43f5e" stroke-width="2.5" class="anim-aura-spin-reverse"/><polygon points="38,8 44,0 50,6 56,0 62,8" fill="#fde047" stroke="#f59e0b" stroke-width="1"/>`;
+          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="12,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="36" fill="none" stroke="#f43f5e" stroke-width="3" class="anim-aura-spin-reverse"/><polygon points="36,12 43,2 50,9 57,2 64,12" fill="#fde047" stroke="#b45309" stroke-width="1.5"/>`;
         } else if (tier === 4) {
-          evoAura = `<circle cx="50" cy="50" r="45" fill="none" stroke="#c084fc" stroke-width="3" stroke-dasharray="8,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="38" fill="none" stroke="#e879f9" stroke-width="2" class="anim-aura-spin-reverse"/>`;
+          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(192,132,252,0.14)" stroke="#c084fc" stroke-width="4" stroke-dasharray="10,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#f0abfc" stroke-width="2.5" class="anim-aura-spin-reverse"/>`;
         } else if (tier === 3) {
-          evoAura = `<circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="8,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="37" fill="none" stroke="#bae6fd" stroke-width="1.5"/>`;
+          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(56,189,248,0.14)" stroke="#38bdf8" stroke-width="4" stroke-dasharray="10,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#e0f2fe" stroke-width="2"/>`;
         } else if (tier === 2) {
-          evoAura = `<circle cx="50" cy="50" r="44" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="6,5" class="anim-aura-spin"/><circle cx="50" cy="50" r="39" fill="none" stroke="#38bdf8" stroke-width="1.5"/>`;
+          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(250,204,21,0.14)" stroke="#fde047" stroke-width="3.5" stroke-dasharray="8,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#38bdf8" stroke-width="2"/>`;
         }
 
         if (petId === "squirrel") {
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #f59e0b)">
+            <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible filter drop-shadow(0 0 ${tier * 3}px #f59e0b)">
               ${evoAura}
               <circle cx="30" cy="50" r="${18 + tier * 1}" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
               <ellipse cx="62" cy="62" rx="${18 + tier * 1}" ry="${20 + tier * 1}" fill="#b45309" stroke="#fbbf24" stroke-width="2.5"/>
