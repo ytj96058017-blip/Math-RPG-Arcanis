@@ -2109,13 +2109,13 @@ const MonsterSvgRenderer = {
         
         let evoAura = "";
         if (tier === 5) {
-          evoAura = `<circle cx="50" cy="50" r="46" fill="none" stroke="#fbbf24" stroke-width="3" stroke-dasharray="10,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="40" fill="none" stroke="#f43f5e" stroke-width="2" class="anim-aura-spin-reverse"/><polygon points="40,6 50,0 60,6" fill="#fde047"/>`;
+          evoAura = `<circle cx="50" cy="50" r="46" fill="none" stroke="#fbbf24" stroke-width="3.5" stroke-dasharray="10,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="39" fill="none" stroke="#f43f5e" stroke-width="2.5" class="anim-aura-spin-reverse"/><polygon points="38,8 44,0 50,6 56,0 62,8" fill="#fde047" stroke="#f59e0b" stroke-width="1"/>`;
         } else if (tier === 4) {
-          evoAura = `<circle cx="50" cy="50" r="45" fill="none" stroke="#a855f7" stroke-width="2.5" stroke-dasharray="8,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="38" fill="none" stroke="#c084fc" stroke-width="1.5"/>`;
+          evoAura = `<circle cx="50" cy="50" r="45" fill="none" stroke="#c084fc" stroke-width="3" stroke-dasharray="8,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="38" fill="none" stroke="#e879f9" stroke-width="2" class="anim-aura-spin-reverse"/>`;
         } else if (tier === 3) {
-          evoAura = `<circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="6,6" class="anim-aura-spin"/>`;
+          evoAura = `<circle cx="50" cy="50" r="44" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="8,4" class="anim-aura-spin"/><circle cx="50" cy="50" r="37" fill="none" stroke="#bae6fd" stroke-width="1.5"/>`;
         } else if (tier === 2) {
-          evoAura = `<circle cx="50" cy="50" r="42" fill="none" stroke="#34d399" stroke-width="1.5"/>`;
+          evoAura = `<circle cx="50" cy="50" r="44" fill="none" stroke="#fde047" stroke-width="2.5" stroke-dasharray="6,5" class="anim-aura-spin"/><circle cx="50" cy="50" r="39" fill="none" stroke="#38bdf8" stroke-width="1.5"/>`;
         }
 
         if (petId === "squirrel") {
@@ -3971,9 +3971,11 @@ recordWrongAnswer(battle) {
         const activePetId = this.state.activePet;
         const activePetStage = this.getPetStage(activePetId);
 
+        const petTierIdx = Math.min(5, Math.floor((activePetStage - 1) / 10));
         let goldMultiplier = 1.0;
         if (activePetId === "squirrel") {
-          goldMultiplier += activePetStage === 3 ? 0.60 : (activePetStage === 2 ? 0.45 : 0.30);
+          const squirrelRates = [0.30, 0.38, 0.46, 0.54, 0.65, 0.80];
+          goldMultiplier += squirrelRates[petTierIdx];
         }
         if (this.state.equippedWeapon === "rapier") goldMultiplier += 0.25;
         if (this.state.weaponEnchant === "greed") goldMultiplier += 0.20;
@@ -3981,7 +3983,8 @@ recordWrongAnswer(battle) {
 
         let expMultiplier = promoRank >= 1 ? 1.25 : 1.0; // 1차 승급 패시브: 경험치 +25%
         if (activePetId === "owl") {
-          expMultiplier += activePetStage === 3 ? 0.40 : (activePetStage === 2 ? 0.30 : 0.20);
+          const owlRates = [0.20, 0.25, 0.30, 0.36, 0.43, 0.50];
+          expMultiplier += owlRates[petTierIdx];
         }
 
         // 동반 중인 펫 경험치 적립 (10단위 승급 구간인 Lv.9, 19, 29, 39, 49에서는 재화 승급 전까지 경험치 잠금)
