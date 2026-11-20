@@ -2109,13 +2109,13 @@ const MonsterSvgRenderer = {
         
         let evoAura = "";
         if (tier === 5) {
-          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="12,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="36" fill="none" stroke="#f43f5e" stroke-width="3" class="anim-aura-spin-reverse"/><polygon points="36,12 43,2 50,9 57,2 64,12" fill="#fde047" stroke="#b45309" stroke-width="1.5"/>`;
+          evoAura = `<circle cx="50" cy="52" r="44" fill="rgba(251,191,36,0.22)" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="12,4"/><circle cx="50" cy="52" r="37" fill="none" stroke="#f43f5e" stroke-width="3"/><polygon points="35,14 43,2 50,10 57,2 65,14" fill="#fde047" stroke="#b45309" stroke-width="1.5"/>`;
         } else if (tier === 4) {
-          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(192,132,252,0.14)" stroke="#c084fc" stroke-width="4" stroke-dasharray="10,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#f0abfc" stroke-width="2.5" class="anim-aura-spin-reverse"/>`;
+          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(192,132,252,0.2)" stroke="#c084fc" stroke-width="4" stroke-dasharray="10,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#f0abfc" stroke-width="2.5"/><polygon points="40,14 50,4 60,14" fill="#e879f9"/>`;
         } else if (tier === 3) {
-          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(56,189,248,0.14)" stroke="#38bdf8" stroke-width="4" stroke-dasharray="10,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#e0f2fe" stroke-width="2"/>`;
+          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="4" stroke-dasharray="10,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#e0f2fe" stroke-width="2"/>`;
         } else if (tier === 2) {
-          evoAura = `<circle cx="50" cy="52" r="42" fill="rgba(250,204,21,0.14)" stroke="#fde047" stroke-width="3.5" stroke-dasharray="8,5" class="anim-aura-spin"/><circle cx="50" cy="52" r="35" fill="none" stroke="#38bdf8" stroke-width="2"/>`;
+          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(250,204,21,0.2)" stroke="#fde047" stroke-width="3.5" stroke-dasharray="8,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#38bdf8" stroke-width="2"/>`;
         }
 
         if (petId === "squirrel") {
@@ -3096,9 +3096,11 @@ sanitizeArmoryState() {
         // 3차 초월 대현자 승급 완료 시 최종 공격력/방어력 +15% 영구 증폭
         const promoMult = (Number(this.state.promotionRank) || 0) >= 3 ? 1.15 : 1.0;
 
-        // 불사조(phoenix) 2·3단계 동반 시 공격력 추가 보너스
-        const phoenixStage = this.state.activePet === "phoenix" ? this.getPetStage("phoenix") : 0;
-        const petAtkMult = phoenixStage === 3 ? 1.12 : (phoenixStage === 2 ? 1.05 : 1.0);
+        // 불사조(phoenix) 레벨 구간별 공격력 추가 보너스
+        const phoenixLv = this.state.activePet === "phoenix" ? this.getPetStage("phoenix") : 0;
+        const phoenixTierIdx = phoenixLv > 0 ? Math.min(5, Math.floor(phoenixLv / 10)) : 0;
+        const phoenixAtkBonus = [0, 0.03, 0.06, 0.09, 0.12, 0.16];
+        const petAtkMult = phoenixLv > 0 ? (1 + phoenixAtkBonus[phoenixTierIdx]) : 1.0;
 
         // 슈트 마법부여 [생명의 룬]: 최대 HP +15%, [단단함의 룬]: 기본 DEF +5
         const suitHpMult = this.state.suitEnchant === "vitality" ? 1.15 : 1.0;
@@ -3971,7 +3973,7 @@ recordWrongAnswer(battle) {
         const activePetId = this.state.activePet;
         const activePetStage = this.getPetStage(activePetId);
 
-        const petTierIdx = Math.min(5, Math.floor((activePetStage - 1) / 10));
+        const petTierIdx = Math.min(5, Math.floor(activePetStage / 10));
         let goldMultiplier = 1.0;
         if (activePetId === "squirrel") {
           const squirrelRates = [0.30, 0.38, 0.46, 0.54, 0.65, 0.80];
@@ -5779,7 +5781,7 @@ updateArmoryPreview() {
           const isOwned = owned.includes(p.id);
           const isEquipped = this.state.activePet === p.id;
           const petLv = this.getPetStage(p.id);
-          const tierIdx = Math.min(5, Math.floor((petLv - 1) / 10));
+          const tierIdx = Math.min(5, Math.floor(petLv / 10));
 
           const curTitle = p.titles[tierIdx];
           const curDesc = p.descs[tierIdx];
