@@ -2103,94 +2103,96 @@ const MonsterSvgRenderer = {
         `;
       },
 
-     renderPet(petId, level = 1) {
+   renderPet(petId, level = 1) {
         if (!petId) return "";
-        const tier = Math.min(5, Math.floor((level - 1) / 10) + 1); // 1~5단계 (10레벨 단위)
-        
-        let evoAura = "";
-        if (tier === 5) {
-          evoAura = `<circle cx="50" cy="52" r="44" fill="rgba(251,191,36,0.22)" stroke="#fbbf24" stroke-width="4.5" stroke-dasharray="12,4"/><circle cx="50" cy="52" r="37" fill="none" stroke="#f43f5e" stroke-width="3"/><polygon points="35,14 43,2 50,10 57,2 65,14" fill="#fde047" stroke="#b45309" stroke-width="1.5"/>`;
-        } else if (tier === 4) {
-          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(192,132,252,0.2)" stroke="#c084fc" stroke-width="4" stroke-dasharray="10,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#f0abfc" stroke-width="2.5"/><polygon points="40,14 50,4 60,14" fill="#e879f9"/>`;
-        } else if (tier === 3) {
-          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(56,189,248,0.2)" stroke="#38bdf8" stroke-width="4" stroke-dasharray="10,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#e0f2fe" stroke-width="2"/>`;
-        } else if (tier === 2) {
-          evoAura = `<circle cx="50" cy="52" r="43" fill="rgba(250,204,21,0.2)" stroke="#fde047" stroke-width="3.5" stroke-dasharray="8,4"/><circle cx="50" cy="52" r="36" fill="none" stroke="#38bdf8" stroke-width="2"/>`;
-        }
+        const step = Math.min(5, Math.floor(Math.max(1, level) / 10) + 1); // 1(Lv.1~9) ~ 5(Lv.40~50)
 
         if (petId === "squirrel") {
+          const gearMark = step >= 2 ? `<circle cx="28" cy="48" r="${3 + step}" fill="#fef08a" stroke="#b45309" stroke-width="1.5"/>` : "";
+          const crownStar = step >= 4 ? `<polygon points="62,14 64,19 69,19 65,22 66,27 62,24 58,27 59,22 55,19 60,19" fill="#fde047"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full overflow-visible filter drop-shadow(0 0 ${tier * 3}px #f59e0b)">
-              ${evoAura}
-              <circle cx="30" cy="50" r="${18 + tier * 1}" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
-              <ellipse cx="62" cy="62" rx="${18 + tier * 1}" ry="${20 + tier * 1}" fill="#b45309" stroke="#fbbf24" stroke-width="2.5"/>
-              <ellipse cx="62" cy="65" rx="12" ry="14" fill="#fef3c7"/>
-              <circle cx="62" cy="38" r="${15 + tier * 1}" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
-              <circle cx="48" cy="22" r="6" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
-              <circle cx="76" cy="22" r="6" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
-              <circle cx="55" cy="36" r="3" fill="#1e1b4b"/>
-              <circle cx="69" cy="36" r="3" fill="#1e1b4b"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2}px #f59e0b)">
+              ${crownStar}
+              <circle cx="28" cy="50" r="${17 + step * 1.2}" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
+              ${gearMark}
+              <ellipse cx="62" cy="63" rx="${17 + step * 1.2}" ry="${19 + step * 1.2}" fill="#b45309" stroke="#fbbf24" stroke-width="2.5"/>
+              <ellipse cx="62" cy="66" rx="${11 + step * 0.5}" ry="${13 + step * 0.5}" fill="#fef3c7"/>
+              <circle cx="62" cy="39" r="${14 + step * 1}" fill="#d97706" stroke="#fbbf24" stroke-width="2.5"/>
+              <circle cx="${50 - step * 0.5}" cy="${23 - step * 0.8}" r="${5.5 + step * 0.5}" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
+              <circle cx="${74 + step * 0.5}" cy="${23 - step * 0.8}" r="${5.5 + step * 0.5}" fill="#b45309" stroke="#fbbf24" stroke-width="2"/>
+              <circle cx="55" cy="37" r="3" fill="#1e1b4b"/>
+              <circle cx="69" cy="37" r="3" fill="#1e1b4b"/>
             </svg>
           `;
         } else if (petId === "bird") {
+          const wingSpread = step * 2.2;
+          const crest = step >= 3 ? `<path d="M46 25 L50 ${14 - step} L54 25 Z" fill="#fef08a"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #38bdf8)">
-              ${evoAura}
-              <ellipse cx="26" cy="54" rx="${12 + tier}" ry="${8 + tier}" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
-              <ellipse cx="74" cy="54" rx="${12 + tier}" ry="${8 + tier}" fill="#0284c7" stroke="#bae6fd" stroke-width="2"/>
-              <circle cx="50" cy="52" r="${22 + tier * 1}" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2}px #38bdf8)">
+              <ellipse cx="${26 - wingSpread * 0.6}" cy="54" rx="${11 + wingSpread}" ry="${7 + step * 1.2}" fill="#0284c7" stroke="#bae6fd" stroke-width="2.2"/>
+              <ellipse cx="${74 + wingSpread * 0.6}" cy="54" rx="${11 + wingSpread}" ry="${7 + step * 1.2}" fill="#0284c7" stroke="#bae6fd" stroke-width="2.2"/>
+              <circle cx="50" cy="52" r="${21 + step * 1}" fill="#38bdf8" stroke="#ffffff" stroke-width="2.5"/>
               <ellipse cx="50" cy="60" rx="14" ry="12" fill="#f0f9ff"/>
-              <path d="M44 24 L50 10 L56 24" fill="#facc15" stroke="#eab308" stroke-width="2"/>
+              ${crest}
+              <path d="M44 26 L50 13 L56 26" fill="#facc15" stroke="#eab308" stroke-width="2"/>
               <circle cx="41" cy="46" r="3" fill="#0f172a"/>
               <circle cx="59" cy="46" r="3" fill="#0f172a"/>
             </svg>
           `;
         } else if (petId === "fox") {
+          const earTip = step >= 2 ? `<polygon points="40,32 34,${15 - step * 1.5} 45,24" fill="#e879f9"/><polygon points="72,32 78,${15 - step * 1.5} 67,24" fill="#e879f9"/>` : "";
+          const gem = step >= 4 ? `<circle cx="56" cy="31" r="3.5" fill="#38bdf8"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #c084fc)">
-              ${evoAura}
-              <path d="M26 68 C12 60 14 36 30 32 C38 42 42 56 40 68 Z" fill="#9333ea" stroke="#f3e8ff" stroke-width="2.5"/>
-              <ellipse cx="56" cy="64" rx="${17 + tier}" ry="${18 + tier}" fill="#7e22ce" stroke="#e9d5ff" stroke-width="2.5"/>
-              <polygon points="40,32 28,${8 - tier * 2} 50,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
-              <polygon points="72,32 84,${8 - tier * 2} 62,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2}px #c084fc)">
+              <path d="M26 68 C${12 - step * 2} 58 ${14 - step * 1.5} 34 30 30 C38 42 42 56 40 68 Z" fill="#9333ea" stroke="#f3e8ff" stroke-width="2.5"/>
+              <ellipse cx="56" cy="64" rx="${16 + step * 1}" ry="${17 + step * 1}" fill="#7e22ce" stroke="#e9d5ff" stroke-width="2.5"/>
+              <polygon points="40,32 28,${10 - step * 1.5} 50,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
+              <polygon points="72,32 84,${10 - step * 1.5} 62,22" fill="#6b21a8" stroke="#e9d5ff" stroke-width="2"/>
+              ${earTip}
               <ellipse cx="56" cy="42" rx="19" ry="16" fill="#faf5ff" stroke="#a855f7" stroke-width="2.5"/>
+              ${gem}
               <circle cx="46" cy="41" r="3.5" fill="#581c87"/>
               <circle cx="66" cy="41" r="3.5" fill="#581c87"/>
             </svg>
           `;
         } else if (petId === "butterfly") {
+          const wSpan = step * 2.5;
+          const wingSpot = step >= 3 ? `<circle cx="${30 - wSpan * 0.5}" cy="40" r="3.5" fill="#fef08a"/><circle cx="${70 + wSpan * 0.5}" cy="40" r="3.5" fill="#fef08a"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #f43f5e)">
-              ${evoAura}
-              <path d="M48 48 C${34 - tier * 2} 24 10 26 12 46 C14 60 36 64 48 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2"/>
-              <path d="M52 48 C${66 + tier * 2} 24 90 26 88 46 C86 60 64 64 52 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2"/>
-              <ellipse cx="50" cy="52" rx="6" ry="${13 + tier}" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2}px #f43f5e)">
+              <path d="M48 48 C${34 - wSpan} 22 ${10 - wSpan * 0.6} 26 ${12 - wSpan * 0.5} 46 C14 60 36 64 48 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2.2"/>
+              <path d="M52 48 C${66 + wSpan} 22 ${90 + wSpan * 0.6} 26 ${88 + wSpan * 0.5} 46 C86 60 64 64 52 54 Z" fill="#fb7185" stroke="#ffe4e6" stroke-width="2.2"/>
+              ${wingSpot}
+              <ellipse cx="50" cy="52" rx="6" ry="${12 + step}" fill="#1e1b4b" stroke="#f43f5e" stroke-width="2"/>
               <circle cx="50" cy="38" r="5" fill="#fbcfe8"/>
             </svg>
           `;
         } else if (petId === "owl") {
+          const starBadge = step >= 3 ? `<circle cx="50" cy="62" r="4" fill="#fbbf24"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #818cf8)">
-              ${evoAura}
-              <ellipse cx="50" cy="56" rx="${22 + tier}" ry="${24 + tier}" fill="#312e81" stroke="#a5b4fc" stroke-width="2.5"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2}px #818cf8)">
+              <ellipse cx="50" cy="56" rx="${21 + step * 1}" ry="${23 + step * 1}" fill="#312e81" stroke="#a5b4fc" stroke-width="2.5"/>
               <ellipse cx="50" cy="62" rx="15" ry="16" fill="#e0e7ff"/>
-              <polygon points="28,34 20,${16 - tier} 38,26" fill="#4338ca" stroke="#c7d2fe" stroke-width="2"/>
-              <polygon points="72,34 80,${16 - tier} 62,26" fill="#4338ca" stroke="#c7d2fe" stroke-width="2"/>
-              <circle cx="40" cy="44" r="7" fill="#fef08a" stroke="#f59e0b" stroke-width="2"/>
-              <circle cx="60" cy="44" r="7" fill="#fef08a" stroke="#f59e0b" stroke-width="2"/>
+              ${starBadge}
+              <polygon points="28,34 20,${18 - step * 1.5} 38,26" fill="#4338ca" stroke="#c7d2fe" stroke-width="2"/>
+              <polygon points="72,34 80,${18 - step * 1.5} 62,26" fill="#4338ca" stroke="#c7d2fe" stroke-width="2"/>
+              <circle cx="40" cy="44" r="${6.5 + step * 0.4}" fill="#fef08a" stroke="#f59e0b" stroke-width="2"/>
+              <circle cx="60" cy="44" r="${6.5 + step * 0.4}" fill="#fef08a" stroke="#f59e0b" stroke-width="2"/>
               <circle cx="40" cy="44" r="3" fill="#1e1b4b"/>
               <circle cx="60" cy="44" r="3" fill="#1e1b4b"/>
             </svg>
           `;
         } else if (petId === "phoenix") {
+          const fSpan = step * 2.5;
+          const tailFlame = step >= 3 ? `<path d="M44 74 L50 ${88 + step * 2} L56 74 Z" fill="#fbbf24"/>` : "";
           return `
-            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${tier * 3}px #f97316)">
-              ${evoAura}
-              <path d="M10 52 Q26 22 46 48 Q28 66 10 52 Z" fill="#ea580c" stroke="#fde047" stroke-width="2"/>
-              <path d="M90 52 Q74 22 54 48 Q72 66 90 52 Z" fill="#ea580c" stroke="#fde047" stroke-width="2"/>
-              <ellipse cx="50" cy="56" rx="${15 + tier}" ry="${19 + tier}" fill="#dc2626" stroke="#fbbf24" stroke-width="2.5"/>
-              <circle cx="50" cy="36" r="${11 + tier}" fill="#ef4444" stroke="#fde047" stroke-width="2"/>
-              <path d="M44 20 L50 ${4 - tier * 2} L56 20" fill="#facc15" stroke="#fef08a" stroke-width="1.5"/>
+            <svg viewBox="0 0 100 100" class="w-full h-full filter drop-shadow(0 0 ${step * 2.5}px #f97316)">
+              ${tailFlame}
+              <path d="M${12 - fSpan * 0.5} 52 Q26 22 46 48 Q28 66 ${12 - fSpan * 0.5} 52 Z" fill="#ea580c" stroke="#fde047" stroke-width="2.2"/>
+              <path d="M${88 + fSpan * 0.5} 52 Q74 22 54 48 Q72 66 ${88 + fSpan * 0.5} 52 Z" fill="#ea580c" stroke="#fde047" stroke-width="2.2"/>
+              <ellipse cx="50" cy="56" rx="${14 + step * 0.8}" ry="${18 + step * 0.8}" fill="#dc2626" stroke="#fbbf24" stroke-width="2.5"/>
+              <circle cx="50" cy="36" r="${10 + step * 0.8}" fill="#ef4444" stroke="#fde047" stroke-width="2"/>
+              <path d="M44 20 L50 ${6 - step * 1.8} L56 20" fill="#facc15" stroke="#fef08a" stroke-width="1.5"/>
               <circle cx="45" cy="35" r="2.5" fill="#fef08a"/>
               <circle cx="55" cy="35" r="2.5" fill="#fef08a"/>
             </svg>
