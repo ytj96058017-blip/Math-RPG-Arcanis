@@ -807,8 +807,8 @@
             <div class="bg-slate-900 border border-slate-800 p-2.5 rounded-xl flex flex-col justify-between">
               <div>
                 <div class="flex justify-between font-bold text-slate-200 mb-1">
-                  <span>하급 생명수</span>
-                  <span class="text-rose-400">+20% HP</span>
+                 <span>하급 생명수</span>
+                  <span class="text-rose-400">고정 +120 회복</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mb-2">가볍게 목을 축이는 기초 회복수</p>
               </div>
@@ -822,7 +822,7 @@
               <div>
                 <div class="flex justify-between font-bold text-indigo-300 mb-1">
                   <span>상급 마나 영약</span>
-                  <span class="text-indigo-400">+45% HP</span>
+                  <span class="text-indigo-400">고정 +350 회복</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mb-2">마도사들이 애용하는 표준 영약</p>
               </div>
@@ -836,7 +836,7 @@
               <div>
                 <div class="flex justify-between font-bold text-amber-300 mb-1">
                   <span>기원의 엘릭서</span>
-                  <span class="text-emerald-400">+75% HP</span>
+                  <span class="text-emerald-400">고정 +900 회복</span>
                 </div>
                 <p class="text-[10px] text-slate-400 mb-2">죽음의 문턱에서 부활하는 비약</p>
               </div>
@@ -3100,13 +3100,13 @@ sanitizeArmoryState() {
         const phoenixStage = this.state.activePet === "phoenix" ? this.getPetStage("phoenix") : 0;
         const petAtkMult = phoenixStage === 3 ? 1.12 : (phoenixStage === 2 ? 1.05 : 1.0);
 
-        // 슈트 마법부여 [생명의 룬]: 최대 HP +15%
+        // 슈트 마법부여 [생명의 룬]: 최대 HP +15%, [단단함의 룬]: 기본 DEF +5
         const suitHpMult = this.state.suitEnchant === "vitality" ? 1.15 : 1.0;
+        const sturdyDefBonus = this.state.suitEnchant === "sturdy" ? 5 : 0;
 
         this.state.atk = Math.round(baseAtk * finalAtkMult * promoMult * petAtkMult);
-        this.state.def = Math.round((baseDef + (suitDef.defBonus || 0)) * promoMult);
+        this.state.def = Math.round((baseDef + (suitDef.defBonus || 0) + sturdyDefBonus) * promoMult);
         this.state.maxHp = Math.round((baseMaxHp + (suitDef.hpBonus || 0)) * suitHpMult);
-
         if (this.state.hp === undefined || this.state.hp === null) {
           this.state.hp = this.state.maxHp;
         }
@@ -3428,6 +3428,10 @@ startBattle(unitId, tier) {
 
         this.wavePotionCount = 0;
         b.turnCount = 0;
+        b.absorbShield = this.state.suitEnchant === "absorbShield" ? Math.round(this.state.maxHp * 0.10) : 0;
+        if (b.absorbShield > 0) {
+          this.showToast(`🛡️ [결계의 룬] 마력 보호막(${b.absorbShield})이 생성되었습니다!`, "info");
+        }
 
         // [밸런스] Tier 4 및 무한의 탑은 플레이어 레벨(Lv.60 초과분)에 비례해 완만하게 강해짐
         const overLv = Math.max(0, (this.state.level || 1) - 60);
@@ -3589,12 +3593,16 @@ startBattle(unitId, tier) {
           const foxCritChance = foxStage === 3 ? 0.35 : (foxStage === 2 ? 0.30 : 0.25);
           const foxCritMult = foxStage === 3 ? 2.0 : (foxStage === 2 ? 1.8 : 1.6);
 
-          if (this.state.equippedWeapon === "rapier" && Math.random() < 0.40) {
+          const bonusCritRate = this.state.weaponEnchant === "critRate" ? 0.15 : 0;
+          if (this.state.equippedWeapon === "rapier" && Math.random() < (0.40 + bonusCritRate)) {
             isCrit = true;
             critMultiplier = 2.0;
-          } else if (foxStage > 0 && Math.random() < foxCritChance) {
+          } else if (foxStage > 0 && Math.random() < (foxCritChance + bonusCritRate)) {
             isCrit = true;
             critMultiplier = foxCritMult;
+          } else if (bonusCritRate > 0 && Math.random() < bonusCritRate) {
+            isCrit = true;
+            critMultiplier = 1.6;
           }
 
           if (isCrit) SoundManager.playCrit();
@@ -3619,7 +3627,13 @@ startBattle(unitId, tier) {
            const buffAtkMult = (b.buffs && b.buffs.atkBoost) ? 1.25 : 1.0;
             const critEnchantMult = (isCrit && this.state.weaponEnchant === "critDmg") ? 1.30 : 1.0;
             const bossEnchantMult = ((b.wave === 3 || b.isTower) && this.state.weaponEnchant === "bossSlayer") ? 1.20 : 1.0;
-            let dmg = Math.max(5, Math.round(this.state.atk * critMultiplier * buffAtkMult * critEnchantMult * bossEnchantMult));
+            const godWeaponMult = this.state.weaponEnchant === "godWeapon" ? 1.40 : 1.0;
+            const focusMult = (this.state.weaponEnchant === "focusEnchant" && b.combo >= 2) ? (1 + Math.min(0.30, b.combo * 0.05)) : 1.0;
+            let dmg = Math.max(5, Math.round(this.state.atk * critMultiplier * buffAtkMult * critEnchantMult * bossEnchantMult * godWeaponMult * focusMult));
+            if (this.state.weaponEnchant === "godWeapon" && Math.random() < 0.30) {
+              dmg += Math.round(this.state.atk * 0.50);
+              this.showToast("🌟 [천공의 파괴신] 광역 뇌전 추가 타격!", "success");
+            }
             let shieldTag = "";
             if (b.monster.hasShield) {
               dmg = Math.max(1, Math.round(dmg * 0.25)); // 보호막 활성 시 피해 75% 감소
@@ -3834,11 +3848,24 @@ recordWrongAnswer(battle) {
             singleDmg = Math.max(1, Math.round(singleDmg * 0.88));
           }
 
+          if (this.state.suitEnchant === "godSuit") {
+            singleDmg = Math.max(1, Math.round(singleDmg * 0.75));
+          }
+
           if (b.buffs && b.buffs.defBoost) {
             singleDmg = Math.max(1, Math.round(singleDmg * 0.75));
           }
 
-          const totalDmg = singleDmg * hitCount;
+          let totalDmg = singleDmg * hitCount;
+
+          // [결계의 룬] 마력 보호막 우선 차감
+          if (b.absorbShield > 0 && totalDmg > 0) {
+            const absorbed = Math.min(b.absorbShield, totalDmg);
+            b.absorbShield -= absorbed;
+            totalDmg -= absorbed;
+            this.showToast(`🛡️ 결계 보호막이 피해 ${absorbed} 흡수!`, "info");
+          }
+
           this.state.hp = Math.max(0, this.state.hp - totalDmg);
 
           // 슈트 마법부여 [반사의 룬]: 받은 피해의 25% 반사
@@ -3849,8 +3876,13 @@ recordWrongAnswer(battle) {
             this.updateBattleStageHpUI();
           }
 
-          // 불사조(phoenix) 펫 부활 우선 발동, 이후 불사조의 깃털 결계석 발동
-          if (this.state.hp <= 0 && this.state.activePet === "phoenix" && !b.phoenixRevived) {
+          // [불사조의 혼 룬] 치명적 피해 시 체력 1로 생존 (전투당 1회)
+          if (this.state.hp <= 0 && this.state.suitEnchant === "phoenixSoul" && !b.phoenixSoulUsed) {
+            b.phoenixSoulUsed = true;
+            this.state.hp = 1;
+            SoundManager.playVictory();
+            this.showToast("🔥 [불사조의 혼] 가호 발동! 체력 1로 치명상을 버텨냈습니다!", "success");
+          } else if (this.state.hp <= 0 && this.state.activePet === "phoenix" && !b.phoenixRevived) {
             b.phoenixRevived = true;
             const pStage = this.getPetStage("phoenix");
             const revRate = pStage === 3 ? 0.80 : (pStage === 2 ? 0.50 : 0.30);
@@ -3862,6 +3894,12 @@ recordWrongAnswer(battle) {
             this.state.hp = Math.max(20, Math.round(this.state.maxHp * 0.50));
             SoundManager.playVictory();
             this.showToast("🪶 [불사조의 깃털]이 불타오르며 HP 50%로 부활했습니다!", "success");
+          }
+
+          // [차원의 불멸신 룬] 살아남았을 때 매 턴 최대 HP 5% 자동 재생
+          if (this.state.hp > 0 && this.state.suitEnchant === "godSuit") {
+            const godRegen = Math.max(5, Math.round(this.state.maxHp * 0.05));
+            this.state.hp = Math.min(this.state.maxHp, this.state.hp + godRegen);
           }
 
           let popupText = `-${totalDmg}`;
@@ -3955,9 +3993,11 @@ recordWrongAnswer(battle) {
             const reqExpForNext = curPetLv * 3;
 
             if (isAtTierBoundary) {
-              // 진화 구간 도달 시, 재화 승급 전까지는 요구 경험치에서 멈춤
-              if (curExp < reqExpForNext) {
-                this.state.petExp[activePetId] = curExp;
+              // 진화 구간(Lv.9, 19, 29, 39) 도달 시 요구 경험치(reqExpForNext)까지 채워야 진화 버튼 활성화
+              this.state.petExp[activePetId] = Math.min(reqExpForNext, curExp);
+              if (this.state.petExp[activePetId] >= reqExpForNext) {
+                const pName = PET_CATALOG[activePetId].name;
+                this.showToast(`✨ [${pName}] 진화 조건 달성! 성소에서 승급할 수 있습니다!`, "success");
               }
             } else {
               if (curExp >= reqExpForNext) {
